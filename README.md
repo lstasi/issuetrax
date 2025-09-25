@@ -48,6 +48,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 - **[ARCHITECTURE.md](ARCHITECTURE.md)**: Technical architecture, patterns, and implementation details
 - **[UI_UX_DESIGN.md](UI_UX_DESIGN.md)**: Detailed UI/UX specifications with gesture system design
 - **[PROJECT_SETUP.md](PROJECT_SETUP.md)**: Step-by-step development environment and project setup guide
+- **[.copilot-instructions.md](.copilot-instructions.md)**: GitHub Copilot configuration and development guidelines
 
 ### 🎯 Quick Navigation
 
@@ -57,6 +58,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 | [Architecture](ARCHITECTURE.md) | Technical implementation details | Developers, Architects |
 | [UI/UX Design](UI_UX_DESIGN.md) | Design specifications and user experience | Designers, Frontend Developers |
 | [Project Setup](PROJECT_SETUP.md) | Development environment setup | Developers, DevOps |
+| [Copilot Instructions](.copilot-instructions.md) | AI coding assistant configuration | Developers using GitHub Copilot |
 
 ## 🎨 Design Highlights
 
