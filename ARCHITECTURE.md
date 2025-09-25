@@ -46,7 +46,7 @@ class PRReviewGestureDetector(
     private val onSwipeLeft: () -> Unit,     // Previous file
     private val onSwipeUp: () -> Unit,       // Next hunk
     private val onSwipeDown: () -> Unit,     // Previous hunk
-    private val onDoubleTap: () -> Unit,     // Toggle view mode
+    private val onDoubleTap: () -> Unit,     // Toggle inline view
     private val onLongPress: (Offset) -> Unit // Comment mode
 ) {
     // Implementation details for gesture recognition
@@ -62,15 +62,15 @@ data class PRReviewUiState(
     val files: List<PRFile> = emptyList(),
     val currentFileIndex: Int = 0,
     val currentHunkIndex: Int = 0,
-    val viewMode: DiffViewMode = DiffViewMode.SIDE_BY_SIDE,
+    val viewMode: DiffViewMode = DiffViewMode.INLINE,
     val comments: Map<String, List<Comment>> = emptyMap(),
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
 enum class DiffViewMode {
-    SIDE_BY_SIDE,
-    UNIFIED
+    INLINE,
+    EXPANDED
 }
 ```
 

@@ -1,32 +1,30 @@
 # Issuetrax
 
-A Kotlin mobile application for efficient GitHub issue management and Pull Request reviews with innovative gesture-based navigation.
+A Kotlin mobile application for focused GitHub issue management and Pull Request reviews with innovative gesture-based navigation and simplified single-repository workflow.
 
 ## 🚀 Overview
 
-Issuetrax is designed to revolutionize mobile code reviews by providing a clean, gesture-driven interface that makes reviewing Pull Requests on mobile devices intuitive and efficient. The app focuses on creating the best possible PR review experience with swipe-based navigation and comprehensive GitHub integration.
+Issuetrax is designed to revolutionize mobile code reviews by providing a clean, gesture-driven interface that makes reviewing Pull Requests on mobile devices intuitive and efficient. The app operates on a **simplified workflow model**: one repository, one issue/PR at a time, with primary focus on creating the best possible PR review experience using **inline diff views optimized for mobile screens**.
 
 ## ✨ Key Features
 
+- **Simplified Workflow**: One repository, one issue/PR focus at a time
 - **Gesture-Based Navigation**: Revolutionary swipe controls for PR navigation
   - Swipe left/right: Navigate between files
   - Swipe up/down: Navigate between code hunks
-  - Double tap: Toggle diff view modes
+  - Double tap: Expand/collapse code sections
   - Long press: Quick comment mode
 
+- **Mobile-Optimized PR Reviews**: Inline diff views designed for mobile screens
 - **GitHub Integration**: Seamless OAuth authentication and full API integration
-- **Advanced PR Reviews**: Side-by-side and unified diff views with inline commenting
-- **Issue Management**: Complete issue tracking and management capabilities
 - **Source Code Browser**: Navigate repository files beyond the current PR
-- **Offline Support**: Smart caching for offline review capabilities
 - **Clean Architecture**: MVVM with Clean Architecture principles
 
 ## 📱 Screens
 
-1. **Login Screen**: Secure GitHub OAuth authentication
-2. **Repository Selection**: Browse and select GitHub repositories
-3. **Issue List**: Comprehensive issue management interface
-4. **PR Reviews**: Advanced gesture-based review interface (primary focus)
+1. **Login & Repository Selection**: Combined GitHub OAuth authentication and single repository selection
+2. **Current Work**: Display active issue/PR or provide simple creation interface
+3. **PR Reviews**: Advanced gesture-based review interface with inline diff viewing (primary focus)
 
 ## 🏗️ Architecture
 
@@ -63,7 +61,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 ## 🎨 Design Highlights
 
 ### Gesture Navigation System
-The core innovation of Issuetrax is its gesture-based navigation system:
+The core innovation of Issuetrax is its gesture-based navigation system optimized for mobile PR reviews:
 
 ```
 Horizontal Gestures:
@@ -73,16 +71,17 @@ Vertical Gestures:
 ↑ ↓ Navigate between code hunks
 
 Special Gestures:
-⚫⚫ Double tap to toggle view modes
+⚫⚫ Double tap to expand/collapse sections
 👆 Long press for quick comments
 ```
 
 ### PR Review Interface
-- **Side-by-side diff view** with syntax highlighting
-- **Unified diff view** for compact viewing
+- **Inline diff view** optimized for mobile screens
+- **Syntax highlighting** for various programming languages
 - **Inline commenting** with suggestion support
 - **Review submission** with approval workflow
 - **File tree navigation** with quick search
+- **Source code browser** for additional context
 
 ## 🛠️ Development Status
 
@@ -90,22 +89,23 @@ This repository currently contains the **definition and design phase** documenta
 
 ### Development Phases
 
-- [x] **Phase 0**: Requirements analysis and definition documents
-- [ ] **Phase 1**: Foundation and GitHub OAuth implementation
-- [ ] **Phase 2**: Core screens (Login, Repository Selection, Issues)
-- [ ] **Phase 3**: PR Review core functionality
+- [x] **Phase 0**: Requirements analysis and definition documents (simplified workflow)
+- [ ] **Phase 1**: Foundation and GitHub OAuth implementation with repository selection
+- [ ] **Phase 2**: Core screens (Auth, Current Work screen)
+- [ ] **Phase 3**: PR Review core functionality with inline diff viewer
 - [ ] **Phase 4**: Advanced gesture navigation system
-- [ ] **Phase 5**: Polish and optimization
+- [ ] **Phase 5**: Polish, optimization, and source code browser
 - [ ] **Phase 6**: APK generation and release preparation
 
 ## 🎯 Target Output
 
 The final deliverable will be an **installable APK** that provides:
 - Native Android performance
-- Gesture-optimized PR review experience
+- Simplified single-repository workflow
+- Gesture-optimized PR review experience with inline diff views
 - Offline-capable operation
 - Secure GitHub authentication
-- Comprehensive issue and PR management
+- Focused issue and PR management
 
 ## 🤝 Contributing
 
@@ -128,4 +128,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Issuetrax** - Revolutionizing mobile code reviews with gesture-based navigation. 
+**Issuetrax** - Revolutionizing mobile code reviews with simplified workflow and gesture-based navigation. 

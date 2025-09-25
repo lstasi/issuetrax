@@ -2,7 +2,7 @@
 
 ## Design Philosophy
 
-Issuetrax embraces a **gesture-first, clean interface** design philosophy that prioritizes efficiency and reduces cognitive load during code reviews. The app follows Material Design 3 principles while introducing innovative gesture-based navigation patterns specifically optimized for mobile PR reviews.
+Issuetrax embraces a **simplified, single-context workflow** design philosophy that focuses on one repository and one issue/PR at a time. The app prioritizes the PR review experience with **inline diff views optimized for mobile screens** and **gesture-based navigation** that reduces UI complexity while maximizing efficiency.
 
 ## Visual Design System
 
@@ -65,7 +65,7 @@ Code Font: JetBrains Mono 14sp/20sp (Code blocks, diffs)
 
 ## Screen Designs
 
-### 1. Login Screen
+### 1. Login & Repository Selection Screen
 
 ```
 ┌─────────────────────────────────────┐
@@ -80,158 +80,117 @@ Code Font: JetBrains Mono 14sp/20sp (Code blocks, diffs)
 │    │    🐙 Sign in with GitHub   │  │
 │    └─────────────────────────────┘  │
 │                                     │
-│    "Secure OAuth 2.0 authentication"│
+│    "Select working repository:"     │
 │                                     │
-│                                     │
+│    ┌─────────────────────────────┐  │
+│    │ 📁 user/current-project     │  │
+│    │ Active: 2 PRs • 5 issues   │  │
+│    │ [Select Repository]         │  │
+│    └─────────────────────────────┘  │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
 **Key Features**:
-- Minimalist design with focus on single action
-- GitHub branding integration
-- Security assurance messaging
-- Loading states during OAuth flow
+- Combined authentication and repository selection
+- Single-repository focus
+- Repository context preview
+- Streamlined workflow
 
-### 2. Repository Selection Screen
+### 2. Current Work Screen
 
 ```
 ┌─────────────────────────────────────┐
-│  [≡] Repositories        [👤][⚙]   │
+│  [⚙] user/repo-name        [👤][⋮]  │
 ├─────────────────────────────────────┤
-│  🔍 Search repositories...          │
+│  📂 Current Work Context            │
 ├─────────────────────────────────────┤
-│  📌 Pinned                          │
-│  ┌─────────────────────────────────┐│
-│  │ 📁 user/important-repo         ⭐││
-│  │ Last updated: 2 hours ago       ││
-│  │ 🟢 4 open PRs • 12 issues      ││
-│  └─────────────────────────────────┘│
 │                                     │
-│  📂 Your Repositories               │
+│  🔄 Active PR #42                   │
 │  ┌─────────────────────────────────┐│
-│  │ 📁 user/mobile-app             ⭐││
-│  │ Kotlin • Updated 1 day ago      ││
-│  │ 🟡 2 open PRs • 8 issues       ││
-│  └─────────────────────────────────┘│
-│  ┌─────────────────────────────────┐│
-│  │ 📁 user/web-service            ⭐││
-│  │ TypeScript • Updated 3 days ago ││
-│  │ 🔴 1 open PR • 15 issues       ││
-│  └─────────────────────────────────┘│
-└─────────────────────────────────────┘
-```
-
-**Key Features**:
-- Search functionality with instant filtering
-- Repository categorization (Pinned, Owned, Starred)
-- Visual status indicators for PRs and issues
-- Pull-to-refresh gesture support
-
-### 3. Issue List Screen
-
-```
-┌─────────────────────────────────────┐
-│  [←] user/repo-name        [🔍][⋮]  │
-├─────────────────────────────────────┤
-│  Issues (24) • PRs (8) • Code      │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
-├─────────────────────────────────────┤
-│  🔍 Filter: Open • Sort: Updated   │
-├─────────────────────────────────────┤
-│  ┌─────────────────────────────────┐│
-│  │ 🟢 #156 Feature: Add dark mode  ││
-│  │ 🏷️ enhancement 🏷️ ui/ux          ││
-│  │ @user • 2 hours ago             ││
-│  │ 💬 3  👍 5                       ││
-│  └─────────────────────────────────┘│
-│  ┌─────────────────────────────────┐│
-│  │ 🟢 #155 Bug: Login not working  ││
-│  │ 🏷️ bug 🏷️ critical              ││
-│  │ @contributor • 4 hours ago      ││
-│  │ 💬 8  👍 2                       ││
-│  └─────────────────────────────────┘│
-│  ┌─────────────────────────────────┐│
-│  │ 🟡 #154 Update documentation    ││
-│  │ 🏷️ documentation                ││
-│  │ @maintainer • 1 day ago         ││
-│  │ 💬 1  👍 1                       ││
-│  └─────────────────────────────────┘│
-└─────────────────────────────────────┘
-```
-
-**Key Features**:
-- Tab-based navigation between Issues and PRs
-- Advanced filtering and sorting options
-- Rich metadata display (labels, assignees, reactions)
-- Swipe actions for quick operations
-
-### 4. PR Reviews Screen (Primary Focus)
-
-#### PR List View
-
-```
-┌─────────────────────────────────────┐
-│  [←] Pull Requests        [🔍][⋮]   │
-├─────────────────────────────────────┤
-│  Open (8) • Closed (45) • Draft (2)│
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
-├─────────────────────────────────────┤
-│  ┌─────────────────────────────────┐│
-│  │ 🟢 #47 Add gesture navigation   ││
+│  │ "Add gesture navigation system" ││
 │  │ feature/gestures → main         ││
-│  │ @developer • 3 hours ago        ││
-│  │ ✅ All checks passed            ││
-│  │ 👀 2/3 approvals • 📝 5 comments││
+│  │ ✅ Ready for review             ││
+│  │ 👀 2/3 approvals needed         ││
 │  │ +234 -89 lines • 8 files       ││
+│  │                                 ││
+│  │    [Continue Review]            ││
 │  └─────────────────────────────────┘│
+│                                     │
+│  📝 Or create new issue:            │
 │  ┌─────────────────────────────────┐│
-│  │ 🟡 #46 Refactor API client      ││
-│  │ refactor/api → main             ││
-│  │ @senior-dev • 1 day ago         ││
-│  │ 🟠 Changes requested            ││
-│  │ 👀 1/2 approvals • 📝 12 comments│
-│  │ +89 -156 lines • 12 files      ││
+│  │ Enter issue title...            ││
 │  └─────────────────────────────────┘│
-│  ┌─────────────────────────────────┐│
-│  │ 🔴 #45 Fix critical bug         ││
-│  │ hotfix/auth → main              ││
-│  │ @contributor • 2 days ago       ││
-│  │ ❌ Tests failing                ││
-│  │ 👀 0/3 approvals • 📝 8 comments││  
-│  │ +12 -34 lines • 3 files        ││
-│  └─────────────────────────────────┘│
+│  [Create Issue]                     │
+│                                     │
 └─────────────────────────────────────┘
 ```
 
-#### PR Detail View with Gesture Navigation
+**Key Features**:
+- Single active work context
+- Direct PR review access
+- Simple issue creation
+- Focus on current task
+
+### 3. PR Review Screen (Primary Focus)
+
+The PR Review screen is the core of the application, optimized for mobile code review with gesture navigation and inline diff viewing.
+
+#### PR Overview & File Navigation
 
 ```
 ┌─────────────────────────────────────┐
 │  [←]  #47: Add gesture navigation   │
 │                              [⋮][✓] │
 ├─────────────────────────────────────┤
-│  📊 Overview • 📁 Files • 💬 Conv   │
+│  📊 Files (8) • 💬 Comments (5)     │
 │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
 ├─────────────────────────────────────┤
 │  📂 GestureDetector.kt (1/8)       │
-│  +45 -12 lines                     │
+│  +45 -12 lines • Modified          │
 ├─────────────────────────────────────┤
-│  1  │ class GestureDetector {      │
-│  2  │ +   private val threshold =  │
-│  3  │ +       100.dp              │
-│  4  │                             │
-│  5  │ -   fun detectSwipe() {     │
-│  6  │ +   fun detectSwipe(        │
-│  7  │ +       sensitivity: Float  │
-│  8  │ +   ) {                     │
-│  9  │         // Implementation  │
-│ 10  │     }                       │
+│                                     │
+│  📋 File List:                      │
+│  • GestureDetector.kt ✓            │
+│  • PRReviewScreen.kt                │
+│  • MainActivity.kt                  │
+│  • navigation/Routes.kt             │
+│  • ... (+4 more)                   │
+│                                     │
+│     [View Current File Diff]        │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+#### Inline Diff Viewer (Mobile Optimized)
+
+```
+┌─────────────────────────────────────┐
+│  📂 GestureDetector.kt (1/8)       │
+│  [Inline View] • Hunk 2/5          │
+├─────────────────────────────────────┤
+│ 15  class GestureDetector {         │
+│ 16  private val threshold = 50.dp   │ 
+│ 17 -fun detectSwipe() {             │
+│ 18 +fun detectSwipe(                │
+│ 19 +    sensitivity: Float = 1.0f   │
+│ 20 +) {                             │
+│ 21      if (dragAmount > threshold) │
+│ 22          onSwipeDetected()       │
+│ 23  }                               │
 │     │                             │
-│     │ 💬 @reviewer: "Great improv-│
-│     │ ement! Consider adding unit │
-│     │ tests for edge cases."      │
-│     │ 👍 2 • 👀 1 • ↩️ Reply       │
+│ 💬  │ @reviewer commented:         │
+│     │ "Good improvement! Consider  │
+│     │  validation for sensitivity" │
+│     │ 👍 2 • ↩️ Reply                │
+│     │                             │
+├─────────────────────────────────────┤
+│  📱 Swipe Guide:                   │
+│  ← → Next/Prev File                │
+│  ↑ ↓ Next/Prev Hunk                │
+│  👆 Long Press: Comment             │
+└─────────────────────────────────────┘
+```
 │     │                             │
 ├─────────────────────────────────────┤
 │  📱 Swipe Guide:                   │
@@ -269,29 +228,24 @@ Visual feedback during gestures:
 - Haptic feedback on action completion
 ```
 
-#### Side-by-Side Diff View
+#### Source Code Browser
 
 ```
 ┌─────────────────────────────────────┐
-│  GestureDetector.kt                 │
-│  [Unified] [Side-by-Side] • 45/8   │
-├─────────────┬───────────────────────┤
-│   Before    │        After          │
-├─────────────┼───────────────────────┤
-│ 1 │ class   │ 1 │ class             │
-│ 2 │         │ 2 │ private val       │
-│ 3 │         │ 3 │   threshold =     │
-│ 4 │         │ 4 │     100.dp        │
-│ 5 │ fun det-│ 5 │                   │
-│ 6 │   ectSw-│ 6 │ fun detectSwipe(  │
-│ 7 │   ipe() │ 7 │   sensitivity:    │
-│ 8 │ {       │ 8 │   Float           │
-│ 9 │   //    │ 9 │ ) {               │
-│10 │ }       │10 │   // Impl         │
-│   │         │11 │ }                 │
-├─────────────┴───────────────────────┤
-│  💬 Add comment on this hunk        │
-│  ✅ Approve   🟡 Request   💬 Comment│
+│  📁 Browse Repository Files         │
+├─────────────────────────────────────┤
+│  🔍 Search files...                 │
+├─────────────────────────────────────┤
+│  📂 src/main/kotlin/                │
+│  │  📄 MainActivity.kt              │
+│  │  📄 IssuetraxApplication.kt     │
+│  │  📂 presentation/                │
+│  │  │  📄 PRReviewScreen.kt 🔄     │
+│  │  │  📄 LoginScreen.kt           │
+│  │  📂 data/                       │
+│  │  │  📄 GitHubRepository.kt      │
+│  │                                 │
+│  [View Selected File]              │
 └─────────────────────────────────────┘
 ```
 
@@ -301,7 +255,7 @@ Visual feedback during gestures:
 ┌─────────────────────────────────────┐
 │  💬 Add Comment                     │
 ├─────────────────────────────────────┤
-│  📍 Line 6: detectSwipe(            │
+│  📍 Line 18: detectSwipe(           │
 │                                     │
 │  ┌─────────────────────────────────┐│
 │  │ Consider adding parameter       ││
@@ -389,7 +343,7 @@ Voice Accessibility:
 - "Swipe right to next file"
 - "Swipe left to previous file"
 - "Swipe up to next change"
-- "Double tap to toggle view"
+- "Double tap to expand hunk"
 
 Alternative Navigation:
 - Hardware buttons support
@@ -410,14 +364,14 @@ Visual Indicators:
 
 ```
 Portrait Mode:
-- Full-screen diff view
+- Full-screen inline diff view
 - Collapsible file list
 - Bottom sheet for comments
 - Gesture-primary navigation
 
 Landscape Mode:
-- Side-by-side file list + diff
-- Persistent comment panel
+- Persistent file list sidebar
+- Wider inline diff view
 - Enhanced gesture zones
 - Optimized for one-handed use
 ```
@@ -426,11 +380,11 @@ Landscape Mode:
 
 ```
 Master-Detail Layout:
-- Persistent file navigation
-- Large diff viewing area
+- Persistent file navigation panel
+- Large inline diff viewing area
 - Side panel for comments
 - Enhanced gesture recognition
-- Multi-pane PR overview
+- Expanded code context display
 ```
 
 ## Dark Mode Support
@@ -461,10 +415,10 @@ File Navigation:
 - Material motion curves
 - Gesture-driven progress
 
-View Mode Toggle:
-- Crossfade transition (200ms)
-- Smooth layout changes
+Hunk Expansion:
+- Smooth expand/collapse (200ms)
 - Preserved scroll position
+- Progressive content loading
 
 Comment Actions:
 - Bottom sheet slide-up (250ms)

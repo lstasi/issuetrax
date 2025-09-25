@@ -2,16 +2,24 @@
 
 ## Project Overview
 
-Issuetrax is a native Android application built with Kotlin that provides a streamlined interface for managing GitHub issues and conducting Pull Request (PR) reviews. The app focuses on delivering an intuitive, gesture-based experience for developers to efficiently review code changes and track project issues.
+Issuetrax is a native Android application built with Kotlin that provides a focused, single-project workflow for GitHub issue management and Pull Request (PR) reviews. The app operates on a simplified model: one repository, one issue/PR at a time, with primary focus on delivering an intuitive, gesture-based PR review experience optimized for mobile devices.
 
 ## Core Requirements
 
 ### Primary Features
-- GitHub issue management and tracking
-- Advanced Pull Request review interface
+- Focused single-repository workflow
+- Single issue/PR management at a time
+- Advanced Pull Request review interface (primary focus)
 - Gesture-based navigation (swipe up/down/left/right)
 - GitHub authentication integration
 - No backend dependency (direct GitHub API integration)
+- Inline diff view optimized for mobile screens
+
+### Simplified Workflow
+1. **Login & Repository Selection**: OAuth authentication with single repository selection
+2. **Current Work Focus**: Display current issue/PR or provide simple creation interface
+3. **PR Review Experience**: Advanced gesture-driven review with inline diff, source code browser, validations, comments, and file navigation
+4. **Single Context**: Work within one repository and one issue/PR at a time to reduce complexity
 
 ### Target Output
 - Installable APK file for Android devices
@@ -71,100 +79,56 @@ app/
 
 ## Screen Specifications
 
-### 1. Login Screen
-**Purpose**: Authenticate users with GitHub
+### 1. Login & Repository Selection Screen
+**Purpose**: Authenticate users with GitHub and select single working repository
 
 **Components**:
-- GitHub logo and app branding
-- "Sign in with GitHub" button
-- OAuth flow integration with Custom Tabs
-- Loading states and error handling
-- Remember authentication option
+- GitHub OAuth authentication flow
+- Repository selection (simplified single-choice interface)
+- Remember selected repository for future sessions
+- Repository context display (name, description, current status)
 
 **Navigation**: 
-- Success → Repository Selection Screen
-- Error → Retry mechanism
+- Success → Current Work Screen
 
-### 2. Repository Selection Screen
-**Purpose**: Allow users to select GitHub repositories to manage
+### 2. Current Work Screen
+**Purpose**: Display current issue/PR or provide simple creation interface
 
 **Components**:
-- Search bar for repository filtering
-- Repository list with:
-  - Repository name and description
-  - Owner information
-  - Star count and fork count
-  - Last updated timestamp
-- Pull-to-refresh functionality
-- Pagination support
-
-**Data Sources**:
-- User's repositories
-- Starred repositories
-- Recently accessed repositories
+- Current repository context header
+- Active issue/PR display (if exists)
+- Simple "Create New Issue" text input (if no active work)
+- Direct navigation to PR review for active PRs
+- Basic issue metadata and status
 
 **Navigation**: 
-- Repository selection → Issue List Screen
+- Active PR → PR Review Screen
+- Create Issue → Issue creation flow
 
-### 3. Issue List Screen
-**Purpose**: Display and manage GitHub issues for selected repository
-
-**Components**:
-- Repository header with name and basic stats
-- Issue list with:
-  - Issue title and number
-  - Labels and milestone information
-  - Author and assignee avatars
-  - Creation/update timestamps
-  - State indicators (open/closed)
-- Filter and sort options
-- Search functionality
-- Pull-to-refresh
-- Infinite scrolling
-
-**Actions**:
-- Tap to view issue details
-- Long press for quick actions
-- Swipe for additional options
-
-**Navigation**: 
-- Issue tap → Issue detail (future enhancement)
-- Navigation drawer → PR Reviews Screen
-
-### 4. PR Reviews Screen (Primary Focus)
-**Purpose**: Provide comprehensive Pull Request review experience
+### 3. PR Review Screen (Primary Focus)
+**Purpose**: Provide comprehensive Pull Request review experience with mobile-optimized interface
 
 #### Core Features
-**PR List View**:
-- Pull request list with:
-  - PR title and number
-  - Author information
-  - Status indicators (draft, ready, approved, changes requested)
-  - Branch information (source → target)
-  - Review status and approvals count
-  - CI/CD status indicators
+**PR Overview**:
+- PR metadata (title, description, status, reviewers)
+- File changes summary
+- CI/CD status indicators
+- Review progress tracking
 
-**PR Detail View**:
-- PR metadata (title, description, labels, reviewers)
-- File changes overview
-- Conversation tab
-- Files changed tab
-- Commits tab
-
-#### Advanced Review Interface
-**File Diff Viewer**:
-- Side-by-side or unified diff views
-- Syntax highlighting for various languages
-- Line-by-line commenting
-- Suggestion mode
-- Collapse/expand hunks
+**Advanced Review Interface**:
+- **Inline Diff Viewer** (mobile-optimized, no side-by-side)
+- File navigation with gesture support
+- Line-by-line commenting system
+- Review submission workflow
+- Source code browser for context
+- Validation and testing integration
 
 **Gesture Navigation System**:
 - **Swipe Right**: Next file in PR
 - **Swipe Left**: Previous file in PR
 - **Swipe Up**: Next hunk/change in current file
 - **Swipe Down**: Previous hunk/change in current file
-- **Double tap**: Toggle between side-by-side and unified view
+- **Double tap**: Toggle between inline views (expanded/collapsed)
 - **Pinch**: Zoom in/out for better readability
 - **Long press**: Quick comment/suggestion mode
 

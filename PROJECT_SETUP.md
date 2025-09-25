@@ -80,23 +80,21 @@ Issuetrax/
 │   │   │   │   │       └── AuthenticateUseCase.kt
 │   │   │   │   ├── presentation/
 │   │   │   │   │   ├── ui/
-│   │   │   │   │   │   ├── login/
-│   │   │   │   │   │   │   ├── LoginScreen.kt
-│   │   │   │   │   │   │   └── LoginViewModel.kt
-│   │   │   │   │   │   ├── repositories/
-│   │   │   │   │   │   │   ├── RepositoriesScreen.kt
-│   │   │   │   │   │   │   └── RepositoriesViewModel.kt
-│   │   │   │   │   │   ├── issues/
-│   │   │   │   │   │   │   ├── IssuesScreen.kt
-│   │   │   │   │   │   │   └── IssuesViewModel.kt
+│   │   │   │   │   │   ├── auth/
+│   │   │   │   │   │   │   ├── AuthScreen.kt
+│   │   │   │   │   │   │   └── AuthViewModel.kt
+│   │   │   │   │   │   ├── current_work/
+│   │   │   │   │   │   │   ├── CurrentWorkScreen.kt
+│   │   │   │   │   │   │   └── CurrentWorkViewModel.kt
 │   │   │   │   │   │   ├── pr_review/
 │   │   │   │   │   │   │   ├── PRReviewScreen.kt
 │   │   │   │   │   │   │   ├── PRReviewViewModel.kt
 │   │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   │   ├── DiffViewer.kt
+│   │   │   │   │   │   │   │   ├── InlineDiffViewer.kt
 │   │   │   │   │   │   │   │   ├── GestureHandler.kt
 │   │   │   │   │   │   │   │   ├── CommentDialog.kt
-│   │   │   │   │   │   │   │   └── FileNavigator.kt
+│   │   │   │   │   │   │   │   ├── FileNavigator.kt
+│   │   │   │   │   │   │   │   └── SourceCodeBrowser.kt
 │   │   │   │   │   │   │   └── gestures/
 │   │   │   │   │   │   │       ├── PRReviewGestureDetector.kt
 │   │   │   │   │   │   │       └── GestureExtensions.kt
@@ -460,10 +458,9 @@ class MainActivity : ComponentActivity() {
 package com.issuetrax.app.presentation.navigation
 
 sealed class Routes(val route: String) {
-    object Login : Routes("login")
-    object Repositories : Routes("repositories")
-    object Issues : Routes("issues/{owner}/{repo}") {
-        fun createRoute(owner: String, repo: String) = "issues/$owner/$repo"
+    object Auth : Routes("auth")
+    object CurrentWork : Routes("current_work/{owner}/{repo}") {
+        fun createRoute(owner: String, repo: String) = "current_work/$owner/$repo"
     }
     object PRReview : Routes("pr_review/{owner}/{repo}/{prNumber}") {
         fun createRoute(owner: String, repo: String, prNumber: Int) = 
