@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Design 3 Color Scheme -->
+    <color name="primary">#1976D2</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#D3E3FD</color>
+    <color name="on_primary_container">#001C38</color>
+    
+    <color name="secondary">#575E71</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#DBE2F9</color>
+    <color name="on_secondary_container">#141B2C</color>
+    
+    <color name="tertiary">#715574</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#FBD7FC</color>
+    <color name="on_tertiary_container">#29132E</color>
+    
+    <color name="error">#BA1A1A</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error_container">#410002</color>
+    
+    <color name="background">#FEFBFF</color>
+    <color name="on_background">#1B1B1F</color>
+    <color name="surface">#FEFBFF</color>
+    <color name="on_surface">#1B1B1F</color>
+    <color name="surface_variant">#E0E2EC</color>
+    <color name="on_surface_variant">#44474F</color>
+    
+    <color name="outline">#74777F</color>
+    <color name="outline_variant">#C4C7CF</color>
+    <color name="scrim">#000000</color>
+    
+    <!-- GitHub-specific colors -->
+    <color name="github_green">#238636</color>
+    <color name="github_red">#D1242F</color>
+    <color name="github_blue">#0969DA</color>
+    <color name="github_purple">#8250DF</color>
+    
+    <!-- Diff colors -->
+    <color name="diff_added">#E6FFED</color>
+    <color name="diff_added_border">#238636</color>
+    <color name="diff_removed">#FFEBE9</color>
+    <color name="diff_removed_border">#D1242F</color>
+    <color name="diff_modified">#FFF8C5</color>
+    <color name="diff_modified_border">#9A6700</color>
+</resources>
