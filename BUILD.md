@@ -6,6 +6,8 @@
 - Java 17 or higher
 - Android Studio (recommended) or command line tools
 
+**Alternative**: Use Docker for containerized builds (see [Docker Build Guide](DOCKER.md))
+
 ## Building from Command Line
 
 ### Debug Build
@@ -23,6 +25,27 @@
 ./gradlew test
 ./gradlew connectedAndroidTest
 ```
+
+## Building with Docker
+
+For consistent builds across environments, use Docker:
+
+```bash
+# Build and serve APKs via web interface
+docker-compose up --build
+
+# Access APKs at http://localhost:8080
+```
+
+See [DOCKER.md](DOCKER.md) for detailed Docker build instructions.
+
+## CI/CD
+
+The project includes GitHub Actions workflows for:
+- **Continuous Integration**: Runs tests and builds on every PR
+- **Release**: Automatically builds and publishes releases when tags are pushed
+- **Dependency Updates**: Weekly dependency update checks
+- **Security Scanning**: Automated vulnerability scanning
 
 ## Project Structure
 
