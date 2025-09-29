@@ -40,6 +40,9 @@ android {
     }
 
     compileOptions {
+        // Java 17 is the current LTS version recommended for Android development
+        // Android Gradle Plugin 8.1.4 and Kotlin 1.9.20 officially support Java 17
+        // Java 22+ support is not yet stable in the Android toolchain
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -130,8 +133,8 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.4")
-    androidTestImplementation("androidx.hilt:hilt-android-testing:1.1.0")
-    kaptAndroidTest("com.google.dagger:hilt-compiler:2.48")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest("com.google.dagger:hilt-android-testing-compiler:2.48")
     
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

@@ -96,6 +96,7 @@ docker run --rm issuetrax-builder ./gradlew lint
 - **Docker**: 20.10 or later
 - **Docker Compose**: 2.0 or later (for compose commands)
 - **Host OS**: Linux, macOS, or Windows with WSL2
+- **Java**: OpenJDK 17 (LTS version recommended for Android development)
 
 ## Volume Mounts
 

@@ -1,6 +1,8 @@
 # Simple Dockerfile for building Issuetrax Android app
 # Use this for building APKs without the web server
 
+# Java 17 is the LTS version recommended for Android development
+# Android Gradle Plugin 8.1.4 and Kotlin 1.9.20 officially support Java 17
 FROM openjdk:17-jdk-slim
 
 # Install required dependencies

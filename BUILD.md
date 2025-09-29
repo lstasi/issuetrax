@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Android SDK (API level 34)
-- Java 17 or higher
+- Java 17 or higher (Java 17 LTS recommended - required for Android Gradle Plugin 8.1.4)
 - Android Studio (recommended) or command line tools
 
 **Alternative**: Use Docker for containerized builds (see [Docker Build Guide](DOCKER.md))
