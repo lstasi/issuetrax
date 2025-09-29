@@ -1,0 +1,87 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ghcr.io/${{ github.repository }}/builder
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix=commit-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build build-only Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.build
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: |
+          ghcr.io/${{ github.repository }}/build-only:latest
+          ghcr.io/${{ github.repository }}/build-only:${{ github.sha }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  test-docker-build:
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Test Docker build
+      run: |
+        # Test that the build-only container can build the APK
+        mkdir -p test-output
+        docker build -f Dockerfile.build -t test-builder .
+        docker run --rm -v $(pwd)/test-output:/app/app/build/outputs/apk test-builder
+        
+        # Verify APK was created
+        if [ -f "test-output/debug/app-debug.apk" ]; then
+          echo "✅ Debug APK built successfully"
+          ls -la test-output/debug/
+        else
+          echo "❌ Debug APK not found"
+          exit 1
+        fi

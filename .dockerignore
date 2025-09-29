@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+BUILD.md
+TODO.md
+doc/
+
+# IDE
+.idea/
+*.iml
+
+# Build outputs (will be generated in container)
+build/
+app/build/
+.gradle/
+
+# Local configuration
+local.properties
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
+
+# Android specific
+captures/

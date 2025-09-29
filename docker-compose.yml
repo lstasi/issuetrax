@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  issuetrax-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount the APK output directory to host for easy access
+      - ./build/docker-outputs:/usr/share/nginx/html/apk
+    environment:
+      - NGINX_PORT=80
+    container_name: issuetrax-apk-server
+    restart: unless-stopped
+
+  # Development container for interactive development
+  issuetrax-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    volumes:
+      # Mount source code for development
+      - .:/app
+      - gradle-cache:/root/.gradle
+    working_dir: /app
+    container_name: issuetrax-dev
+    profiles:
+      - dev
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
+
+volumes:
+  gradle-cache:

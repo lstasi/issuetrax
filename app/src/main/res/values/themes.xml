@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Issuetrax" parent="android:Theme.Material.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryVariant">@color/primary_container</item>
+        <item name="android:colorOnPrimary">@color/on_primary</item>
+        
+        <!-- Secondary brand color. -->
+        <item name="android:colorSecondary">@color/secondary</item>
+        <item name="android:colorSecondaryVariant">@color/secondary_container</item>
+        <item name="android:colorOnSecondary">@color/on_secondary</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/primary</item>
+        
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:colorSurface">@color/surface</item>
+        <item name="android:colorOnBackground">@color/on_background</item>
+        <item name="android:colorOnSurface">@color/on_surface</item>
+        
+        <!-- Error colors -->
+        <item name="android:colorError">@color/error</item>
+        
+        <!-- Customize splash screen -->
+        <item name="android:windowSplashScreenBackground">@color/primary</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+    </style>
+</resources>

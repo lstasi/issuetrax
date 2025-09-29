@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Issuetrax</string>
+    
+    <!-- Authentication -->
+    <string name="auth_title">Welcome to Issuetrax</string>
+    <string name="auth_subtitle">Sign in with GitHub to start reviewing PRs</string>
+    <string name="auth_sign_in">Sign in with GitHub</string>
+    <string name="auth_error">Authentication failed. Please try again.</string>
+    
+    <!-- Navigation -->
+    <string name="nav_current_work">Current Work</string>
+    <string name="nav_pr_review">PR Review</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Current Work -->
+    <string name="current_work_title">Current Work</string>
+    <string name="current_work_no_active">No active work</string>
+    <string name="current_work_select_repo">Select Repository</string>
+    
+    <!-- PR Review -->
+    <string name="pr_review_title">Pull Request Review</string>
+    <string name="pr_review_files">Files</string>
+    <string name="pr_review_comments">Comments</string>
+    <string name="pr_review_submit">Submit Review</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">Network error. Check your connection.</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+</resources>
