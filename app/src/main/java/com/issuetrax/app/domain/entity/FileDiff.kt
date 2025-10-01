@@ -1,8 +1,5 @@
 package com.issuetrax.app.domain.entity
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class FileDiff(
     val filename: String,
     val status: FileStatus,
@@ -15,12 +12,10 @@ data class FileDiff(
     val previousFilename: String? = null
 )
 
-@Serializable
 enum class FileStatus {
     ADDED, MODIFIED, REMOVED, RENAMED, COPIED, CHANGED, UNCHANGED
 }
 
-@Serializable
 data class CodeHunk(
     val oldStart: Int,
     val oldCount: Int,
@@ -29,7 +24,6 @@ data class CodeHunk(
     val lines: List<DiffLine>
 )
 
-@Serializable
 data class DiffLine(
     val type: LineType,
     val content: String,
@@ -37,7 +31,6 @@ data class DiffLine(
     val newLineNumber: Int?
 )
 
-@Serializable
 enum class LineType {
     CONTEXT, ADDITION, DELETION, NO_NEWLINE
 }

@@ -1,9 +1,7 @@
 package com.issuetrax.app.domain.entity
 
-import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
-@Serializable
 data class Repository(
     val id: Long,
     val name: String,

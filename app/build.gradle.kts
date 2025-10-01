@@ -45,6 +45,8 @@ android {
         // Java 22+ support is not yet stable in the Android toolchain
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Enable desugaring to support java.time APIs on API < 26
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -121,6 +123,9 @@ dependencies {
     // WorkManager (for background sync)
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.1.0")
+
+    // Desugaring support for java.time on API < 26
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

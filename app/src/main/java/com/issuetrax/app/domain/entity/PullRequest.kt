@@ -1,9 +1,7 @@
 package com.issuetrax.app.domain.entity
 
-import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
-@Serializable
 data class PullRequest(
     val id: Long,
     val number: Int,
@@ -28,12 +26,10 @@ data class PullRequest(
     val htmlUrl: String
 )
 
-@Serializable
 enum class PRState {
     OPEN, CLOSED, MERGED
 }
 
-@Serializable
 enum class ReviewDecision {
     APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED
 }
