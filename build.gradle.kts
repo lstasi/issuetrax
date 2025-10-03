@@ -13,5 +13,5 @@ buildscript {
 
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20" apply false
-    id("com.github.ben-manes.versions") version "0.49.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
