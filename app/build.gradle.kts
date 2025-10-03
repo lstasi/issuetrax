@@ -88,8 +88,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.4")
 
     // Hilt Dependency Injection
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-compiler:2.48")
+    implementation("com.google.dagger:hilt-android:2.57.2")
+    kapt("com.google.dagger:hilt-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Networking
@@ -138,8 +138,8 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.4")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
-    kaptAndroidTest("com.google.dagger:hilt-android-testing-compiler:2.48")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57.2")
+    kaptAndroidTest("com.google.dagger:hilt-android-testing-compiler:2.57.2")
     
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
