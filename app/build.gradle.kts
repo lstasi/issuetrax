@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.issuetrax.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
@@ -114,6 +114,9 @@ dependencies {
     // Image Loading
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("io.coil-kt:coil-svg:2.5.0")
+
+    // Material Components (needed for Theme.MaterialComponents parent and material attributes)
+    implementation("com.google.android.material:material:1.10.0")
 
     // Room Database (for caching)
     implementation("androidx.room:room-runtime:2.6.0")
