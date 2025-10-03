@@ -90,7 +90,7 @@ dependencies {
     // Hilt Dependency Injection
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
     // Networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -122,7 +122,7 @@ dependencies {
 
     // WorkManager (for background sync)
     implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("androidx.hilt:hilt-work:1.1.0")
+    implementation("androidx.hilt:hilt-work:1.3.0")
 
     // Desugaring support for java.time on API < 26
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
