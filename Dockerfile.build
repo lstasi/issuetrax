@@ -3,7 +3,7 @@
 
 # Java 17 is the LTS version recommended for Android development
 # Android Gradle Plugin 8.1.4 and Kotlin 1.9.20 officially support Java 17
-FROM openjdk:17-jdk-slim
+FROM openjdk:18-jdk-slim
 
 # Install required dependencies
 RUN apt-get update && apt-get install -y \
