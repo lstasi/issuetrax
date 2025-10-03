@@ -119,9 +119,9 @@ dependencies {
     implementation("com.google.android.material:material:1.10.0")
 
     // Room Database (for caching)
-    implementation("androidx.room:room-runtime:2.6.0")
-    implementation("androidx.room:room-ktx:2.6.0")
-    kapt("androidx.room:room-compiler:2.6.0")
+    implementation("androidx.room:room-runtime:2.8.1")
+    implementation("androidx.room:room-ktx:2.8.1")
+    kapt("androidx.room:room-compiler:2.8.1")
 
     // WorkManager (for background sync)
     implementation("androidx.work:work-runtime-ktx:2.8.1")
