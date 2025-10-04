@@ -22,10 +22,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        // GitHub OAuth Configuration
-        buildConfigField("String", "GITHUB_CLIENT_ID", "\"your_github_client_id\"")
-        buildConfigField("String", "GITHUB_REDIRECT_URI", "\"issuetrax://oauth\"")
     }
 
     buildTypes {

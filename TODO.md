@@ -21,10 +21,10 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 - [x] Retrofit and OkHttp setup for GitHub API
 
 ### GitHub Integration
-- [ ] GitHub OAuth implementation
-- [ ] OAuth token storage with EncryptedSharedPreferences
-- [ ] GitHub API service interface creation
-- [ ] Basic API authentication and rate limiting handling
+- [x] GitHub OAuth implementation
+- [x] OAuth token storage with EncryptedSharedPreferences
+- [x] GitHub API service interface creation
+- [x] Basic API authentication and rate limiting handling
 
 ### Core Architecture
 - [x] Basic navigation structure with Compose Navigation
