@@ -39,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
     
-    private val _isAuthenticatedFlow = MutableStateFlow(getAccessToken() != null)
+    private val _isAuthenticatedFlow = MutableStateFlow(encryptedPrefs.getString(ACCESS_TOKEN_KEY, null) != null)
     
     override suspend fun authenticate(authCode: String): Result<String> {
         return try {
