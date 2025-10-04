@@ -4,9 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.issuetrax.app.BuildConfig
-import com.issuetrax.app.data.api.AccessTokenRequest
-import com.issuetrax.app.data.api.GitHubOAuthService
 import com.issuetrax.app.domain.repository.AuthRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -15,16 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val oauthService: GitHubOAuthService
+    @ApplicationContext private val context: Context
 ) : AuthRepository {
     
     companion object {
         private const val PREFS_NAME = "auth_prefs"
         private const val ACCESS_TOKEN_KEY = "access_token"
-        
-        // TODO: Move these to secure configuration or environment variables
-        private const val GITHUB_CLIENT_SECRET = "your_github_client_secret"
     }
     
     private val masterKey = MasterKey.Builder(context)
@@ -41,24 +34,16 @@ class AuthRepositoryImpl @Inject constructor(
     
     private val _isAuthenticatedFlow = MutableStateFlow(encryptedPrefs.getString(ACCESS_TOKEN_KEY, null) != null)
     
-    override suspend fun authenticate(authCode: String): Result<String> {
+    override suspend fun authenticate(token: String): Result<String> {
         return try {
-            val request = AccessTokenRequest(
-                clientId = BuildConfig.GITHUB_CLIENT_ID,
-                clientSecret = GITHUB_CLIENT_SECRET,
-                code = authCode,
-                redirectUri = BuildConfig.GITHUB_REDIRECT_URI
-            )
-            
-            val response = oauthService.getAccessToken(request)
-            
-            if (response.isSuccessful && response.body() != null) {
-                val accessToken = response.body()!!.accessToken
-                saveAccessToken(accessToken)
-                Result.success(accessToken)
-            } else {
-                Result.failure(Exception("Failed to exchange OAuth code: ${response.message()}"))
+            // Validate token is not empty
+            if (token.isBlank()) {
+                return Result.failure(Exception("Token cannot be empty"))
             }
+            
+            // Save the token directly (it's a Personal Access Token from GitHub)
+            saveAccessToken(token)
+            Result.success(token)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -83,7 +68,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
     
     override suspend fun refreshToken(): Result<String> {
-        // GitHub OAuth tokens don't expire, so we just return the current token
+        // GitHub Personal Access Tokens don't expire (unless configured to do so)
+        // Just return the current token
         val currentToken = getAccessToken()
         return if (currentToken != null) {
             Result.success(currentToken)

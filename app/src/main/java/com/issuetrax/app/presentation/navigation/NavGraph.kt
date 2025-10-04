@@ -9,9 +9,7 @@ import com.issuetrax.app.presentation.ui.current_work.CurrentWorkScreen
 import com.issuetrax.app.presentation.ui.pr_review.PRReviewScreen
 
 @Composable
-fun NavGraph(
-    onOAuthCallbackRegistered: ((String) -> Unit) -> Unit = {}
-) {
+fun NavGraph() {
     val navController = rememberNavController()
     
     NavHost(
@@ -24,8 +22,7 @@ fun NavGraph(
                     navController.navigate(Routes.CurrentWork.route) {
                         popUpTo(Routes.Auth.route) { inclusive = true }
                     }
-                },
-                onOAuthCallbackRegistered = onOAuthCallbackRegistered
+                }
             )
         }
         

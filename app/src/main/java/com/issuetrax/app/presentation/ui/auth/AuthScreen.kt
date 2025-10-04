@@ -1,47 +1,46 @@
 package com.issuetrax.app.presentation.ui.auth
 
-import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.issuetrax.app.BuildConfig
 import com.issuetrax.app.R
 
 @Composable
 fun AuthScreen(
     onAuthSuccess: () -> Unit,
-    onOAuthCallbackRegistered: ((String) -> Unit) -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-    
-    // Register OAuth callback handler
-    LaunchedEffect(Unit) {
-        onOAuthCallbackRegistered { code ->
-            viewModel.authenticate(code)
-        }
-    }
+    var token by remember { mutableStateOf("") }
     
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
@@ -73,6 +72,37 @@ fun AuthScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Enter your GitHub Personal Access Token below. You can create one at github.com/settings/tokens",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            OutlinedTextField(
+                value = token,
+                onValueChange = { token = it },
+                label = { Text("Personal Access Token") },
+                placeholder = { Text("ghp_...") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (token.isNotBlank()) {
+                            viewModel.authenticate(token)
+                        }
+                    }
+                ),
+                enabled = !uiState.isLoading,
+                isError = uiState.error != null
+            )
+            
             if (uiState.error != null) {
                 Text(
                     text = uiState.error!!,
@@ -84,20 +114,10 @@ fun AuthScreen(
             
             Button(
                 onClick = {
-                    // Launch GitHub OAuth in Custom Tabs
-                    val oauthUrl = "https://github.com/login/oauth/authorize" +
-                            "?client_id=${BuildConfig.GITHUB_CLIENT_ID}" +
-                            "&redirect_uri=${BuildConfig.GITHUB_REDIRECT_URI}" +
-                            "&scope=repo,user"
-                    
-                    val customTabsIntent = CustomTabsIntent.Builder()
-                        .setShowTitle(true)
-                        .build()
-                    
-                    customTabsIntent.launchUrl(context, Uri.parse(oauthUrl))
+                    viewModel.authenticate(token)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !uiState.isLoading
+                enabled = !uiState.isLoading && token.isNotBlank()
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
@@ -105,6 +125,20 @@ fun AuthScreen(
                     )
                 }
                 Text(stringResource(R.string.auth_sign_in))
+            }
+            
+            TextButton(
+                onClick = {
+                    // Open GitHub token creation page
+                    val context = LocalContext.current
+                    val intent = android.content.Intent(
+                        android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://github.com/settings/tokens/new?description=Issuetrax&scopes=repo,user")
+                    )
+                    context.startActivity(intent)
+                }
+            ) {
+                Text("Create Token on GitHub")
             }
         }
     }

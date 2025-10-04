@@ -13,9 +13,8 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         
-        // Skip adding auth header if it already exists or for OAuth token exchange
-        if (request.header("Authorization") != null || 
-            request.url.encodedPath.contains("/login/oauth/access_token")) {
+        // Skip adding auth header if it already exists
+        if (request.header("Authorization") != null) {
             return chain.proceed(request)
         }
         
