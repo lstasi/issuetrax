@@ -1,5 +1,8 @@
 package com.issuetrax.app.presentation.ui.auth
 
+import android.content.Intent
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,18 +19,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.issuetrax.app.BuildConfig
 import com.issuetrax.app.R
 
 @Composable
 fun AuthScreen(
     onAuthSuccess: () -> Unit,
+    onOAuthCallbackRegistered: ((String) -> Unit) -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    
+    // Register OAuth callback handler
+    LaunchedEffect(Unit) {
+        onOAuthCallbackRegistered { code ->
+            viewModel.authenticate(code)
+        }
+    }
     
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
@@ -70,9 +84,17 @@ fun AuthScreen(
             
             Button(
                 onClick = {
-                    // TODO: Implement GitHub OAuth
-                    // For now, simulate successful authentication
-                    viewModel.authenticate("demo_token")
+                    // Launch GitHub OAuth in Custom Tabs
+                    val oauthUrl = "https://github.com/login/oauth/authorize" +
+                            "?client_id=${BuildConfig.GITHUB_CLIENT_ID}" +
+                            "&redirect_uri=${BuildConfig.GITHUB_REDIRECT_URI}" +
+                            "&scope=repo,user"
+                    
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setShowTitle(true)
+                        .build()
+                    
+                    customTabsIntent.launchUrl(context, Uri.parse(oauthUrl))
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
