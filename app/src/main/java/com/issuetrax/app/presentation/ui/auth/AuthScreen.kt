@@ -41,6 +41,7 @@ fun AuthScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var token by remember { mutableStateOf("") }
+    val context = LocalContext.current
     
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
@@ -130,7 +131,6 @@ fun AuthScreen(
             TextButton(
                 onClick = {
                     // Open GitHub token creation page
-                    val context = LocalContext.current
                     val intent = android.content.Intent(
                         android.content.Intent.ACTION_VIEW,
                         android.net.Uri.parse("https://github.com/settings/tokens/new?description=Issuetrax&scopes=repo,user")
