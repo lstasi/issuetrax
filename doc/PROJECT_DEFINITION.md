@@ -23,8 +23,9 @@ Issuetrax is a native Android application built with Kotlin that provides a focu
 
 ### Target Output
 - Installable APK file for Android devices
-- Minimum Android API level: 24 (Android 7.0)
-- Target Android API level: 34 (Android 14)
+- **Minimum Android API level: 34 (Android 14)**
+- **Target Android API level: 34 (Android 14)**
+- **Note: No backward compatibility - Android 14+ only for minimal app size and complexity**
 
 ## Technical Stack
 
@@ -32,20 +33,27 @@ Issuetrax is a native Android application built with Kotlin that provides a focu
 - **Language**: Kotlin
 - **Platform**: Android Native
 - **Build System**: Gradle with Kotlin DSL
-- **Minimum SDK**: API 24 (Android 7.0)
+- **Minimum SDK**: API 34 (Android 14)
 - **Target SDK**: API 34 (Android 14)
+- **Philosophy**: Minimal dependencies, simple UI, no animations, Android 14+ only
 
-### Key Libraries & Dependencies
-- **UI Framework**: Jetpack Compose
+### Key Libraries & Dependencies (Minimal Essential Only)
+- **UI Framework**: Jetpack Compose (minimal Material3 components only)
 - **Navigation**: Jetpack Navigation Compose
 - **Authentication**: GitHub OAuth 2.0 with Custom Tabs
 - **Networking**: Retrofit 2 + OkHttp 3
 - **JSON Parsing**: Kotlinx Serialization
 - **Async Operations**: Kotlin Coroutines + Flow
 - **Dependency Injection**: Hilt
-- **Local Storage**: DataStore (Preferences)
-- **Version Control**: Git integration via GitHub API
-- **Testing**: JUnit 5, Espresso, Compose Testing
+- **Local Storage**: DataStore (Preferences) + Security-crypto for token storage
+- **Testing**: JUnit, Espresso, Compose Testing (basic only)
+
+### Explicitly Removed Dependencies
+- ❌ Room Database (no local caching - simple app only)
+- ❌ WorkManager (no background sync needed)
+- ❌ Coil Image Loading (no image loading needed)
+- ❌ Material Icons Extended (use minimal built-in icons only)
+- ❌ Core Library Desugaring (not needed with minSdk 34)
 
 ## Architecture
 

@@ -22,11 +22,13 @@
 
 ```bash
 # Minimum required SDK components:
-- Android 7.0 (API 24) - Minimum SDK
+- Android 14 (API 34) - Minimum SDK (No backward compatibility)
 - Android 14 (API 34) - Target SDK
 - Android SDK Build-Tools 34.0.0
 - Android Emulator (for testing)
 ```
+
+**Note**: This app targets Android 14+ exclusively for minimal complexity and dependencies.
 
 ## Project Structure Creation
 
@@ -57,7 +59,7 @@ Run the script once and it will write `local.properties` for you. `local.propert
    - Name: Issuetrax
    - Package: com.issuetrax.app
    - Language: Kotlin
-   - Minimum SDK: API 24
+   - Minimum SDK: API 34 (Android 14)
    - Build configuration language: Kotlin DSL (build.gradle.kts)
    - Use Jetpack Compose: Yes
 ```
@@ -187,7 +189,7 @@ android {
 
     defaultConfig {
         applicationId = "com.issuetrax.app"
-        minSdk = 24
+        minSdk = 34  // Android 14+ only - minimal app
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
@@ -239,19 +241,19 @@ android {
 }
 
 dependencies {
+    // MINIMAL DEPENDENCIES ONLY - Android 14+ 
+    
     // Compose BOM - ensures compatible versions
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
 
     // Activity & Lifecycle
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")
@@ -261,7 +263,7 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // Networking
+    // Networking - GitHub API only
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -273,44 +275,43 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // DataStore
+    // DataStore - Simple preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Security & Authentication
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.browser:browser:1.6.0") // For Custom Tabs OAuth
+    implementation("androidx.security:security-crypto:1.1.0")
+    implementation("androidx.browser:browser:1.6.0")
 
-    // Image Loading
-    implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("io.coil-kt:coil-svg:2.5.0")
+    // Material Components - Theme support
+    implementation("com.google.android.material:material:1.10.0")
 
-    // Room Database (for caching)
-    implementation("androidx.room:room-runtime:2.6.0")
-    implementation("androidx.room:room-ktx:2.6.0")
-    kapt("androidx.room:room-compiler:2.6.0")
-
-    // WorkManager (for background sync)
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("androidx.hilt:hilt-work:1.1.0")
-
-    // Testing
+    // Testing - Basic only
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk:1.14.6")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
 
-    // Android Testing
+    // Android Testing - Basic only
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation("androidx.navigation:navigation-testing:2.7.4")
-    androidTestImplementation("androidx.work:work-testing:2.8.1")
 
     // Debugging
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+// NOTE: The following dependencies have been REMOVED for minimal app:
+// ❌ androidx.compose.material:material-icons-extended (not used)
+// ❌ io.coil-kt:coil-compose (no image loading needed)
+// ❌ io.coil-kt:coil-svg (not used)
+// ❌ androidx.room:* (no local database caching)
+// ❌ androidx.work:* (no background sync)
+// ❌ androidx.hilt:hilt-work (WorkManager not used)
+// ❌ androidx.navigation:navigation-testing (minimal testing)
+// ❌ androidx.work:work-testing (WorkManager not used)
+// ❌ androidx.lifecycle:lifecycle-runtime-compose (not essential)
 
 // Allow references to generated code
 kapt {

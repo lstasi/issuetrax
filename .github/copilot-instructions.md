@@ -10,27 +10,36 @@ Issuetrax is a Kotlin Android application for focused GitHub issue management an
 - **Target Platform**: Android Native (Kotlin)
 - **Architecture**: Clean Architecture + MVVM
 - **UI Framework**: Jetpack Compose
-- **Minimum SDK**: API 24 (Android 7.0)
+- **Minimum SDK**: API 34 (Android 14) - **No backward compatibility**
 - **Target SDK**: API 34 (Android 14)
+- **Philosophy**: Minimal dependencies, simple UI, no animations unless essential
 
-## Key Technologies & Dependencies
+## Key Technologies & Dependencies (Minimal Essential Only)
 
 - **Language**: Kotlin with coroutines and flows
-- **UI**: Jetpack Compose with Material Design 3
+- **UI**: Jetpack Compose with Material Design 3 (minimal components)
 - **Navigation**: Jetpack Navigation Compose
 - **DI**: Hilt (Dagger-Hilt)
 - **Networking**: Retrofit 2 + OkHttp 3
 - **Serialization**: Kotlinx Serialization
-- **Local Storage**: Room + DataStore
-- **Authentication**: GitHub OAuth 2.0
-- **Testing**: JUnit 5, Espresso, Compose Testing
+- **Local Storage**: DataStore (preferences only)
+- **Authentication**: GitHub OAuth 2.0 with Custom Tabs
+- **Security**: Security-crypto for encrypted token storage
+- **Testing**: JUnit, Espresso, Compose Testing (basic only)
+
+### Explicitly Removed (Not Used)
+- ❌ Room Database (no local caching)
+- ❌ WorkManager (no background sync)
+- ❌ Coil Image Loading (no images)
+- ❌ Material Icons Extended (basic icons only)
+- ❌ Desugaring (not needed with minSdk 34)
 
 ## Architecture Guidelines
 
-### Clean Architecture Layers
+### Clean Architecture Layers (Minimal)
 1. **Presentation Layer**: Compose UI + ViewModels
 2. **Domain Layer**: Use Cases + Entities (business logic)
-3. **Data Layer**: Repositories + Data Sources (API, Cache, DB)
+3. **Data Layer**: Repositories + Data Sources (API only - no local DB)
 
 ### Key Patterns
 - MVVM with ViewModels managing UI state
