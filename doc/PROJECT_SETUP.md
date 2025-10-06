@@ -30,6 +30,23 @@
 
 ## Project Structure Creation
 
+### Quick SDK setup (non-IDE / CI)
+
+If you're working on the project outside Android Studio (CI or local CLI), the build requires a `local.properties` file at the project root with the Android SDK path, for example:
+
+```
+sdk.dir=/home/you/Android/Sdk
+```
+
+This repository includes a small helper script to create `local.properties` automatically when an SDK is present on your machine or when `ANDROID_HOME` / `ANDROID_SDK_ROOT` is set:
+
+```
+./scripts/setup-local-properties.sh
+```
+
+Run the script once and it will write `local.properties` for you. `local.properties` is intentionally gitignored and should not be committed.
+
+
 ### 1. Create New Android Project
 
 ```bash
