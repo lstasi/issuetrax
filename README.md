@@ -28,15 +28,17 @@ Issuetrax is designed to revolutionize mobile code reviews by providing a clean,
 
 ## 🏗️ Architecture
 
-Built with modern Android development practices:
+Built with modern Android development practices and **minimal essential dependencies**:
 
 - **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
+- **UI Framework**: Jetpack Compose (Material 3)
 - **Architecture**: MVVM + Clean Architecture
 - **Dependency Injection**: Hilt
 - **Networking**: Retrofit + OkHttp
-- **Local Storage**: Room + DataStore
-- **Authentication**: GitHub OAuth 2.0
+- **Local Storage**: DataStore (preferences only)
+- **Authentication**: GitHub OAuth 2.0 with Custom Tabs
+- **Target**: Android 14+ (API 34) - No backward compatibility
+- **Philosophy**: Simple UI, minimal dependencies, no unnecessary animations
 
 ## 📚 Documentation
 
@@ -101,13 +103,14 @@ This repository currently contains the **definition and design phase** documenta
 
 ## 🎯 Target Output
 
-The final deliverable will be an **installable APK** that provides:
-- Native Android performance
+The final deliverable will be a **minimal, focused installable APK** that provides:
+- Native Android 14+ performance
 - Simplified single-repository workflow
 - Gesture-optimized PR review experience with inline diff views
-- Offline-capable operation
 - Secure GitHub authentication
 - Focused issue and PR management
+- **Minimal APK size** with only essential dependencies
+- **Simple, clean UI** without unnecessary animations
 
 ## 🤝 Contributing
 
