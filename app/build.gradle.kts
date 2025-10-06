@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.issuetrax.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
@@ -115,6 +115,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("io.coil-kt:coil-svg:2.5.0")
 
+    // Material Components (needed for Theme.MaterialComponents parent and material attributes)
+    implementation("com.google.android.material:material:1.10.0")
+
     // Room Database (for caching)
     implementation("androidx.room:room-runtime:2.8.1")
     implementation("androidx.room:room-ktx:2.8.1")
@@ -130,7 +133,7 @@ dependencies {
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk:1.14.6")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
