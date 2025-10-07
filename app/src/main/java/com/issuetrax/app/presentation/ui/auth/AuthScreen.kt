@@ -15,7 +15,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -41,7 +39,6 @@ fun AuthScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var token by remember { mutableStateOf("") }
-    val context = LocalContext.current
     
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
@@ -126,19 +123,6 @@ fun AuthScreen(
                     )
                 }
                 Text(stringResource(R.string.auth_sign_in))
-            }
-            
-            TextButton(
-                onClick = {
-                    // Open GitHub token creation page
-                    val intent = android.content.Intent(
-                        android.content.Intent.ACTION_VIEW,
-                        android.net.Uri.parse("https://github.com/settings/tokens/new?description=Issuetrax&scopes=repo,user")
-                    )
-                    context.startActivity(intent)
-                }
-            ) {
-                Text("Create Token on GitHub")
             }
         }
     }

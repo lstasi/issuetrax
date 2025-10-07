@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.issuetrax.app.presentation.ui.auth.AuthScreen
 import com.issuetrax.app.presentation.ui.current_work.CurrentWorkScreen
 import com.issuetrax.app.presentation.ui.pr_review.PRReviewScreen
+import com.issuetrax.app.presentation.ui.repository_selection.RepositorySelectionScreen
 
 @Composable
 fun NavGraph() {
@@ -19,16 +20,31 @@ fun NavGraph() {
         composable(Routes.Auth.route) {
             AuthScreen(
                 onAuthSuccess = {
-                    navController.navigate(Routes.CurrentWork.route) {
+                    navController.navigate(Routes.RepositorySelection.route) {
                         popUpTo(Routes.Auth.route) { inclusive = true }
                     }
                 }
             )
         }
         
-        composable(Routes.CurrentWork.route) {
+        composable(Routes.RepositorySelection.route) {
+            RepositorySelectionScreen(
+                onRepositorySelected = { owner, repo ->
+                    navController.navigate(Routes.CurrentWork.createRoute(owner, repo)) {
+                        popUpTo(Routes.RepositorySelection.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        
+        composable(Routes.CurrentWork.route) { backStackEntry ->
+            val owner = backStackEntry.arguments?.getString("owner") ?: ""
+            val repo = backStackEntry.arguments?.getString("repo") ?: ""
+            
             CurrentWorkScreen(
-                onNavigateToPR = { owner, repo, prNumber ->
+                owner = owner,
+                repo = repo,
+                onNavigateToPR = { prNumber ->
                     navController.navigate(Routes.PRReview.createRoute(owner, repo, prNumber))
                 }
             )

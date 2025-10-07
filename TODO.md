@@ -35,10 +35,10 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 ## Phase 2: Core Screens (Weeks 3-4)
 
 ### Authentication & Repository Selection
-- [ ] Login screen implementation
-- [ ] GitHub OAuth flow integration with Custom Tabs
-- [ ] Repository selection screen
-- [ ] Repository context persistence
+- [x] Login screen implementation
+- [x] GitHub OAuth flow integration with Custom Tabs (Changed to Personal Access Token)
+- [x] Repository selection screen
+- [x] Repository context persistence
 
 ### Current Work Screen
 - [ ] Basic issue/PR list functionality

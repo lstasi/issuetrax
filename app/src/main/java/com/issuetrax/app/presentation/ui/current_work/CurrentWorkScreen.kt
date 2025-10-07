@@ -19,7 +19,9 @@ import com.issuetrax.app.R
 
 @Composable
 fun CurrentWorkScreen(
-    onNavigateToPR: (String, String, Int) -> Unit
+    owner: String,
+    repo: String,
+    onNavigateToPR: (Int) -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -39,6 +41,13 @@ fun CurrentWorkScreen(
             )
             
             Text(
+                text = "$owner/$repo",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Text(
                 text = stringResource(R.string.current_work_no_active),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
@@ -47,9 +56,9 @@ fun CurrentWorkScreen(
             
             Button(
                 onClick = {
-                    // TODO: Implement repository selection and PR list
+                    // TODO: Implement PR list
                     // For now, navigate to a demo PR
-                    onNavigateToPR("example", "repo", 1)
+                    onNavigateToPR(1)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
