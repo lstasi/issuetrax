@@ -937,9 +937,191 @@ All methods follow this pattern:
 
 ---
 
-## 5. Dependency Injection
+## 5. Resources (res folder)
 
-### 5.1 Hilt Modules
+### 5.1 Resource Structure
+
+The `app/src/main/res` directory contains Android resources used throughout the application:
+
+```
+res/
+├── drawable/          # Vector drawables and images
+├── mipmap-*/         # App launcher icons (various densities)
+├── values/           # Default values (strings, colors, themes)
+├── values-v31/       # API 31+ specific values
+└── xml/              # XML configuration files
+```
+
+### 5.2 String Resources
+
+**File**: `res/values/strings.xml`  
+**Purpose**: Centralized string resources for internationalization
+
+**Categories**:
+
+**App Identity**
+- `app_name` - Application name: "Issuetrax"
+
+**Authentication Strings**
+- `auth_title` - "Welcome to Issuetrax"
+- `auth_subtitle` - "Sign in with GitHub to start reviewing PRs"
+- `auth_sign_in` - "Sign in with GitHub"
+- `auth_error` - "Authentication failed. Please try again."
+
+**Navigation Strings**
+- `nav_current_work` - "Current Work"
+- `nav_pr_review` - "PR Review"
+- `nav_settings` - "Settings"
+
+**Repository Selection Strings**
+- `repo_selection_title` - "Select Repository"
+- `repo_selection_subtitle` - "Choose a repository to work on"
+- `repo_selection_empty` - "No repositories found"
+
+**Current Work Strings**
+- `current_work_title` - "Current Work"
+- `current_work_no_active` - "No active work"
+- `current_work_select_repo` - "Select Repository"
+
+**PR Review Strings**
+- `pr_review_title` - "Pull Request Review"
+- `pr_review_files` - "Files"
+- `pr_review_comments` - "Comments"
+- `pr_review_submit` - "Submit Review"
+
+**Common Strings**
+- `loading` - "Loading…"
+- `error_generic` - "Something went wrong. Please try again."
+- `error_network` - "Network error. Check your connection."
+- `retry` - "Retry"
+- `cancel` - "Cancel"
+- `ok` - "OK"
+
+### 5.3 Color Resources
+
+**File**: `res/values/colors.xml`  
+**Purpose**: Material Design 3 color scheme and app-specific colors
+
+**Material Design 3 Colors**
+- Primary: `#1976D2` (GitHub-inspired blue)
+- Secondary: `#575E71` (Neutral gray-blue)
+- Tertiary: `#715574` (Purple accent)
+- Error: `#BA1A1A` (Material error red)
+- Background/Surface: `#FEFBFF` (Near white)
+- Outline: `#74777F` (Border gray)
+
+**GitHub-Specific Colors**
+- `github_green` - `#238636` (Success/merged)
+- `github_red` - `#D1242F` (Closed/conflicts)
+- `github_blue` - `#0969DA` (Links/info)
+- `github_purple` - `#8250DF` (Draft/special)
+
+**Diff Colors**
+- `diff_added` - `#E6FFED` (Addition background)
+- `diff_added_border` - `#238636` (Addition border)
+- `diff_removed` - `#FFEBE9` (Deletion background)
+- `diff_removed_border` - `#D1242F` (Deletion border)
+- `diff_modified` - `#FFF8C5` (Modified background)
+- `diff_modified_border` - `#9A6700` (Modified border)
+
+### 5.4 Theme Resources
+
+**File**: `res/values/themes.xml`  
+**Purpose**: Application theme configuration
+
+**Theme**: `Theme.Issuetrax`
+- Parent: `Theme.MaterialComponents.DayNight.NoActionBar`
+- NoActionBar: Uses Compose-based app bars instead
+- DayNight: Supports light/dark mode switching
+
+**Theme Attributes**:
+- Status bar color: Primary color
+- Window background: Background color
+- Material color mappings for primary, secondary, error, surface
+
+**File**: `res/values-v31/themes.xml`  
+**Purpose**: Android 12+ (API 31) specific theme configuration
+- Splash screen customization
+- Dynamic color support preparation
+
+### 5.5 Drawable Resources
+
+**File**: `res/drawable/ic_launcher_foreground.xml`  
+**Purpose**: App launcher icon foreground layer
+
+**Design**:
+- Vector drawable (108x108dp)
+- Green background (`#3DDC84` - Android green)
+- Simplified list/document icon pattern
+- Adaptive icon support for Android 8.0+
+
+**Launcher Icons** (`res/mipmap-*/`):
+- Multiple density variants: mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi
+- Adaptive icon support (`mipmap-anydpi-v26`)
+- Background + foreground layers for Material Design
+
+### 5.6 XML Configuration Files
+
+#### Network Security Configuration
+**File**: `res/xml/network_security_config.xml`  
+**Purpose**: Network security policy for HTTPS connections
+
+**Configuration**:
+- Cleartext traffic: Disabled (HTTPS only)
+- Certificate pinning for GitHub API
+- Domains: `api.github.com`, `github.com` (with subdomains)
+- Pin expiration: 2025-12-31
+- Two SHA-256 certificate pins for redundancy
+
+**Security Benefits**:
+- Prevents man-in-the-middle attacks
+- Ensures connection to legitimate GitHub servers
+- Protects OAuth tokens in transit
+
+#### Backup Rules
+**File**: `res/xml/backup_rules.xml`  
+**Purpose**: Android Auto Backup configuration
+
+**Configuration**:
+- Defines what data should be backed up
+- Excludes sensitive data (tokens, preferences)
+
+#### Data Extraction Rules
+**File**: `res/xml/data_extraction_rules.xml`  
+**Purpose**: Android 12+ data extraction rules
+
+**Configuration**:
+- Defines data extraction policies for device transfers
+- Aligns with backup rules for consistency
+
+### 5.7 Android Manifest
+
+**File**: `app/src/main/AndroidManifest.xml`  
+**Purpose**: Application configuration and permissions
+
+**Permissions**:
+- `INTERNET` - Required for GitHub API calls
+- `ACCESS_NETWORK_STATE` - Check network connectivity
+
+**Queries** (Android 11+):
+- Intent query for HTTPS browsing (OAuth flow support)
+
+**Application Configuration**:
+- Application class: `IssuetraxApplication` (Hilt)
+- Backup enabled with custom rules
+- Network security config applied
+- App icon and label from resources
+- Material theme applied
+
+**Activities**:
+- `MainActivity` - Single activity, exported as launcher
+- Launch mode: `singleTop` (prevents duplicate instances)
+
+---
+
+## 6. Dependency Injection
+
+### 6.1 Hilt Modules
 
 #### `NetworkModule`
 **Package**: `com.issuetrax.app.di`  
@@ -999,7 +1181,7 @@ All methods follow this pattern:
 
 ---
 
-## 6. Class Relationships
+## 7. Class Relationships
 
 ### Dependency Flow
 
@@ -1049,30 +1231,109 @@ API Service + DTOs + Mappers
 
 ---
 
-## 7. Current Implementation Notes
+## 8. Current Implementation Notes
 
 ### What's Implemented
-✅ Basic Clean Architecture structure  
-✅ GitHub API integration (REST API)  
-✅ Authentication with Personal Access Token  
-✅ Repository selection  
-✅ Pull request listing  
-✅ Pull request file viewing  
-✅ Basic review submission  
-✅ Material Design 3 theme  
-✅ Navigation between screens  
-✅ Encrypted token storage  
+
+#### ✅ Foundation & Infrastructure
+- Basic Clean Architecture structure (Presentation, Domain, Data layers)
+- Hilt dependency injection setup
+- Material Design 3 theme configuration
+- Navigation graph with 4 routes
+- Resource organization (strings, colors, themes)
+- Network security configuration with certificate pinning
+- Android manifest with proper permissions
+
+#### ✅ Authentication Layer
+- Personal Access Token authentication
+- Encrypted token storage (EncryptedSharedPreferences)
+- AuthRepository with token management
+- AuthViewModel with reactive state
+- AuthScreen UI with token input
+- Auth state flow for automatic navigation
+
+#### ✅ Data Layer
+- GitHub REST API service (Retrofit)
+- 6 API endpoints (user, repos, PRs, PR details, PR files, reviews)
+- DTO models (UserDto, RepositoryDto, PullRequestDto, FileDiffDto)
+- Domain mappers (DTO → Entity conversion)
+- Auth interceptor for token injection
+- Rate limit interceptor with logging
+- Repository implementations (GitHub, Auth, RepositoryContext)
+
+#### ✅ Domain Layer
+- Entity models (User, Repository, PullRequest, FileDiff, CodeHunk, DiffLine)
+- Enum types (UserType, PRState, ReviewDecision, FileStatus, LineType)
+- Repository interfaces (GitHubRepository, AuthRepository, RepositoryContextRepository)
+- Use cases (Authenticate, GetRepositories, GetPullRequests, SubmitReview)
+
+#### ✅ Repository Selection Screen
+- RepositorySelectionViewModel with state management
+- Full UI implementation with repository list
+- LazyColumn for repository items
+- Repository details (name, description, language, open issues)
+- Refresh functionality
+- Loading, error, and empty states
+- Navigation to Current Work screen
+
+#### ⚠️ Current Work Screen - PARTIALLY IMPLEMENTED
+**Implemented**:
+- Screen skeleton with basic layout
+- Owner/repo display
+- Navigation structure to PR review
+- Placeholder demo button
+
+**Not Implemented (see detailed todo list below)**:
+- Pull request list display
+- PR filtering and sorting
+- PR status indicators
+- Refresh functionality
+- Loading and error states
+- Empty state handling
+
+#### ⚠️ PR Review Screen - SKELETON ONLY
+**Implemented**:
+- Basic screen structure
+- Top app bar with back navigation
+- Owner/repo/PR number display
+- Placeholder text
+
+**Not Implemented**:
+- PR metadata display
+- File list
+- Diff viewer
+- Comment system
+- Review submission
+- Gesture navigation
+- Any actual functionality
 
 ### What's Not Implemented
-❌ OAuth 2.0 flow (uses PAT instead)  
-❌ Local caching/offline support  
-❌ Gesture-based navigation  
-❌ Code syntax highlighting  
-❌ Inline commenting  
-❌ Draft reviews  
-❌ Background sync  
-❌ Image loading  
-❌ Complex animations  
+
+#### ❌ Core Features Not Started
+- OAuth 2.0 flow (uses PAT instead)
+- Local caching/offline support
+- Gesture-based navigation system
+- Code syntax highlighting
+- Inline commenting on diffs
+- Draft reviews
+- Comment threading
+- Review conversations
+- File tree navigation
+- Code search within PR
+- Background sync
+- Image/avatar loading
+- Animations and transitions
+
+#### ❌ Advanced Features
+- Multiple repository support
+- Issue management
+- PR creation
+- Branch management
+- Merge conflict resolution
+- CI/CD status display
+- Review request notifications
+- Team mentions
+- Code suggestions
 
 ### Simplified Design Decisions
 
@@ -1083,10 +1344,12 @@ API Service + DTOs + Mappers
 5. **Single Repository Focus**: Simplified workflow
 6. **Minimal Dependencies**: Only essential libraries
 7. **API 34 Only**: No backward compatibility code
+8. **Compose Only**: No XML layouts
+9. **No Complex Animations**: Focus on functionality
 
 ---
 
-## 8. Testing Structure
+## 9. Testing Structure
 
 ### Current Test Coverage
 
@@ -1099,22 +1362,268 @@ API Service + DTOs + Mappers
 
 ---
 
-## 9. Future Enhancements
+## 10. Development Roadmap & Next Steps
 
-Based on the architecture, these are potential future additions (not currently planned):
+This section provides a granular, step-by-step roadmap starting from the Current Work Screen. Each item is broken down into manageable tasks that can be implemented and tested independently.
 
-1. Gesture system implementation
-2. Syntax highlighting for code diffs
-3. Inline comment threading
-4. Draft review support
-5. Local caching with Room
-6. Offline mode
-7. More comprehensive error handling
-8. Advanced navigation patterns
+### Phase 1: Complete Current Work Screen (Highest Priority)
+
+#### 1.1 Update CurrentWorkViewModel
+- [ ] Add method to load pull requests using existing `GetPullRequestsUseCase`
+- [ ] Update `CurrentWorkUiState` to include:
+  - [ ] `pullRequests: List<PullRequest>`
+  - [ ] `isLoadingPRs: Boolean`
+  - [ ] `filter: PRFilter` enum (ALL, OPEN, CLOSED)
+  - [ ] `sortBy: PRSortOrder` enum (CREATED, UPDATED, COMMENTS)
+- [ ] Implement `loadPullRequests(owner, repo, state)` method
+- [ ] Add `refreshPullRequests()` method
+- [ ] Add `filterPullRequests(filter)` method
+- [ ] Handle loading states properly
+- [ ] Handle error states with proper messages
+
+#### 1.2 Update CurrentWorkScreen UI
+- [ ] Replace placeholder content with pull request list
+- [ ] Add `LazyColumn` for PR items (similar to repository list pattern)
+- [ ] Create `PullRequestItem` composable with:
+  - [ ] PR number and title
+  - [ ] Author information (username)
+  - [ ] State indicator (open/closed/merged) with colored badge
+  - [ ] Basic stats (comments, changed files, +/- lines)
+  - [ ] Created/updated timestamp
+  - [ ] Click handler to navigate to PR review
+- [ ] Add top app bar with:
+  - [ ] Repository name display
+  - [ ] Refresh button
+  - [ ] Filter dropdown menu (open/closed/all)
+- [ ] Implement loading state (CircularProgressIndicator)
+- [ ] Implement error state with retry button
+- [ ] Implement empty state ("No pull requests found")
+- [ ] Add pull-to-refresh functionality
+
+#### 1.3 Create Supporting Components
+- [ ] `PRStateIndicator` composable - colored badge showing PR state
+- [ ] `PRStats` composable - compact stats display
+- [ ] `TimeAgo` helper function - format timestamps (e.g., "2 hours ago")
+
+#### 1.4 Testing & Validation
+- [ ] Test with repository that has no PRs
+- [ ] Test with repository that has many PRs
+- [ ] Test error handling (network errors, rate limits)
+- [ ] Test filter functionality
+- [ ] Test navigation to PR review screen with correct parameters
+
+### Phase 2: Implement PR Review Screen - Basic Display
+
+#### 2.1 Update PRReviewViewModel
+- [ ] Wire up existing `loadPullRequest()` method to actual screen
+- [ ] Ensure PR details are loaded on screen launch
+- [ ] Ensure PR files are loaded on screen launch
+- [ ] Handle loading states
+- [ ] Handle error states
+- [ ] Add computed property for current file metadata
+
+#### 2.2 Create PR Metadata Section
+- [ ] Create `PRMetadataCard` composable showing:
+  - [ ] PR title
+  - [ ] PR state (open/closed/merged)
+  - [ ] Author information
+  - [ ] Created/updated dates
+  - [ ] Branch information (head → base)
+  - [ ] PR description (body)
+  - [ ] Stats (commits, files changed, additions, deletions)
+
+#### 2.3 Implement File List View
+- [ ] Create `FileListView` composable
+- [ ] Display list of changed files using existing `files` from state
+- [ ] For each file show:
+  - [ ] File name with full path
+  - [ ] Change type (added/modified/removed/renamed)
+  - [ ] Addition/deletion counts
+  - [ ] File status icon
+- [ ] Highlight current file being viewed
+- [ ] Add click handler to jump to specific file
+- [ ] Show file counter (e.g., "File 1 of 12")
+
+#### 2.4 Basic File Navigation
+- [ ] Add navigation buttons (Previous/Next file)
+- [ ] Implement `navigateToNextFile()` (already in ViewModel)
+- [ ] Implement `navigateToPreviousFile()` (already in ViewModel)
+- [ ] Show current file index
+- [ ] Disable previous/next when at boundaries
+
+#### 2.5 Testing & Validation
+- [ ] Test with PR that has 1 file
+- [ ] Test with PR that has many files
+- [ ] Test file navigation
+- [ ] Test error handling
+- [ ] Verify data matches GitHub web interface
+
+### Phase 3: Implement Diff Viewer (Core Feature)
+
+#### 3.1 Create Diff Parser
+- [ ] Create `DiffParser` utility class
+- [ ] Parse unified diff format from `FileDiff.patch`
+- [ ] Extract code hunks with line numbers
+- [ ] Identify additions, deletions, context lines
+- [ ] Handle special cases (binary files, no newline at EOF)
+
+#### 3.2 Create Diff Display Components
+- [ ] Create `DiffView` composable for file display
+- [ ] Create `DiffHunk` composable for each hunk
+- [ ] Create `DiffLine` composable for individual lines
+- [ ] Apply color coding:
+  - [ ] Green background for additions
+  - [ ] Red background for deletions
+  - [ ] Gray for context lines
+- [ ] Show line numbers (old and new)
+- [ ] Use monospace font for code
+- [ ] Handle long lines with horizontal scroll
+
+#### 3.3 Implement Inline Diff View
+- [ ] Create `InlineDiffView` composable
+- [ ] Show old and new lines together
+- [ ] Optimize for mobile screen width
+- [ ] Add expand/collapse for large hunks
+
+#### 3.4 Testing & Validation
+- [ ] Test with small diffs (1-5 lines)
+- [ ] Test with large diffs (100+ lines)
+- [ ] Test with various file types
+- [ ] Test readability on mobile screen
+- [ ] Compare with GitHub web interface
+
+### Phase 4: Implement Review Submission
+
+#### 4.1 Create Review UI Components
+- [ ] Create `ReviewSubmissionDialog` composable
+- [ ] Add review comment text field
+- [ ] Add review type selector (Approve/Request Changes/Comment)
+- [ ] Add submit button
+- [ ] Handle submission loading state
+
+#### 4.2 Wire Review Submission
+- [ ] Connect to existing `submitReview()` in ViewModel
+- [ ] Use existing `SubmitReviewUseCase`
+- [ ] Show success feedback
+- [ ] Handle submission errors
+- [ ] Navigate back to Current Work on success
+
+#### 4.3 Testing & Validation
+- [ ] Test approve flow
+- [ ] Test request changes flow
+- [ ] Test comment-only flow
+- [ ] Verify submission on GitHub web interface
+
+### Phase 5: Add Gesture Navigation (Advanced)
+
+#### 5.1 Implement Gesture Detection
+- [ ] Create `GestureDetector` for swipe gestures
+- [ ] Detect horizontal swipes (left/right)
+- [ ] Detect vertical swipes (up/down)
+- [ ] Add velocity thresholds
+- [ ] Prevent conflicts with scroll
+
+#### 5.2 Map Gestures to Actions
+- [ ] Swipe left → Next file
+- [ ] Swipe right → Previous file
+- [ ] Swipe up → Next hunk (future)
+- [ ] Swipe down → Previous hunk (future)
+
+#### 5.3 Add Visual Feedback
+- [ ] Show swipe indicators
+- [ ] Animate file transitions
+- [ ] Add haptic feedback
+
+#### 5.4 Testing & Validation
+- [ ] Test on physical device
+- [ ] Test gesture sensitivity
+- [ ] Test edge cases (end of files)
+
+### Phase 6: Syntax Highlighting (Enhancement)
+
+#### 6.1 Add Syntax Highlighting Library
+- [ ] Evaluate lightweight syntax highlighting libraries
+- [ ] Add dependency if needed
+- [ ] Create language detector from file extension
+
+#### 6.2 Implement Highlighting
+- [ ] Apply syntax highlighting to diff lines
+- [ ] Support common languages (Kotlin, Java, Python, JavaScript, etc.)
+- [ ] Use appropriate color scheme for light/dark theme
+
+#### 6.3 Testing & Validation
+- [ ] Test with various file types
+- [ ] Verify readability
+- [ ] Check performance with large files
+
+### Phase 7: Inline Comments (Future)
+
+#### 7.1 Comment UI Components
+- [ ] Create `CommentThread` composable
+- [ ] Create `CommentItem` composable
+- [ ] Create `AddCommentDialog` composable
+
+#### 7.2 Comment Placement
+- [ ] Allow long-press on diff line to add comment
+- [ ] Show comment indicators on lines
+- [ ] Display comment threads inline
+
+#### 7.3 API Integration
+- [ ] Add comment fetching to `GitHubApiService`
+- [ ] Add comment posting to `GitHubApiService`
+- [ ] Update domain models for comments
+- [ ] Create use cases for comments
+
+### Phase 8: Polish & Optimization
+
+#### 8.1 Performance Optimization
+- [ ] Optimize large PR loading
+- [ ] Add pagination for file lists
+- [ ] Implement lazy loading for diffs
+- [ ] Add caching for viewed PRs
+
+#### 8.2 Error Handling
+- [ ] Improve error messages
+- [ ] Add retry mechanisms
+- [ ] Handle rate limiting gracefully
+- [ ] Add offline detection
+
+#### 8.3 Accessibility
+- [ ] Add content descriptions
+- [ ] Test with TalkBack
+- [ ] Ensure proper touch targets
+- [ ] Add keyboard navigation
+
+#### 8.4 Testing
+- [ ] Add unit tests for ViewModels
+- [ ] Add unit tests for Use Cases
+- [ ] Add UI tests for critical flows
+- [ ] Add integration tests
+
+### Priority Summary
+
+**Immediate Next Steps** (This Sprint):
+1. Complete Current Work Screen (Phase 1) - 3-5 days
+2. Implement PR Review basic display (Phase 2) - 2-3 days
+
+**Short Term** (Next Sprint):
+3. Implement Diff Viewer (Phase 3) - 5-7 days
+4. Implement Review Submission (Phase 4) - 2-3 days
+
+**Medium Term** (Following Sprints):
+5. Add Gesture Navigation (Phase 5) - 3-5 days
+6. Add Syntax Highlighting (Phase 6) - 2-3 days
+
+**Long Term** (Future):
+7. Inline Comments (Phase 7) - 5-7 days
+8. Polish & Optimization (Phase 8) - Ongoing
+
+**Total Estimated Time to MVP**: 15-20 development days
+**Total Estimated Time to Feature Complete**: 30-40 development days
 
 ---
 
-## Conclusion
+## 11. Conclusion
 
 This class architecture documentation reflects the **current implementation** of Issuetrax. The application follows Clean Architecture principles with a deliberately minimal approach:
 
@@ -1123,5 +1632,29 @@ This class architecture documentation reflects the **current implementation** of
 - **Modern**: Kotlin, Compose, Material Design 3
 - **Testable**: Clear separation of concerns
 - **Maintainable**: Standard patterns and practices
+
+### Current State Summary
+
+**Foundation**: ✅ Complete  
+- Architecture, DI, navigation, resources, security all in place
+
+**Authentication**: ✅ Complete  
+- Full PAT authentication with encrypted storage
+
+**Repository Selection**: ✅ Complete  
+- Full UI, data loading, navigation working
+
+**Current Work Screen**: ⚠️ 40% Complete  
+- Structure in place, needs PR list implementation
+
+**PR Review Screen**: ⚠️ 10% Complete  
+- Basic structure only, core functionality needed
+
+### Next Steps
+
+Follow the granular roadmap in Section 10, starting with:
+1. **Immediate**: Complete Current Work Screen (Phase 1)
+2. **Short-term**: Implement PR Review basic display and diff viewer (Phases 2-3)
+3. **Medium-term**: Add review submission and gesture navigation (Phases 4-5)
 
 The architecture is designed to be understood step-by-step and can evolve incrementally as needs arise, without requiring significant refactoring.
