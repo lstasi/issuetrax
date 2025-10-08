@@ -1,5 +1,6 @@
 package com.issuetrax.app.domain.usecase
 
+import com.issuetrax.app.domain.entity.Review
 import com.issuetrax.app.domain.repository.GitHubRepository
 import com.issuetrax.app.domain.repository.ReviewComment
 import javax.inject.Inject
@@ -14,7 +15,7 @@ class SubmitReviewUseCase @Inject constructor(
         body: String?,
         event: ReviewEvent,
         comments: List<ReviewComment> = emptyList()
-    ): Result<Unit> {
+    ): Result<Review> {
         val eventString = when (event) {
             ReviewEvent.APPROVE -> "APPROVE"
             ReviewEvent.REQUEST_CHANGES -> "REQUEST_CHANGES"

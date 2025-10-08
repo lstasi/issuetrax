@@ -7,6 +7,7 @@ import com.issuetrax.app.data.mapper.toDomain
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
+import com.issuetrax.app.domain.entity.Review
 import com.issuetrax.app.domain.entity.User
 import com.issuetrax.app.domain.repository.AuthRepository
 import com.issuetrax.app.domain.repository.GitHubRepository
@@ -132,7 +133,7 @@ class GitHubRepositoryImpl @Inject constructor(
         body: String?,
         event: String,
         comments: List<ReviewComment>
-    ): Result<Unit> {
+    ): Result<Review> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -145,7 +146,8 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.createReview("Bearer $token", owner, repo, number, request)
             if (response.isSuccessful) {
-                Result.success(Unit)
+                val review = response.body()!!.toDomain()
+                Result.success(review)
             } else {
                 Result.failure(Exception("Failed to create review: ${response.code()}"))
             }

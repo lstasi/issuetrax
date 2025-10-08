@@ -2,6 +2,7 @@ package com.issuetrax.app.data.api
 
 import com.issuetrax.app.data.api.model.PullRequestDto
 import com.issuetrax.app.data.api.model.RepositoryDto
+import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.FileDiffDto
 import retrofit2.Response
@@ -54,7 +55,7 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("number") number: Int,
         @Body reviewRequest: CreateReviewRequest
-    ): Response<Unit>
+    ): Response<ReviewDto>
 }
 
 data class CreateReviewRequest(

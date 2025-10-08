@@ -3,6 +3,7 @@ package com.issuetrax.app.data.mapper
 import com.issuetrax.app.data.api.model.FileDiffDto
 import com.issuetrax.app.data.api.model.PullRequestDto
 import com.issuetrax.app.data.api.model.RepositoryDto
+import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
@@ -95,6 +96,27 @@ fun FileDiffDto.toDomain(): FileDiff {
         blobUrl = blobUrl,
         rawUrl = rawUrl,
         previousFilename = previousFilename
+    )
+}
+
+fun ReviewDto.toDomain(): Review {
+    return Review(
+        id = id,
+        user = user.toDomain(),
+        body = body,
+        state = when (state.uppercase()) {
+            "APPROVED" -> ReviewState.APPROVED
+            "CHANGES_REQUESTED" -> ReviewState.CHANGES_REQUESTED
+            "COMMENTED" -> ReviewState.COMMENTED
+            "DISMISSED" -> ReviewState.DISMISSED
+            "PENDING" -> ReviewState.PENDING
+            else -> ReviewState.COMMENTED
+        },
+        htmlUrl = htmlUrl,
+        pullRequestUrl = pullRequestUrl,
+        submittedAt = submittedAt?.let { parseDateTime(it) },
+        commitId = commitId,
+        authorAssociation = authorAssociation
     )
 }
 
