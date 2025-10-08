@@ -9,6 +9,7 @@ data class Repository(
     val owner: User,
     val description: String?,
     val private: Boolean,
+    val archived: Boolean,
     val htmlUrl: String,
     val cloneUrl: String,
     val sshUrl: String,
