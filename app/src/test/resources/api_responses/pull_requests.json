@@ -1,0 +1,222 @@
+[
+  {
+    "id": 1111111111,
+    "number": 42,
+    "title": "Add new feature for user authentication",
+    "body": "This PR adds OAuth2 authentication support.\n\nChanges:\n- Added OAuth2 flow\n- Updated security config\n- Added tests",
+    "state": "open",
+    "user": {
+      "id": 1234567,
+      "login": "testuser",
+      "name": "Test User",
+      "email": "test@example.com",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+      "html_url": "https://github.com/testuser",
+      "type": "User"
+    },
+    "created_at": "2024-10-01T10:00:00Z",
+    "updated_at": "2024-10-08T14:30:00Z",
+    "merged_at": null,
+    "closed_at": null,
+    "mergeable": true,
+    "merged": false,
+    "draft": false,
+    "changed_files": 5,
+    "additions": 234,
+    "deletions": 45,
+    "commits": 3,
+    "head": {
+      "label": "testuser:feature/oauth",
+      "ref": "feature/oauth",
+      "sha": "abc123def456",
+      "user": {
+        "id": 1234567,
+        "login": "testuser",
+        "name": "Test User",
+        "email": "test@example.com",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+        "html_url": "https://github.com/testuser",
+        "type": "User"
+      },
+      "repo": {
+        "id": 123456789,
+        "name": "test-repo",
+        "full_name": "testuser/test-repo",
+        "owner": {
+          "id": 1234567,
+          "login": "testuser",
+          "name": "Test User",
+          "email": "test@example.com",
+          "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+          "html_url": "https://github.com/testuser",
+          "type": "User"
+        },
+        "description": "A test repository for unit testing",
+        "private": false,
+        "html_url": "https://github.com/testuser/test-repo",
+        "clone_url": "https://github.com/testuser/test-repo.git",
+        "ssh_url": "git@github.com:testuser/test-repo.git",
+        "default_branch": "main",
+        "language": "Kotlin",
+        "stargazers_count": 42,
+        "forks_count": 7,
+        "open_issues_count": 3,
+        "created_at": "2023-01-15T10:30:00Z",
+        "updated_at": "2024-10-08T12:00:00Z",
+        "pushed_at": "2024-10-08T11:45:00Z"
+      }
+    },
+    "base": {
+      "label": "testuser:main",
+      "ref": "main",
+      "sha": "xyz789abc012",
+      "user": {
+        "id": 1234567,
+        "login": "testuser",
+        "name": "Test User",
+        "email": "test@example.com",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+        "html_url": "https://github.com/testuser",
+        "type": "User"
+      },
+      "repo": {
+        "id": 123456789,
+        "name": "test-repo",
+        "full_name": "testuser/test-repo",
+        "owner": {
+          "id": 1234567,
+          "login": "testuser",
+          "name": "Test User",
+          "email": "test@example.com",
+          "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+          "html_url": "https://github.com/testuser",
+          "type": "User"
+        },
+        "description": "A test repository for unit testing",
+        "private": false,
+        "html_url": "https://github.com/testuser/test-repo",
+        "clone_url": "https://github.com/testuser/test-repo.git",
+        "ssh_url": "git@github.com:testuser/test-repo.git",
+        "default_branch": "main",
+        "language": "Kotlin",
+        "stargazers_count": 42,
+        "forks_count": 7,
+        "open_issues_count": 3,
+        "created_at": "2023-01-15T10:30:00Z",
+        "updated_at": "2024-10-08T12:00:00Z",
+        "pushed_at": "2024-10-08T11:45:00Z"
+      }
+    },
+    "html_url": "https://github.com/testuser/test-repo/pull/42"
+  },
+  {
+    "id": 2222222222,
+    "number": 43,
+    "title": "Fix bug in data processing",
+    "body": "Fixes issue with null pointer exception in data processor",
+    "state": "open",
+    "user": {
+      "id": 7654321,
+      "login": "contributor",
+      "name": "Contributor User",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/7654321?v=4",
+      "html_url": "https://github.com/contributor",
+      "type": "User"
+    },
+    "created_at": "2024-10-05T15:20:00Z",
+    "updated_at": "2024-10-07T09:45:00Z",
+    "merged_at": null,
+    "closed_at": null,
+    "mergeable": true,
+    "merged": false,
+    "draft": false,
+    "changed_files": 2,
+    "additions": 15,
+    "deletions": 8,
+    "commits": 1,
+    "head": {
+      "label": "contributor:fix/null-pointer",
+      "ref": "fix/null-pointer",
+      "sha": "def456ghi789",
+      "user": {
+        "id": 7654321,
+        "login": "contributor",
+        "name": "Contributor User",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/7654321?v=4",
+        "html_url": "https://github.com/contributor",
+        "type": "User"
+      },
+      "repo": {
+        "id": 123456789,
+        "name": "test-repo",
+        "full_name": "testuser/test-repo",
+        "owner": {
+          "id": 1234567,
+          "login": "testuser",
+          "name": "Test User",
+          "email": "test@example.com",
+          "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+          "html_url": "https://github.com/testuser",
+          "type": "User"
+        },
+        "description": "A test repository for unit testing",
+        "private": false,
+        "html_url": "https://github.com/testuser/test-repo",
+        "clone_url": "https://github.com/testuser/test-repo.git",
+        "ssh_url": "git@github.com:testuser/test-repo.git",
+        "default_branch": "main",
+        "language": "Kotlin",
+        "stargazers_count": 42,
+        "forks_count": 7,
+        "open_issues_count": 3,
+        "created_at": "2023-01-15T10:30:00Z",
+        "updated_at": "2024-10-08T12:00:00Z",
+        "pushed_at": "2024-10-08T11:45:00Z"
+      }
+    },
+    "base": {
+      "label": "testuser:main",
+      "ref": "main",
+      "sha": "xyz789abc012",
+      "user": {
+        "id": 1234567,
+        "login": "testuser",
+        "name": "Test User",
+        "email": "test@example.com",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+        "html_url": "https://github.com/testuser",
+        "type": "User"
+      },
+      "repo": {
+        "id": 123456789,
+        "name": "test-repo",
+        "full_name": "testuser/test-repo",
+        "owner": {
+          "id": 1234567,
+          "login": "testuser",
+          "name": "Test User",
+          "email": "test@example.com",
+          "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+          "html_url": "https://github.com/testuser",
+          "type": "User"
+        },
+        "description": "A test repository for unit testing",
+        "private": false,
+        "html_url": "https://github.com/testuser/test-repo",
+        "clone_url": "https://github.com/testuser/test-repo.git",
+        "ssh_url": "git@github.com:testuser/test-repo.git",
+        "default_branch": "main",
+        "language": "Kotlin",
+        "stargazers_count": 42,
+        "forks_count": 7,
+        "open_issues_count": 3,
+        "created_at": "2023-01-15T10:30:00Z",
+        "updated_at": "2024-10-08T12:00:00Z",
+        "pushed_at": "2024-10-08T11:45:00Z"
+      }
+    },
+    "html_url": "https://github.com/testuser/test-repo/pull/43"
+  }
+]
