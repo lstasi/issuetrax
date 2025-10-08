@@ -32,6 +32,7 @@ fun RepositoryDto.toDomain(): Repository {
         owner = owner.toDomain(),
         description = description,
         private = private,
+        archived = archived,
         htmlUrl = htmlUrl,
         cloneUrl = cloneUrl,
         sshUrl = sshUrl,
@@ -53,7 +54,7 @@ fun PullRequestDto.toDomain(): PullRequest {
         title = title,
         body = body,
         state = when (state.lowercase()) {
-            "closed" -> if (merged) PRState.MERGED else PRState.CLOSED
+            "closed" -> if (merged == true) PRState.MERGED else PRState.CLOSED
             else -> PRState.OPEN
         },
         author = user.toDomain(),

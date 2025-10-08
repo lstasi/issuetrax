@@ -118,7 +118,7 @@ class CurrentWorkViewModel @Inject constructor(
         return when (_uiState.value.sortBy) {
             PRSortOrder.CREATED -> pullRequests.sortedByDescending { it.createdAt }
             PRSortOrder.UPDATED -> pullRequests.sortedByDescending { it.updatedAt }
-            PRSortOrder.COMMENTS -> pullRequests.sortedByDescending { it.commits } // Using commits as proxy since we don't have comments count
+            PRSortOrder.COMMENTS -> pullRequests.sortedByDescending { it.commits ?: 0 } // Using commits as proxy since we don't have comments count
         }
     }
     
