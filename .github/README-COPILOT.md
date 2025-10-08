@@ -1,6 +1,15 @@
 # Copilot Coding Agent Setup
 
-This directory contains setup scripts for the GitHub Copilot Coding Agent environment.
+This directory contains configuration and setup scripts for the GitHub Copilot Coding Agent environment.
+
+## copilot.yml
+
+Configuration file for GitHub Copilot Coding Agent that defines:
+- Setup steps to run before the firewall is enabled
+- Custom instructions file location
+- Build environment configuration
+
+See [Best practices for Copilot coding agent](https://gh.io/copilot-coding-agent-tips) for more information.
 
 ## copilot-setup.sh
 
@@ -15,12 +24,9 @@ This script runs **before the firewall is enabled** in the Copilot environment, 
 
 ### Usage:
 
-The script is automatically executed by the Copilot Coding Agent when configured in the repository settings:
+The script is automatically executed by the Copilot Coding Agent based on the `copilot.yml` configuration file.
 
-1. Go to Repository Settings → Copilot → Coding Agent
-2. Under "Actions setup steps", add this script to run before the firewall is enabled
-
-Alternatively, run manually:
+To run manually for testing:
 ```bash
 ./.github/copilot-setup.sh
 ```

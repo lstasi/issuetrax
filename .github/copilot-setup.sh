@@ -7,7 +7,9 @@ set -e
 echo "Setting up Android development environment for Copilot..."
 
 # Ensure we're in the project directory
-cd /home/runner/work/Issuetrax/Issuetrax
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Make gradlew executable
 chmod +x gradlew

@@ -23,7 +23,7 @@ Issuetrax is a Kotlin Android application for focused GitHub issue management an
 - **Networking**: Retrofit 2 + OkHttp 3
 - **Serialization**: Kotlinx Serialization
 - **Local Storage**: DataStore (preferences only)
-- **Authentication**: GitHub OAuth 2.0 with Custom Tabs
+- **Authentication**: GitHub Personal Access Token (PAT) - simplified
 - **Security**: Security-crypto for encrypted token storage
 - **Testing**: JUnit, Espresso, Compose Testing (basic only)
 
@@ -94,7 +94,7 @@ app/src/main/java/com/issuetrax/app/
 ├── data/
 │   ├── api/                 # GitHub API interfaces
 │   ├── repository/          # Repository implementations
-│   └── local/              # Room database, DataStore
+│   └── local/              # DataStore only (no Room database)
 ├── domain/
 │   ├── entity/             # Domain models
 │   ├── repository/         # Repository interfaces
@@ -113,9 +113,9 @@ app/src/main/java/com/issuetrax/app/
 ## Core Features & Implementation
 
 ### GitHub Integration
-- Use GitHub REST API v4 for data operations
-- Implement OAuth 2.0 flow with Custom Tabs
-- Cache data locally with Room for offline capability
+- Use GitHub REST API v3 for data operations
+- Implement Personal Access Token (PAT) authentication (simplified - no OAuth)
+- No local database caching (DataStore for preferences only)
 - Handle rate limiting and network errors gracefully
 
 ### Gesture-Based Navigation
@@ -194,7 +194,7 @@ fun `when getPullRequests is called, should return success with data`() = runTes
 ## Performance Considerations
 
 - Use `LazyColumn` for large lists
-- Implement proper image caching with Coil
+- No image loading library needed (minimal UI, no images)
 - Optimize Compose recompositions
 - Handle large PR diffs efficiently
 - Implement proper memory management
@@ -203,7 +203,7 @@ fun `when getPullRequests is called, should return success with data`() = runTes
 
 - Store sensitive data in EncryptedSharedPreferences
 - Validate all API responses
-- Implement proper OAuth token management
+- Implement proper PAT (Personal Access Token) management
 - Use certificate pinning for API calls
 - Follow Android security best practices
 

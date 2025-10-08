@@ -1,0 +1,12 @@
+# GitHub Copilot Coding Agent Configuration
+# See: https://gh.io/copilot-coding-agent-tips
+
+# Setup steps that run before the firewall is enabled
+# This allows downloading dependencies from external repositories like dl.google.com
+setup_steps:
+  - name: "Setup Android Environment"
+    run: ./.github/copilot-setup.sh
+    shell: bash
+
+# Custom instructions file location (default is .github/copilot-instructions.md)
+instructions: .github/copilot-instructions.md
