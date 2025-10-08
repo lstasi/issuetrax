@@ -46,6 +46,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 
 ### 📋 Core Documents
 
+- **[CLASS_ARCHITECTURE.md](doc/CLASS_ARCHITECTURE.md)**: Complete class reference with all classes, methods, and relationships ⭐ **NEW**
 - **[PROJECT_DEFINITION.md](doc/PROJECT_DEFINITION.md)**: Complete project overview, requirements, and implementation roadmap
 - **[ARCHITECTURE.md](doc/ARCHITECTURE.md)**: Technical architecture, patterns, and implementation details
 - **[UI_UX_DESIGN.md](doc/UI_UX_DESIGN.md)**: Detailed UI/UX specifications with gesture system design
@@ -56,6 +57,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 
 | Document | Purpose | Target Audience |
 |----------|---------|-----------------|
+| [Class Architecture](doc/CLASS_ARCHITECTURE.md) | **Detailed class reference and implementation** | **Developers, Code Reviewers** |
 | [Project Definition](doc/PROJECT_DEFINITION.md) | High-level overview and requirements | Product Managers, Stakeholders |
 | [Architecture](doc/ARCHITECTURE.md) | Technical implementation details | Developers, Architects |
 | [UI/UX Design](doc/UI_UX_DESIGN.md) | Design specifications and user experience | Designers, Frontend Developers |

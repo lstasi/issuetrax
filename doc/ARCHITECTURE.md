@@ -4,6 +4,8 @@
 
 This document details the technical architecture for the Issuetrax Kotlin mobile application, focusing on the implementation details that support the gesture-based PR review system and GitHub integration.
 
+**For detailed class-by-class documentation, see [CLASS_ARCHITECTURE.md](CLASS_ARCHITECTURE.md)** - Complete reference of all classes, their responsibilities, and relationships.
+
 ## Architecture Patterns
 
 ### Clean Architecture Implementation
