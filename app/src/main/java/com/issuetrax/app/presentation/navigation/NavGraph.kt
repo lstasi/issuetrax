@@ -12,7 +12,7 @@ import com.issuetrax.app.presentation.ui.repository_selection.RepositorySelectio
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
-    
+
     NavHost(
         navController = navController,
         startDestination = Routes.Auth.route
@@ -26,35 +26,38 @@ fun NavGraph() {
                 }
             )
         }
-        
+
         composable(Routes.RepositorySelection.route) {
             RepositorySelectionScreen(
                 onRepositorySelected = { owner, repo ->
-                    navController.navigate(Routes.CurrentWork.createRoute(owner, repo)) {
-                        popUpTo(Routes.RepositorySelection.route) { inclusive = true }
-                    }
+                    navController.navigate(Routes.CurrentWork.createRoute(owner, repo))
                 }
             )
         }
-        
+
         composable(Routes.CurrentWork.route) { backStackEntry ->
             val owner = backStackEntry.arguments?.getString("owner") ?: ""
             val repo = backStackEntry.arguments?.getString("repo") ?: ""
-            
+
             CurrentWorkScreen(
                 owner = owner,
                 repo = repo,
                 onNavigateToPR = { prNumber ->
                     navController.navigate(Routes.PRReview.createRoute(owner, repo, prNumber))
+                },
+                onNavigateBack = {
+                    navController.navigate(Routes.RepositorySelection.route) {
+                        popUpTo(Routes.RepositorySelection.route) { inclusive = false }
+                    }
                 }
             )
         }
-        
+
         composable(Routes.PRReview.route) { backStackEntry ->
             val owner = backStackEntry.arguments?.getString("owner") ?: ""
             val repo = backStackEntry.arguments?.getString("repo") ?: ""
             val prNumber = backStackEntry.arguments?.getString("prNumber")?.toIntOrNull() ?: 0
-            
+
             PRReviewScreen(
                 owner = owner,
                 repo = repo,

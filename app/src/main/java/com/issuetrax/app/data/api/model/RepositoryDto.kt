@@ -11,6 +11,7 @@ data class RepositoryDto(
     val owner: UserDto,
     val description: String?,
     val private: Boolean,
+    val archived: Boolean,
     @SerialName("html_url") val htmlUrl: String,
     @SerialName("clone_url") val cloneUrl: String,
     @SerialName("ssh_url") val sshUrl: String,

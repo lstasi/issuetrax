@@ -47,7 +47,9 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getUserRepositories("Bearer $token")
             if (response.isSuccessful) {
-                val repositories = response.body()!!.map { it.toDomain() }
+                val repositories = response.body()!!
+                    .filter { !it.archived }  // Filter out archived repositories
+                    .map { it.toDomain() }
                 emit(Result.success(repositories))
             } else {
                 emit(Result.failure(Exception("Failed to get repositories: ${response.code()}")))
