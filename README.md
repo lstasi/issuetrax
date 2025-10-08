@@ -28,15 +28,17 @@ Issuetrax is designed to revolutionize mobile code reviews by providing a clean,
 
 ## 🏗️ Architecture
 
-Built with modern Android development practices:
+Built with modern Android development practices and **minimal essential dependencies**:
 
 - **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
+- **UI Framework**: Jetpack Compose (Material 3)
 - **Architecture**: MVVM + Clean Architecture
 - **Dependency Injection**: Hilt
 - **Networking**: Retrofit + OkHttp
-- **Local Storage**: Room + DataStore
-- **Authentication**: GitHub OAuth 2.0
+- **Local Storage**: DataStore (preferences only)
+- **Authentication**: GitHub OAuth 2.0 with Custom Tabs
+- **Target**: Android 14+ (API 34) - No backward compatibility
+- **Philosophy**: Simple UI, minimal dependencies, no unnecessary animations
 
 ## 📚 Documentation
 
@@ -44,6 +46,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 
 ### 📋 Core Documents
 
+- **[CLASS_ARCHITECTURE.md](doc/CLASS_ARCHITECTURE.md)**: Complete class reference with all classes, methods, and relationships ⭐ **NEW**
 - **[PROJECT_DEFINITION.md](doc/PROJECT_DEFINITION.md)**: Complete project overview, requirements, and implementation roadmap
 - **[ARCHITECTURE.md](doc/ARCHITECTURE.md)**: Technical architecture, patterns, and implementation details
 - **[UI_UX_DESIGN.md](doc/UI_UX_DESIGN.md)**: Detailed UI/UX specifications with gesture system design
@@ -54,6 +57,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 
 | Document | Purpose | Target Audience |
 |----------|---------|-----------------|
+| [Class Architecture](doc/CLASS_ARCHITECTURE.md) | **Detailed class reference and implementation** | **Developers, Code Reviewers** |
 | [Project Definition](doc/PROJECT_DEFINITION.md) | High-level overview and requirements | Product Managers, Stakeholders |
 | [Architecture](doc/ARCHITECTURE.md) | Technical implementation details | Developers, Architects |
 | [UI/UX Design](doc/UI_UX_DESIGN.md) | Design specifications and user experience | Designers, Frontend Developers |
@@ -101,13 +105,14 @@ This repository currently contains the **definition and design phase** documenta
 
 ## 🎯 Target Output
 
-The final deliverable will be an **installable APK** that provides:
-- Native Android performance
+The final deliverable will be a **minimal, focused installable APK** that provides:
+- Native Android 14+ performance
 - Simplified single-repository workflow
 - Gesture-optimized PR review experience with inline diff views
-- Offline-capable operation
 - Secure GitHub authentication
 - Focused issue and PR management
+- **Minimal APK size** with only essential dependencies
+- **Simple, clean UI** without unnecessary animations
 
 ## 🤝 Contributing
 

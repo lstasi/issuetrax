@@ -4,6 +4,8 @@
 
 This document details the technical architecture for the Issuetrax Kotlin mobile application, focusing on the implementation details that support the gesture-based PR review system and GitHub integration.
 
+**For detailed class-by-class documentation, see [CLASS_ARCHITECTURE.md](CLASS_ARCHITECTURE.md)** - Complete reference of all classes, their responsibilities, and relationships.
+
 ## Architecture Patterns
 
 ### Clean Architecture Implementation
@@ -411,12 +413,13 @@ fun `swipe gesture triggers correct action`() {
 
 ```kotlin
 // build.gradle.kts (app level)
+// MINIMAL DEPENDENCIES CONFIGURATION - Android 14+ Only
 android {
     compileSdk = 34
     
     defaultConfig {
         applicationId = "com.issuetrax.app"
-        minSdk = 24
+        minSdk = 34  // Android 14+ only - no backward compatibility
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
@@ -438,43 +441,58 @@ android {
     }
     
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.4.6"
     }
 }
 
 dependencies {
-    // Compose BOM
+    // Compose BOM - minimal UI components only
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     
+    // Activity & Lifecycle
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")
     
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    
-    // Hilt
+    // Hilt - Dependency Injection
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     
-    // Networking
+    // Networking - GitHub API only
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     
-    // DataStore
+    // DataStore - Simple preferences storage
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     
-    // Security
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // Security - Encrypted token storage
+    implementation("androidx.security:security-crypto:1.1.0")
+    
+    // Custom Tabs - OAuth flow
+    implementation("androidx.browser:browser:1.6.0")
+    
+    // Material Components - Theme support
+    implementation("com.google.android.material:material:1.10.0")
 }
 ```
+
+**Note: Removed Dependencies for Minimal App**
+- ❌ Room Database - No local caching required
+- ❌ WorkManager - No background sync needed
+- ❌ Coil Image Loading - No images to load
+- ❌ Material Icons Extended - Use basic icons only
+- ❌ Core Library Desugaring - Not needed with minSdk 34
 
 This technical architecture provides the foundation for implementing the gesture-based PR review system while maintaining clean, testable, and performant code. The modular approach allows for iterative development and easy maintenance as the application evolves.

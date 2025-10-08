@@ -13,6 +13,11 @@
     <string name="nav_pr_review">PR Review</string>
     <string name="nav_settings">Settings</string>
     
+    <!-- Repository Selection -->
+    <string name="repo_selection_title">Select Repository</string>
+    <string name="repo_selection_subtitle">Choose a repository to work on</string>
+    <string name="repo_selection_empty">No repositories found</string>
+    
     <!-- Current Work -->
     <string name="current_work_title">Current Work</string>
     <string name="current_work_no_active">No active work</string>

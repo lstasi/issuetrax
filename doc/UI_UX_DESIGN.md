@@ -4,6 +4,13 @@
 
 Issuetrax embraces a **simplified, single-context workflow** design philosophy that focuses on one repository and one issue/PR at a time. The app prioritizes the PR review experience with **inline diff views optimized for mobile screens** and **gesture-based navigation** that reduces UI complexity while maximizing efficiency.
 
+## Related Documentation
+
+- **[CLASS_ARCHITECTURE.md](CLASS_ARCHITECTURE.md)** - Complete class reference for implementation details
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture patterns
+- **[PROJECT_DEFINITION.md](PROJECT_DEFINITION.md)** - Project requirements and scope
+- **[PROJECT_SETUP.md](PROJECT_SETUP.md)** - Development environment setup
+
 ## Visual Design System
 
 ### Color Palette
