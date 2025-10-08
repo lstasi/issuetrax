@@ -3,10 +3,8 @@
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">api.github.com</domain>
         <domain includeSubdomains="true">github.com</domain>
-        <pin-set expiration="2025-12-31">
-            <!-- GitHub's certificate pins -->
-            <pin digest="SHA-256">WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=</pin>
-            <pin digest="SHA-256">RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=</pin>
-        </pin-set>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
     </domain-config>
 </network-security-config>
