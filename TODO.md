@@ -94,18 +94,18 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 **Priority**: HIGHEST - Start here  
 **Estimated Time**: 3-5 days
 
-### 1.1 Update CurrentWorkViewModel
-- [ ] Add method to load pull requests using existing `GetPullRequestsUseCase`
-- [ ] Update `CurrentWorkUiState` to include:
-  - [ ] `pullRequests: List<PullRequest>`
-  - [ ] `isLoadingPRs: Boolean`
-  - [ ] `filter: PRFilter` enum (ALL, OPEN, CLOSED)
-  - [ ] `sortBy: PRSortOrder` enum (CREATED, UPDATED, COMMENTS)
-- [ ] Implement `loadPullRequests(owner, repo, state)` method
-- [ ] Add `refreshPullRequests()` method
-- [ ] Add `filterPullRequests(filter)` method
-- [ ] Handle loading states properly
-- [ ] Handle error states with proper messages
+### 1.1 Update CurrentWorkViewModel ✅ COMPLETE
+- [x] Add method to load pull requests using existing `GetPullRequestsUseCase`
+- [x] Update `CurrentWorkUiState` to include:
+  - [x] `pullRequests: List<PullRequest>`
+  - [x] `isLoadingPRs: Boolean`
+  - [x] `filter: PRFilter` enum (ALL, OPEN, CLOSED)
+  - [x] `sortBy: PRSortOrder` enum (CREATED, UPDATED, COMMENTS)
+- [x] Implement `loadPullRequests(owner, repo, state)` method
+- [x] Add `refreshPullRequests()` method
+- [x] Add `filterPullRequests(filter)` method
+- [x] Handle loading states properly
+- [x] Handle error states with proper messages
 
 ### 1.2 Update CurrentWorkScreen UI
 - [ ] Replace placeholder content with pull request list

@@ -22,6 +22,13 @@
     <string name="current_work_title">Current Work</string>
     <string name="current_work_no_active">No active work</string>
     <string name="current_work_select_repo">Select Repository</string>
+    <string name="current_work_empty">No pull requests found</string>
+    <string name="current_work_filter_all">All</string>
+    <string name="current_work_filter_open">Open</string>
+    <string name="current_work_filter_closed">Closed</string>
+    <string name="current_work_state_open">Open</string>
+    <string name="current_work_state_closed">Closed</string>
+    <string name="current_work_state_merged">Merged</string>
     
     <!-- PR Review -->
     <string name="pr_review_title">Pull Request Review</string>
