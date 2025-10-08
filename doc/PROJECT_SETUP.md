@@ -1,5 +1,13 @@
 # Issuetrax - Project Setup Guide
 
+## Documentation Overview
+
+This guide covers project setup and initial implementation. For comprehensive documentation:
+- **[CLASS_ARCHITECTURE.md](CLASS_ARCHITECTURE.md)** - Complete class reference with all classes, methods, and relationships
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture patterns and design decisions
+- **[PROJECT_DEFINITION.md](PROJECT_DEFINITION.md)** - Project requirements and roadmap
+- **[UI_UX_DESIGN.md](UI_UX_DESIGN.md)** - Design specifications and gesture system
+
 ## Development Environment Setup
 
 ### Prerequisites

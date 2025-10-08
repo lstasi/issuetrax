@@ -4,6 +4,13 @@
 
 Issuetrax is a native Android application built with Kotlin that provides a focused, single-project workflow for GitHub issue management and Pull Request (PR) reviews. The app operates on a simplified model: one repository, one issue/PR at a time, with primary focus on delivering an intuitive, gesture-based PR review experience optimized for mobile devices.
 
+## Related Documentation
+
+- **[CLASS_ARCHITECTURE.md](CLASS_ARCHITECTURE.md)** - Complete class reference documentation for the current implementation
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture patterns and implementation details
+- **[PROJECT_SETUP.md](PROJECT_SETUP.md)** - Development environment setup and initial implementation
+- **[UI_UX_DESIGN.md](UI_UX_DESIGN.md)** - Design specifications and gesture system
+
 ## Core Requirements
 
 ### Primary Features
