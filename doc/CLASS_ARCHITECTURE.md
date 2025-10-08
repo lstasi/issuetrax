@@ -214,8 +214,31 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 
 **Methods**:
 - `loadUserRepositories()` - Loads user's repositories
-- `loadPullRequests(owner: String, repo: String)` - Loads PRs for repository
+- `loadPullRequests(owner: String, repo: String, state: String = "open")` - Loads PRs for repository with state filter
+- `refreshPullRequests()` - Reloads PRs with current filter
+- `filterPullRequests(filter: PRFilter)` - Changes filter and reloads PRs
+- `sortPullRequests(sortOrder: PRSortOrder)` - Sorts PRs in-memory
 - `clearError()` - Clears error state
+
+#### `PRFilter`
+**Package**: `com.issuetrax.app.presentation.ui.current_work`  
+**Type**: Enum  
+**Purpose**: Filter options for pull requests
+
+**Values**:
+- `ALL` - All pull requests
+- `OPEN` - Open pull requests
+- `CLOSED` - Closed pull requests
+
+#### `PRSortOrder`
+**Package**: `com.issuetrax.app.presentation.ui.current_work`  
+**Type**: Enum  
+**Purpose**: Sort order options for pull requests
+
+**Values**:
+- `CREATED` - Sort by creation date (newest first)
+- `UPDATED` - Sort by update date (newest first)
+- `COMMENTS` - Sort by number of commits (most first)
 
 #### `CurrentWorkUiState`
 **Package**: `com.issuetrax.app.presentation.ui.current_work`  
@@ -228,6 +251,8 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - `repositories: List<Repository> = emptyList()` - Available repositories
 - `pullRequests: List<PullRequest> = emptyList()` - Open pull requests
 - `selectedRepository: String? = null` - Currently selected repository
+- `filter: PRFilter = PRFilter.OPEN` - Current PR filter
+- `sortBy: PRSortOrder = PRSortOrder.UPDATED` - Current sort order
 - `error: String? = null` - Error message
 
 #### `CurrentWorkScreen`
