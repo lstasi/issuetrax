@@ -50,6 +50,12 @@ android {
         buildConfig = true
     }
 
+    lint {
+        // Disable problematic lint checks that have bugs in Android Lint tool
+        disable += "MutableCollectionMutableState"
+        disable += "AutoboxingStateCreation"
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
