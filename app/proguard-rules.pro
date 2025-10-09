@@ -93,6 +93,9 @@
    static kotlinx.serialization.KSerializer serializer();
 }
 
+# Keep all API model DTOs to prevent obfuscation issues
+-keep class com.issuetrax.app.data.api.model.** { *; }
+
 # Room
 -keep class * extends androidx.room.RoomDatabase
 -dontwarn androidx.room.paging.**

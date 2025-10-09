@@ -7,6 +7,7 @@ import com.issuetrax.app.data.mapper.toDomain
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
+import com.issuetrax.app.domain.entity.Review
 import com.issuetrax.app.domain.entity.User
 import com.issuetrax.app.domain.repository.AuthRepository
 import com.issuetrax.app.domain.repository.GitHubRepository
@@ -47,7 +48,9 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getUserRepositories("Bearer $token")
             if (response.isSuccessful) {
-                val repositories = response.body()!!.map { it.toDomain() }
+                val repositories = response.body()!!
+                    .filter { !it.archived }  // Filter out archived repositories
+                    .map { it.toDomain() }
                 emit(Result.success(repositories))
             } else {
                 emit(Result.failure(Exception("Failed to get repositories: ${response.code()}")))
@@ -130,7 +133,7 @@ class GitHubRepositoryImpl @Inject constructor(
         body: String?,
         event: String,
         comments: List<ReviewComment>
-    ): Result<Unit> {
+    ): Result<Review> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -143,7 +146,13 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.createReview("Bearer $token", owner, repo, number, request)
             if (response.isSuccessful) {
-                Result.success(Unit)
+                val reviewDto = response.body()
+                if (reviewDto != null) {
+                    val review = reviewDto.toDomain()
+                    Result.success(review)
+                } else {
+                    Result.failure(Exception("Failed to create review: response body is null"))
+                }
             } else {
                 Result.failure(Exception("Failed to create review: ${response.code()}"))
             }

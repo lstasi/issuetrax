@@ -1,0 +1,57 @@
+[
+  {
+    "filename": "src/main/kotlin/AuthService.kt",
+    "status": "modified",
+    "additions": 45,
+    "deletions": 12,
+    "changes": 57,
+    "patch": "@@ -1,10 +1,15 @@\n package com.example\n \n class AuthService {\n-    fun authenticate(user: String): Boolean {\n-        return false\n+    fun authenticate(user: String, password: String): Boolean {\n+        if (user.isEmpty() || password.isEmpty()) {\n+            return false\n+        }\n+        return validateCredentials(user, password)\n     }\n+    \n+    private fun validateCredentials(user: String, password: String): Boolean {\n+        // Implementation\n+        return true\n+    }\n }",
+    "blob_url": "https://github.com/testuser/test-repo/blob/abc123def456/src/main/kotlin/AuthService.kt",
+    "raw_url": "https://github.com/testuser/test-repo/raw/abc123def456/src/main/kotlin/AuthService.kt",
+    "previous_filename": null
+  },
+  {
+    "filename": "src/main/kotlin/OAuth2Config.kt",
+    "status": "added",
+    "additions": 78,
+    "deletions": 0,
+    "changes": 78,
+    "patch": "@@ -0,0 +1,78 @@\n+package com.example\n+\n+class OAuth2Config {\n+    val clientId: String = \"\"\n+    val clientSecret: String = \"\"\n+    val redirectUri: String = \"\"\n+}",
+    "blob_url": "https://github.com/testuser/test-repo/blob/abc123def456/src/main/kotlin/OAuth2Config.kt",
+    "raw_url": "https://github.com/testuser/test-repo/raw/abc123def456/src/main/kotlin/OAuth2Config.kt",
+    "previous_filename": null
+  },
+  {
+    "filename": "README.md",
+    "status": "modified",
+    "additions": 15,
+    "deletions": 3,
+    "changes": 18,
+    "patch": "@@ -10,7 +10,19 @@\n # Test Repository\n \n-This is a test repository.\n+This is a test repository for OAuth2 authentication.\n+\n+## Authentication\n+\n+The application now supports OAuth2 authentication:\n+\n+- Client ID configuration\n+- Secure token storage\n+- Automatic token refresh\n \n ## Installation\n \n-Run `./gradlew build`\n+Run `./gradlew build` to build the application.",
+    "blob_url": "https://github.com/testuser/test-repo/blob/abc123def456/README.md",
+    "raw_url": "https://github.com/testuser/test-repo/raw/abc123def456/README.md",
+    "previous_filename": null
+  },
+  {
+    "filename": "config/SecurityConfig.kt",
+    "status": "renamed",
+    "additions": 5,
+    "deletions": 2,
+    "changes": 7,
+    "patch": "@@ -1,5 +1,8 @@\n package com.example.config\n \n class SecurityConfig {\n-    val enabled = false\n+    val enabled = true\n+    val oauth2Enabled = true\n+    val tokenExpiration = 3600\n }",
+    "blob_url": "https://github.com/testuser/test-repo/blob/abc123def456/config/SecurityConfig.kt",
+    "raw_url": "https://github.com/testuser/test-repo/raw/abc123def456/config/SecurityConfig.kt",
+    "previous_filename": "config/Config.kt"
+  },
+  {
+    "filename": "tests/AuthServiceTest.kt",
+    "status": "added",
+    "additions": 91,
+    "deletions": 0,
+    "changes": 91,
+    "patch": "@@ -0,0 +1,91 @@\n+package com.example.tests\n+\n+import org.junit.Test\n+import org.junit.Assert.*\n+\n+class AuthServiceTest {\n+    @Test\n+    fun testAuthentication() {\n+        // Test implementation\n+    }\n+}",
+    "blob_url": "https://github.com/testuser/test-repo/blob/abc123def456/tests/AuthServiceTest.kt",
+    "raw_url": "https://github.com/testuser/test-repo/raw/abc123def456/tests/AuthServiceTest.kt",
+    "previous_filename": null
+  }
+]

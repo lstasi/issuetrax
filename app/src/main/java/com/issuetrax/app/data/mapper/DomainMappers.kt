@@ -3,6 +3,7 @@ package com.issuetrax.app.data.mapper
 import com.issuetrax.app.data.api.model.FileDiffDto
 import com.issuetrax.app.data.api.model.PullRequestDto
 import com.issuetrax.app.data.api.model.RepositoryDto
+import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
@@ -32,6 +33,7 @@ fun RepositoryDto.toDomain(): Repository {
         owner = owner.toDomain(),
         description = description,
         private = private,
+        archived = archived,
         htmlUrl = htmlUrl,
         cloneUrl = cloneUrl,
         sshUrl = sshUrl,
@@ -53,7 +55,7 @@ fun PullRequestDto.toDomain(): PullRequest {
         title = title,
         body = body,
         state = when (state.lowercase()) {
-            "closed" -> if (merged) PRState.MERGED else PRState.CLOSED
+            "closed" -> if (merged == true) PRState.MERGED else PRState.CLOSED
             else -> PRState.OPEN
         },
         author = user.toDomain(),
@@ -94,6 +96,27 @@ fun FileDiffDto.toDomain(): FileDiff {
         blobUrl = blobUrl,
         rawUrl = rawUrl,
         previousFilename = previousFilename
+    )
+}
+
+fun ReviewDto.toDomain(): Review {
+    return Review(
+        id = id,
+        user = user.toDomain(),
+        body = body,
+        state = when (state.uppercase()) {
+            "APPROVED" -> ReviewState.APPROVED
+            "CHANGES_REQUESTED" -> ReviewState.CHANGES_REQUESTED
+            "COMMENTED" -> ReviewState.COMMENTED
+            "DISMISSED" -> ReviewState.DISMISSED
+            "PENDING" -> ReviewState.PENDING
+            else -> ReviewState.COMMENTED
+        },
+        htmlUrl = htmlUrl,
+        pullRequestUrl = pullRequestUrl,
+        submittedAt = submittedAt?.let { parseDateTime(it) },
+        commitId = commitId,
+        authorAssociation = authorAssociation
     )
 }
 
