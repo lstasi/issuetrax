@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("kotlinx-serialization")
@@ -49,8 +50,10 @@ android {
         buildConfig = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
+    lint {
+        // Disable problematic lint checks that have bugs in Android Lint tool
+        disable += "MutableCollectionMutableState"
+        disable += "AutoboxingStateCreation"
     }
 
     packaging {

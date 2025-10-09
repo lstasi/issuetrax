@@ -114,3 +114,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+# Test API responses from validation script
+*_live.json
+.env
