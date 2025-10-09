@@ -3,6 +3,7 @@ package com.issuetrax.app.domain.repository
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
+import com.issuetrax.app.domain.entity.Review
 import kotlinx.coroutines.flow.Flow
 
 interface GitHubRepository {
@@ -35,7 +36,7 @@ interface GitHubRepository {
         body: String?,
         event: String, // "APPROVE", "REQUEST_CHANGES", "COMMENT"
         comments: List<ReviewComment> = emptyList()
-    ): Result<Unit>
+    ): Result<Review>
 }
 
 data class ReviewComment(
