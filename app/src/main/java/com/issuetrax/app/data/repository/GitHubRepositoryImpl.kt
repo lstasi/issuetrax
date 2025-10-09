@@ -146,8 +146,13 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.createReview("Bearer $token", owner, repo, number, request)
             if (response.isSuccessful) {
-                val review = response.body()!!.toDomain()
-                Result.success(review)
+                val reviewDto = response.body()
+                if (reviewDto != null) {
+                    val review = reviewDto.toDomain()
+                    Result.success(review)
+                } else {
+                    Result.failure(Exception("Failed to create review: response body is null"))
+                }
             } else {
                 Result.failure(Exception("Failed to create review: ${response.code()}"))
             }
