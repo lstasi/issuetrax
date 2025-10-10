@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.domain.entity.Repository
+import com.issuetrax.app.presentation.ui.common.components.ErrorText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,12 +90,7 @@ fun RepositorySelectionScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = uiState.error!!,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
+                        ErrorText(text = uiState.error!!)
                     }
                 }
                 

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
+import com.issuetrax.app.presentation.ui.common.components.ErrorText
 
 @Composable
 fun AuthScreen(
@@ -102,11 +103,9 @@ fun AuthScreen(
             )
             
             if (uiState.error != null) {
-                Text(
+                ErrorText(
                     text = uiState.error!!,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             
