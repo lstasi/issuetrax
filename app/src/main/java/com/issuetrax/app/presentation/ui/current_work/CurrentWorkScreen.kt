@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -47,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.domain.entity.PRState
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -138,14 +138,7 @@ fun CurrentWorkScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        SelectionContainer {
-                            Text(
-                                text = uiState.error!!,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.error,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        ErrorText(text = uiState.error!!)
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { viewModel.refreshPullRequests() }) {
                             Text(stringResource(R.string.retry))

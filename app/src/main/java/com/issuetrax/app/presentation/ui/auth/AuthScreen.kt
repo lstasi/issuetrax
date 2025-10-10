@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
+import com.issuetrax.app.presentation.ui.common.components.ErrorText
 
 @Composable
 fun AuthScreen(
@@ -103,14 +103,10 @@ fun AuthScreen(
             )
             
             if (uiState.error != null) {
-                SelectionContainer {
-                    Text(
-                        text = uiState.error!!,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                ErrorText(
+                    text = uiState.error!!,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             
             Button(

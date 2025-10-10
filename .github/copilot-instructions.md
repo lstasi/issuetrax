@@ -63,6 +63,7 @@ Issuetrax is a Kotlin Android application for focused GitHub issue management an
 - Use `remember` and `rememberSaveable` appropriately
 - Follow Material Design 3 patterns
 - Implement proper state hoisting
+- **Error messages**: Always wrap error text with `SelectionContainer` to make it selectable for users to copy for bug reports. Consider using the `ErrorText` composable from `presentation/ui/common/components/` for consistency
 
 ### Architecture Patterns
 ```kotlin
