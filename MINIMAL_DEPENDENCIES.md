@@ -127,6 +127,37 @@ The app builds successfully with the minimal dependency set:
 
 All existing functionality works with the reduced dependency set.
 
+## Dependency Conflict Resolution
+
+To prevent app update failures caused by dependency version conflicts, the following strategies are enforced in `app/build.gradle.kts`:
+
+### Kotlin Version Enforcement
+```kotlin
+configurations.all {
+    resolutionStrategy {
+        // Force consistent Kotlin version across all dependencies to avoid DEX conflicts
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        
+        // Prefer newer versions to avoid conflicts
+        preferProjectModules()
+    }
+}
+```
+
+This ensures:
+- **No DEX conflicts** during app installation or updates
+- **Consistent Kotlin runtime** across all dependencies
+- **Smooth app updates** without "dependency conflict" errors
+
+### Manifest Optimizations
+The `AndroidManifest.xml` removes unnecessary startup providers:
+- `androidx.startup.InitializationProvider` is disabled to avoid authority conflicts
+- Only essential components are initialized
+- Reduces potential update conflicts
+
 ## Documentation
 
 All project documentation has been updated to reflect this minimal dependency policy:
