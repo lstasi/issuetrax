@@ -13,5 +13,5 @@ data class FileDiffDto(
     val patch: String?,
     @SerialName("blob_url") val blobUrl: String?,
     @SerialName("raw_url") val rawUrl: String?,
-    @SerialName("previous_filename") val previousFilename: String?
+    @SerialName("previous_filename") val previousFilename: String? = null
 )
