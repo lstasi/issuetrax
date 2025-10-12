@@ -248,6 +248,20 @@ android {
     }
 }
 
+// Force consistent dependency versions to prevent update conflicts
+configurations.all {
+    resolutionStrategy {
+        // Force consistent Kotlin version across all dependencies to avoid DEX conflicts
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        
+        // Prefer newer versions to avoid conflicts
+        preferProjectModules()
+    }
+}
+
 dependencies {
     // MINIMAL DEPENDENCIES ONLY - Android 14+ 
     
@@ -366,7 +380,8 @@ android.enableComposeCompilerReports=true
 
 ```xml
 <!-- app/src/main/AndroidManifest.xml -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -388,6 +403,13 @@ android.enableComposeCompilerReports=true
         android:label="@string/app_name"
         android:theme="@style/Theme.Issuetrax"
         android:networkSecurityConfig="@xml/network_security_config">
+
+        <!-- Disable unnecessary startup providers to avoid conflicts -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="remove" />
 
         <activity
             android:name=".presentation.MainActivity"

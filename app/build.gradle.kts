@@ -63,6 +63,19 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force consistent Kotlin version across all dependencies to avoid DEX conflicts
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        
+        // Prefer newer versions to avoid conflicts
+        preferProjectModules()
+    }
+}
+
 dependencies {
     // Compose BOM - ensures compatible versions
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))

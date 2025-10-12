@@ -5,6 +5,7 @@ import com.issuetrax.app.data.api.model.RepositoryDto
 import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.FileDiffDto
+import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -58,12 +59,14 @@ interface GitHubApiService {
     ): Response<ReviewDto>
 }
 
+@Serializable
 data class CreateReviewRequest(
     val body: String?,
     val event: String,
     val comments: List<ReviewCommentRequest> = emptyList()
 )
 
+@Serializable
 data class ReviewCommentRequest(
     val path: String,
     val position: Int,

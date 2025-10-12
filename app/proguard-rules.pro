@@ -62,6 +62,22 @@
 # is used.
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
+# Keep generic signatures for Response types - CRITICAL for Retrofit
+-keepattributes Signature
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep class retrofit2.Response { *; }
+
+# Keep our API service interface explicitly to prevent method obfuscation issues
+-keep interface com.issuetrax.app.data.api.GitHubApiService { *; }
+-keep class com.issuetrax.app.data.api.GitHubApiService { *; }
+
+# Keep all API model DTOs to prevent obfuscation issues
+-keep class com.issuetrax.app.data.api.model.** { *; }
+
+# Keep request/response classes for Retrofit
+-keep class com.issuetrax.app.data.api.CreateReviewRequest { *; }
+-keep class com.issuetrax.app.data.api.ReviewCommentRequest { *; }
+
 # OkHttp platform used only on JVM and when Conscrypt and other security providers are available.
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**
@@ -92,10 +108,3 @@
 -keepclassmembers class <1> {
    static kotlinx.serialization.KSerializer serializer();
 }
-
-# Keep all API model DTOs to prevent obfuscation issues
--keep class com.issuetrax.app.data.api.model.** { *; }
-
-# Room
--keep class * extends androidx.room.RoomDatabase
--dontwarn androidx.room.paging.**
