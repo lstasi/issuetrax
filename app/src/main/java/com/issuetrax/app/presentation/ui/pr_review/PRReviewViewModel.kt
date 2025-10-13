@@ -75,6 +75,13 @@ class PRReviewViewModel @Inject constructor(
         }
     }
     
+    fun navigateToFile(index: Int) {
+        val currentState = _uiState.value
+        if (index >= 0 && index < currentState.files.size) {
+            _uiState.value = currentState.copy(currentFileIndex = index)
+        }
+    }
+    
     fun submitReview(owner: String, repo: String, prNumber: Int, body: String?, event: ReviewEvent) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)

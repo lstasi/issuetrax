@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
+import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,19 +102,15 @@ fun PRReviewScreen(
                         ) {
                             // PR Metadata Card
                             PRMetadataCard(pullRequest = pullRequest)
-                        
-                        // Placeholder for future components (file list, diff viewer, etc.)
-                        Text(
-                            text = "Files loaded: ${uiState.files.size}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        
-                        Text(
-                            text = "File list and diff viewer will be implemented next.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                            
+                            // File List View
+                            if (uiState.files.isNotEmpty()) {
+                                FileListView(
+                                    files = uiState.files,
+                                    currentFileIndex = uiState.currentFileIndex,
+                                    onFileClick = { index -> viewModel.navigateToFile(index) }
+                                )
+                            }
                         }
                     }
                 }
