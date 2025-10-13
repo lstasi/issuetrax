@@ -83,4 +83,4 @@ app/src/main/java/com/issuetrax/app/
 3. Sync project with Gradle files
 4. Run on device or emulator
 
-For detailed setup instructions, see [doc/PROJECT_SETUP.md](doc/PROJECT_SETUP.md).
+For detailed setup instructions, see [doc/PROJECT_SETUP.md](PROJECT_SETUP.md).

@@ -323,6 +323,95 @@ class PRReviewViewModelTest {
     }
     
     @Test
+    fun `navigateToFile should set currentFileIndex to specified valid index`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified"),
+            createTestFileDiff("file2.kt", "added"),
+            createTestFileDiff("file3.kt", "removed")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // When
+        viewModel.navigateToFile(2)
+        
+        // Then
+        assertEquals("Current file index should be 2", 2, viewModel.uiState.value.currentFileIndex)
+        assertEquals("Current file should be third file", "file3.kt", viewModel.uiState.value.currentFile?.filename)
+    }
+    
+    @Test
+    fun `navigateToFile should ignore negative index`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified"),
+            createTestFileDiff("file2.kt", "added")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // When
+        viewModel.navigateToFile(-1)
+        
+        // Then
+        assertEquals("Current file index should stay at 0", 0, viewModel.uiState.value.currentFileIndex)
+    }
+    
+    @Test
+    fun `navigateToFile should ignore index beyond files size`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified"),
+            createTestFileDiff("file2.kt", "added")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // When
+        viewModel.navigateToFile(10)
+        
+        // Then
+        assertEquals("Current file index should stay at 0", 0, viewModel.uiState.value.currentFileIndex)
+    }
+    
+    @Test
     fun `submitReview should update state to submitting then success`() = runTest {
         // Given
         val owner = "testuser"

@@ -760,7 +760,7 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - `patch: String?` - Diff patch
 - `@SerialName("blob_url") blobUrl: String?` - Blob URL
 - `@SerialName("raw_url") rawUrl: String?` - Raw URL
-- `@SerialName("previous_filename") previousFilename: String?` - Previous name
+- `@SerialName("previous_filename") previousFilename: String? = null` - Previous name (only present for renamed files)
 
 **Usage**: Deserialized from GitHub API, mapped to domain `FileDiff`
 
@@ -1439,35 +1439,36 @@ This section provides a granular, step-by-step roadmap starting from the Current
 
 ### Phase 2: Implement PR Review Screen - Basic Display
 
-#### 2.1 Update PRReviewViewModel
-- [ ] Wire up existing `loadPullRequest()` method to actual screen
-- [ ] Ensure PR details are loaded on screen launch
-- [ ] Ensure PR files are loaded on screen launch
-- [ ] Handle loading states
-- [ ] Handle error states
-- [ ] Add computed property for current file metadata
+#### 2.1 Update PRReviewViewModel ✅ COMPLETE
+- [x] Wire up existing `loadPullRequest()` method to actual screen
+- [x] Ensure PR details are loaded on screen launch
+- [x] Ensure PR files are loaded on screen launch
+- [x] Handle loading states
+- [x] Handle error states
+- [x] Add computed property for current file metadata
 
-#### 2.2 Create PR Metadata Section
-- [ ] Create `PRMetadataCard` composable showing:
-  - [ ] PR title
-  - [ ] PR state (open/closed/merged)
-  - [ ] Author information
-  - [ ] Created/updated dates
-  - [ ] Branch information (head → base)
-  - [ ] PR description (body)
-  - [ ] Stats (commits, files changed, additions, deletions)
+#### 2.2 Create PR Metadata Section ✅ COMPLETE
+- [x] Create `PRMetadataCard` composable showing:
+  - [x] PR title
+  - [x] PR state (open/closed/merged)
+  - [x] Author information
+  - [x] Created/updated dates
+  - [x] Branch information (head → base)
+  - [x] PR description (body)
+  - [x] Stats (commits, files changed, additions, deletions)
 
-#### 2.3 Implement File List View
-- [ ] Create `FileListView` composable
-- [ ] Display list of changed files using existing `files` from state
-- [ ] For each file show:
-  - [ ] File name with full path
-  - [ ] Change type (added/modified/removed/renamed)
-  - [ ] Addition/deletion counts
-  - [ ] File status icon
-- [ ] Highlight current file being viewed
-- [ ] Add click handler to jump to specific file
-- [ ] Show file counter (e.g., "File 1 of 12")
+#### 2.3 Implement File List View ✅ COMPLETE
+- [x] Create `FileListView` composable
+- [x] Display list of changed files using existing `files` from state
+- [x] For each file show:
+  - [x] File name with full path
+  - [x] Change type (added/modified/removed/renamed)
+  - [x] Addition/deletion counts
+  - [x] File status icon
+- [x] Highlight current file being viewed
+- [x] Add click handler to jump to specific file
+- [x] Show file counter (e.g., "File 1 of 12")
+- [x] Add `navigateToFile(index)` function to ViewModel
 
 #### 2.4 Basic File Navigation
 - [ ] Add navigation buttons (Previous/Next file)

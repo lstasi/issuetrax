@@ -150,7 +150,7 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (30% complete)
+## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (75% complete)
 
 **Current Status**: ViewModel wired, loading states implemented  
 **Priority**: HIGHEST - Current Focus  
@@ -164,27 +164,28 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 - [x] Handle error states
 - [x] Add computed property for current file metadata (already existed)
 
-### 2.2 Create PR Metadata Section
-- [ ] Create `PRMetadataCard` composable showing:
-  - [ ] PR title
-  - [ ] PR state (open/closed/merged)
-  - [ ] Author information
-  - [ ] Created/updated dates
-  - [ ] Branch information (head → base)
-  - [ ] PR description (body)
-  - [ ] Stats (commits, files changed, additions, deletions)
+### 2.2 Create PR Metadata Section ✅ COMPLETE
+- [x] Create `PRMetadataCard` composable showing:
+  - [x] PR title
+  - [x] PR state (open/closed/merged)
+  - [x] Author information
+  - [x] Created/updated dates
+  - [x] Branch information (head → base)
+  - [x] PR description (body)
+  - [x] Stats (commits, files changed, additions, deletions)
 
-### 2.3 Implement File List View
-- [ ] Create `FileListView` composable
-- [ ] Display list of changed files using existing `files` from state
-- [ ] For each file show:
-  - [ ] File name with full path
-  - [ ] Change type (added/modified/removed/renamed)
-  - [ ] Addition/deletion counts
-  - [ ] File status icon
-- [ ] Highlight current file being viewed
-- [ ] Add click handler to jump to specific file
-- [ ] Show file counter (e.g., "File 1 of 12")
+### 2.3 Implement File List View ✅ COMPLETE
+- [x] Create `FileListView` composable
+- [x] Display list of changed files using existing `files` from state
+- [x] For each file show:
+  - [x] File name with full path
+  - [x] Change type (added/modified/removed/renamed)
+  - [x] Addition/deletion counts
+  - [x] File status icon
+- [x] Highlight current file being viewed
+- [x] Add click handler to jump to specific file
+- [x] Show file counter (e.g., "File 1 of 12")
+- [x] Add `navigateToFile(index)` function to ViewModel
 
 ### 2.4 Basic File Navigation
 - [ ] Add navigation buttons (Previous/Next file)

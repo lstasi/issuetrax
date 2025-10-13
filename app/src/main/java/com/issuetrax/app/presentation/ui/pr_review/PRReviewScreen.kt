@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
+import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
+import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,39 +92,26 @@ fun PRReviewScreen(
                     }
                 }
                 uiState.pullRequest != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.pr_review_title),
-                            style = MaterialTheme.typography.headlineMedium,
-                            textAlign = TextAlign.Center
-                        )
-                        
-                        Text(
-                            text = "PR #$prNumber: ${uiState.pullRequest?.title}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        
-                        Text(
-                            text = "Files loaded: ${uiState.files.size}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        
-                        Text(
-                            text = "PR review interface will be implemented here with gesture-based navigation.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    uiState.pullRequest?.let { pullRequest ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // PR Metadata Card
+                            PRMetadataCard(pullRequest = pullRequest)
+                            
+                            // File List View
+                            if (uiState.files.isNotEmpty()) {
+                                FileListView(
+                                    files = uiState.files,
+                                    currentFileIndex = uiState.currentFileIndex,
+                                    onFileClick = { index -> viewModel.navigateToFile(index) }
+                                )
+                            }
+                        }
                     }
                 }
             }
