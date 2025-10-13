@@ -1439,23 +1439,23 @@ This section provides a granular, step-by-step roadmap starting from the Current
 
 ### Phase 2: Implement PR Review Screen - Basic Display
 
-#### 2.1 Update PRReviewViewModel
-- [ ] Wire up existing `loadPullRequest()` method to actual screen
-- [ ] Ensure PR details are loaded on screen launch
-- [ ] Ensure PR files are loaded on screen launch
-- [ ] Handle loading states
-- [ ] Handle error states
-- [ ] Add computed property for current file metadata
+#### 2.1 Update PRReviewViewModel ✅ COMPLETE
+- [x] Wire up existing `loadPullRequest()` method to actual screen
+- [x] Ensure PR details are loaded on screen launch
+- [x] Ensure PR files are loaded on screen launch
+- [x] Handle loading states
+- [x] Handle error states
+- [x] Add computed property for current file metadata
 
-#### 2.2 Create PR Metadata Section
-- [ ] Create `PRMetadataCard` composable showing:
-  - [ ] PR title
-  - [ ] PR state (open/closed/merged)
-  - [ ] Author information
-  - [ ] Created/updated dates
-  - [ ] Branch information (head → base)
-  - [ ] PR description (body)
-  - [ ] Stats (commits, files changed, additions, deletions)
+#### 2.2 Create PR Metadata Section ✅ COMPLETE
+- [x] Create `PRMetadataCard` composable showing:
+  - [x] PR title
+  - [x] PR state (open/closed/merged)
+  - [x] Author information
+  - [x] Created/updated dates
+  - [x] Branch information (head → base)
+  - [x] PR description (body)
+  - [x] Stats (commits, files changed, additions, deletions)
 
 #### 2.3 Implement File List View
 - [ ] Create `FileListView` composable
