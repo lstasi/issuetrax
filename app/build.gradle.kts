@@ -54,6 +54,8 @@ android {
         // Disable problematic lint checks that have bugs in Android Lint tool
         disable += "MutableCollectionMutableState"
         disable += "AutoboxingStateCreation"
+        // Disable MissingClass for manifest provider removal (tools:node="remove")
+        disable += "MissingClass"
     }
 
     packaging {
