@@ -150,7 +150,7 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (50% complete)
+## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (75% complete)
 
 **Current Status**: ViewModel wired, loading states implemented  
 **Priority**: HIGHEST - Current Focus  
@@ -174,17 +174,18 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
   - [x] PR description (body)
   - [x] Stats (commits, files changed, additions, deletions)
 
-### 2.3 Implement File List View
-- [ ] Create `FileListView` composable
-- [ ] Display list of changed files using existing `files` from state
-- [ ] For each file show:
-  - [ ] File name with full path
-  - [ ] Change type (added/modified/removed/renamed)
-  - [ ] Addition/deletion counts
-  - [ ] File status icon
-- [ ] Highlight current file being viewed
-- [ ] Add click handler to jump to specific file
-- [ ] Show file counter (e.g., "File 1 of 12")
+### 2.3 Implement File List View ✅ COMPLETE
+- [x] Create `FileListView` composable
+- [x] Display list of changed files using existing `files` from state
+- [x] For each file show:
+  - [x] File name with full path
+  - [x] Change type (added/modified/removed/renamed)
+  - [x] Addition/deletion counts
+  - [x] File status icon
+- [x] Highlight current file being viewed
+- [x] Add click handler to jump to specific file
+- [x] Show file counter (e.g., "File 1 of 12")
+- [x] Add `navigateToFile(index)` function to ViewModel
 
 ### 2.4 Basic File Navigation
 - [ ] Add navigation buttons (Previous/Next file)

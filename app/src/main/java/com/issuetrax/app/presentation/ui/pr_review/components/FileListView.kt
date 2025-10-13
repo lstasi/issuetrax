@@ -67,7 +67,9 @@ fun FileListView(
         
         // File list
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp), // Fixed height to prevent layout issues in scrollable parent
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(files) { index, file ->
