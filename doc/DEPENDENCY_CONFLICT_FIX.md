@@ -50,7 +50,7 @@ Modified `AndroidManifest.xml` to remove the `InitializationProvider`:
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     
-    <application ...>
+    <application>
         <!-- Disable unnecessary startup providers to avoid conflicts -->
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -105,8 +105,8 @@ BUILD SUCCESSFUL in 53s
 ## Related Documentation
 
 - [MINIMAL_DEPENDENCIES.md](MINIMAL_DEPENDENCIES.md) - Complete minimal dependency policy
-- [doc/PROJECT_SETUP.md](doc/PROJECT_SETUP.md) - Project setup with dependency configuration
-- [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) - Technical architecture details
+- [doc/PROJECT_SETUP.md](PROJECT_SETUP.md) - Project setup with dependency configuration
+- [doc/ARCHITECTURE.md](ARCHITECTURE.md) - Technical architecture details
 
 ## Maintenance
 
