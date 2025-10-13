@@ -115,7 +115,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0")
 
     // Custom Tabs (for OAuth)
-    implementation("androidx.browser:browser:1.6.0")
+    implementation("androidx.browser:browser:1.9.0")
 
     // Material Components (needed for Theme.MaterialComponents parent and material attributes)
     implementation("com.google.android.material:material:1.10.0")
