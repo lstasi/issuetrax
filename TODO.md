@@ -150,7 +150,7 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (30% complete)
+## Phase 2: PR Review Screen - Basic Display 🚀 IN PROGRESS (50% complete)
 
 **Current Status**: ViewModel wired, loading states implemented  
 **Priority**: HIGHEST - Current Focus  
@@ -164,15 +164,15 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 - [x] Handle error states
 - [x] Add computed property for current file metadata (already existed)
 
-### 2.2 Create PR Metadata Section
-- [ ] Create `PRMetadataCard` composable showing:
-  - [ ] PR title
-  - [ ] PR state (open/closed/merged)
-  - [ ] Author information
-  - [ ] Created/updated dates
-  - [ ] Branch information (head → base)
-  - [ ] PR description (body)
-  - [ ] Stats (commits, files changed, additions, deletions)
+### 2.2 Create PR Metadata Section ✅ COMPLETE
+- [x] Create `PRMetadataCard` composable showing:
+  - [x] PR title
+  - [x] PR state (open/closed/merged)
+  - [x] Author information
+  - [x] Created/updated dates
+  - [x] Branch information (head → base)
+  - [x] PR description (body)
+  - [x] Stats (commits, files changed, additions, deletions)
 
 ### 2.3 Implement File List View
 - [ ] Create `FileListView` composable
