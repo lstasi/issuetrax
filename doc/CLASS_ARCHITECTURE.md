@@ -760,7 +760,7 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - `patch: String?` - Diff patch
 - `@SerialName("blob_url") blobUrl: String?` - Blob URL
 - `@SerialName("raw_url") rawUrl: String?` - Raw URL
-- `@SerialName("previous_filename") previousFilename: String?` - Previous name
+- `@SerialName("previous_filename") previousFilename: String? = null` - Previous name (only present for renamed files)
 
 **Usage**: Deserialized from GitHub API, mapped to domain `FileDiff`
 
