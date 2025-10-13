@@ -2,7 +2,7 @@
 # This allows building the APK inside a container for consistent builds
 
 # Build stage
-FROM eclipse-temurin:17-jdk AS builder
+FROM eclipse-temurin:25-jdk AS builder
 
 # Java 17 is used for consistency with Android development requirements
 # Android Gradle Plugin 8.1.4 and Kotlin 1.9.20 officially support Java 17
