@@ -226,8 +226,21 @@ class MyViewModelTest {
 ## Current Test Status
 
 ### ✅ Implemented
+
+#### Domain Layer
 - `GetPullRequestsUseCaseTest` - 5 tests, all passing
+
+#### Presentation Layer
 - `CurrentWorkViewModelTest` - 11 tests, all passing
+- `PRReviewViewModelTest` - 19 tests, all passing
+- `PRReviewIntegrationTest` - 13 integration tests, all passing
+
+#### Component Tests
+- `FileNavigationButtonsTest` - 6 tests, all passing
+- `PRMetadataCardTest` - 3 tests, all passing
+
+#### Data Layer
+- `FileDiffDtoTest` - Data model tests, all passing
 
 ### 🚧 To Be Implemented
 - `GetUserRepositoriesUseCaseTest`
@@ -235,7 +248,6 @@ class MyViewModelTest {
 - `SubmitReviewUseCaseTest`
 - `AuthViewModelTest`
 - `RepositorySelectionViewModelTest`
-- `PRReviewViewModelTest`
 - `GitHubRepositoryImplTest`
 - `AuthRepositoryImplTest`
 
