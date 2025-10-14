@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
+import com.issuetrax.app.presentation.ui.pr_review.components.FileNavigationButtons
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,6 +103,16 @@ fun PRReviewScreen(
                         ) {
                             // PR Metadata Card
                             PRMetadataCard(pullRequest = pullRequest)
+                            
+                            // File Navigation Buttons
+                            if (uiState.files.isNotEmpty()) {
+                                FileNavigationButtons(
+                                    currentFileIndex = uiState.currentFileIndex,
+                                    totalFiles = uiState.files.size,
+                                    onPreviousClick = { viewModel.navigateToPreviousFile() },
+                                    onNextClick = { viewModel.navigateToNextFile() }
+                                )
+                            }
                             
                             // File List View
                             if (uiState.files.isNotEmpty()) {
