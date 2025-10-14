@@ -25,6 +25,15 @@ import com.issuetrax.app.domain.entity.LineType
  */
 object DiffParser {
     
+    /**
+     * Regex pattern for parsing hunk headers.
+     * Format: @@ -oldStart[,oldCount] +newStart[,newCount] @@ [section header]
+     * Capture groups:
+     * - Group 1: oldStart (line number where changes start in old file)
+     * - Group 2: oldCount (number of lines in old file, optional, defaults to 1)
+     * - Group 3: newStart (line number where changes start in new file)
+     * - Group 4: newCount (number of lines in new file, optional, defaults to 1)
+     */
     private val HUNK_HEADER_REGEX = Regex("""^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@.*$""")
     private const val NO_NEWLINE_MARKER = "\\ No newline at end of file"
     
@@ -54,11 +63,11 @@ object DiffParser {
             // Look for hunk header
             val match = HUNK_HEADER_REGEX.matchEntire(line)
             if (match != null) {
-                val (oldStart, oldCount, newStart, newCount) = parseHunkHeader(match)
+                val hunkHeader = parseHunkHeader(match)
                 val hunkLines = mutableListOf<DiffLine>()
                 
-                var oldLineNum = oldStart
-                var newLineNum = newStart
+                var oldLineNum = hunkHeader.oldStart
+                var newLineNum = hunkHeader.newStart
                 
                 // Parse lines in this hunk
                 i++
@@ -132,10 +141,10 @@ object DiffParser {
                 
                 hunks.add(
                     CodeHunk(
-                        oldStart = oldStart,
-                        oldCount = oldCount,
-                        newStart = newStart,
-                        newCount = newCount,
+                        oldStart = hunkHeader.oldStart,
+                        oldCount = hunkHeader.oldCount,
+                        newStart = hunkHeader.newStart,
+                        newCount = hunkHeader.newCount,
                         lines = hunkLines
                     )
                 )
