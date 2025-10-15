@@ -235,11 +235,13 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 - [x] Use monospace font for code
 - [x] Handle long lines with horizontal scroll
 
-### 3.3 Implement Inline Diff View
-- [ ] Create `InlineDiffView` composable
-- [ ] Show old and new lines together
-- [ ] Optimize for mobile screen width
-- [ ] Add expand/collapse for large hunks
+### 3.3 Implement Inline Diff View ✅ COMPLETE
+- [x] Create `InlineDiffView` composable
+- [x] Show old and new lines together
+- [x] Optimize for mobile screen width
+- [x] Add expand/collapse for large hunks
+- [x] Add view toggle in PRReviewScreen (Inline vs Standard)
+- [x] Create comprehensive tests for InlineDiffView
 
 ### 3.4 Testing & Validation
 - [ ] Test with small diffs (1-5 lines)
@@ -508,12 +510,13 @@ The following features are **intentionally NOT included** to keep the app simple
 ## Notes & Blockers 📝
 
 ### Current Focus
-🎯 **Phase 3: Implement Diff Viewer** (In Progress - 66% complete)
+🎯 **Phase 3: Implement Diff Viewer** (In Progress - 75% complete)
 - Phase 1 (Current Work Screen) is now COMPLETE (100%)
 - Phase 2 (PR Review Screen - Basic Display) is now COMPLETE (100%)
 - Phase 3.1 (Diff Parser) is now COMPLETE
 - Phase 3.2 (Diff Display Components) is now COMPLETE
-- Next: Phase 3.3 (Inline Diff View) - Optimize for mobile screen width
+- Phase 3.3 (Inline Diff View) is now COMPLETE
+- Next: Phase 3.4 (Testing & Validation) - Test with various diff types
 
 ### Known Issues
 - None currently
