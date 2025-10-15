@@ -262,64 +262,74 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 4: Implement Review Submission 📝
+## Phase 4: Add Gesture Navigation (Advanced) 🎨
 
-**Priority**: HIGH - Complete MVP  
-**Estimated Time**: 2-3 days
-
-### 4.1 Create Review UI Components
-- [ ] Create `ReviewSubmissionDialog` composable
-- [ ] Add review comment text field
-- [ ] Add review type selector (Approve/Request Changes/Comment)
-- [ ] Add submit button
-- [ ] Handle submission loading state
-
-### 4.2 Wire Review Submission
-- [ ] Connect to existing `submitReview()` in ViewModel
-- [ ] Use existing `SubmitReviewUseCase`
-- [ ] Show success feedback
-- [ ] Handle submission errors
-- [ ] Navigate back to Current Work on success
-
-### 4.3 Testing & Validation
-- [ ] Test approve flow
-- [ ] Test request changes flow
-- [ ] Test comment-only flow
-- [ ] Verify submission on GitHub web interface
-
----
-
-## 🎯 MVP COMPLETE - Phases 1-4 (15-20 development days)
-
----
-
-## Phase 5: Add Gesture Navigation (Advanced) 🎨
-
-**Priority**: MEDIUM - Enhancement  
+**Priority**: HIGH - Enhanced navigation  
 **Estimated Time**: 3-5 days
 
-### 5.1 Implement Gesture Detection
+### 4.1 Implement Gesture Detection
 - [ ] Create `GestureDetector` for swipe gestures
 - [ ] Detect horizontal swipes (left/right)
 - [ ] Detect vertical swipes (up/down)
 - [ ] Add velocity thresholds
 - [ ] Prevent conflicts with scroll
 
-### 5.2 Map Gestures to Actions
+### 4.2 Map Gestures to Actions
 - [ ] Swipe left → Next file
 - [ ] Swipe right → Previous file
 - [ ] Swipe up → Next hunk (future)
 - [ ] Swipe down → Previous hunk (future)
 
-### 5.3 Add Visual Feedback
+### 4.3 Add Visual Feedback
 - [ ] Show swipe indicators
 - [ ] Animate file transitions
 - [ ] Add haptic feedback
 
-### 5.4 Testing & Validation
+### 4.4 Testing & Validation
 - [ ] Test on physical device
 - [ ] Test gesture sensitivity
 - [ ] Test edge cases (end of files)
+
+---
+
+## Phase 5: Enhance PR Visualization 🎨
+
+**Priority**: HIGH - Improved UX  
+**Estimated Time**: 3-4 days
+
+### 5.1 Create Top Toolbar with PR Actions
+- [ ] Create `PRActionToolbar` composable with:
+  - [ ] PR info button that opens description in MD format
+  - [ ] Merge button with confirmation dialog
+  - [ ] Close PR button
+  - [ ] Approve button (quick approve without detailed review)
+  - [ ] Run/Re-run tests button (CI/CD integration)
+- [ ] Implement `MarkdownRenderer` for description display
+- [ ] Add action handlers in ViewModel
+
+### 5.2 Compact PR Metadata Display
+- [ ] Simplify `PRMetadataCard` to show only essential info:
+  - [ ] Move PR title to top toolbar
+  - [ ] Remove or minimize description from card view
+  - [ ] Keep only key stats (state, commits, files changed)
+  - [ ] Make design more compact for mobile
+- [ ] Update PRReviewScreen to use compacted layout
+
+### 5.3 Add PR Action Capabilities
+- [ ] Create `MergePullRequestUseCase`
+- [ ] Create `ClosePullRequestUseCase`
+- [ ] Create `ApprovePullRequestUseCase`
+- [ ] Create `TriggerCIRunUseCase`
+- [ ] Add API endpoints to `GitHubApiService`
+- [ ] Update repository interface and implementation
+
+### 5.4 Testing & Validation
+- [ ] Test merge workflow with mergeable PR
+- [ ] Test merge workflow with conflicts (show error)
+- [ ] Test close PR workflow
+- [ ] Test quick approve workflow
+- [ ] Test CI/CD trigger (if available)
+- [ ] Verify markdown rendering for PR descriptions
 
 ---
 
@@ -345,22 +355,53 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 7: Inline Comments (Future) 💬
+## Phase 7: Implement Review Submission 📝
+
+**Priority**: HIGH - Complete MVP  
+**Estimated Time**: 2-3 days
+
+### 7.1 Create Review UI Components
+- [ ] Create `ReviewSubmissionDialog` composable
+- [ ] Add review comment text field
+- [ ] Add review type selector (Approve/Request Changes/Comment)
+- [ ] Add submit button
+- [ ] Handle submission loading state
+
+### 7.2 Wire Review Submission
+- [ ] Connect to existing `submitReview()` in ViewModel
+- [ ] Use existing `SubmitReviewUseCase`
+- [ ] Show success feedback
+- [ ] Handle submission errors
+- [ ] Navigate back to Current Work on success
+
+### 7.3 Testing & Validation
+- [ ] Test approve flow
+- [ ] Test request changes flow
+- [ ] Test comment-only flow
+- [ ] Verify submission on GitHub web interface
+
+---
+
+## 🎯 MVP COMPLETE - Phases 1-7 (20-25 development days)
+
+---
+
+## Phase 8: Inline Comments (Future) 💬
 
 **Priority**: LOW - Future enhancement  
 **Estimated Time**: 5-7 days
 
-### 7.1 Comment UI Components
+### 8.1 Comment UI Components
 - [ ] Create `CommentThread` composable
 - [ ] Create `CommentItem` composable
 - [ ] Create `AddCommentDialog` composable
 
-### 7.2 Comment Placement
+### 8.2 Comment Placement
 - [ ] Allow long-press on diff line to add comment
 - [ ] Show comment indicators on lines
 - [ ] Display comment threads inline
 
-### 7.3 API Integration
+### 8.3 API Integration
 - [ ] Add comment fetching to `GitHubApiService`
 - [ ] Add comment posting to `GitHubApiService`
 - [ ] Update domain models for comments
@@ -368,30 +409,30 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 ---
 
-## Phase 8: Polish & Optimization 🎯
+## Phase 9: Polish & Optimization 🎯
 
 **Priority**: ONGOING  
 **Estimated Time**: Ongoing
 
-### 8.1 Performance Optimization
+### 9.1 Performance Optimization
 - [ ] Optimize large PR loading
 - [ ] Add pagination for file lists
 - [ ] Implement lazy loading for diffs
 - [ ] Add caching for viewed PRs
 
-### 8.2 Error Handling
+### 9.2 Error Handling
 - [ ] Improve error messages
 - [ ] Add retry mechanisms
 - [ ] Handle rate limiting gracefully
 - [ ] Add offline detection
 
-### 8.3 Accessibility
+### 9.3 Accessibility
 - [ ] Add content descriptions
 - [ ] Test with TalkBack
 - [ ] Ensure proper touch targets (48dp minimum)
 - [ ] Add keyboard navigation
 
-### 8.4 Testing
+### 9.4 Testing
 - [ ] Add unit tests for ViewModels
 - [ ] Add unit tests for Use Cases
 - [ ] Add UI tests for critical flows
@@ -433,25 +474,35 @@ The following features are **intentionally NOT included** to keep the app simple
 ### Sprint 1 (Current) - Weeks 1-2
 - **Focus**: Complete Current Work Screen (Phase 1)
 - **Deliverable**: Working PR list with filtering and navigation
-- **Status**: 🔨 In Progress
+- **Status**: ✅ Complete
 
 ### Sprint 2 - Weeks 3-4
 - **Focus**: PR Review Basic Display + Diff Viewer (Phases 2-3)
 - **Deliverable**: View PR metadata, files, and diffs
-- **Status**: ⏳ Upcoming
+- **Status**: ✅ Complete
 
 ### Sprint 3 - Week 5
-- **Focus**: Review Submission (Phase 4)
+- **Focus**: Gesture Navigation + PR Visualization (Phases 4-5)
+- **Deliverable**: Enhanced UX with gestures and improved PR actions
+- **Status**: 📋 Planned
+
+### Sprint 4 - Week 6
+- **Focus**: Syntax Highlighting (Phase 6)
+- **Deliverable**: Improved code readability
+- **Status**: 📋 Planned
+
+### Sprint 5 - Week 7
+- **Focus**: Review Submission (Phase 7)
 - **Deliverable**: Complete MVP - can review PRs end-to-end
 - **Status**: 📋 Planned
 
-### Sprint 4+ - Weeks 6-8
-- **Focus**: Enhancements (Phases 5-7)
-- **Deliverable**: Gesture navigation, syntax highlighting
+### Sprint 6+ - Weeks 8-10
+- **Focus**: Enhancements (Phases 8-9)
+- **Deliverable**: Inline comments, polish, and optimization
 - **Status**: 🔮 Future
 
-**MVP Completion Target**: 15-20 development days  
-**Feature Complete Target**: 30-40 development days
+**MVP Completion Target**: 20-25 development days  
+**Feature Complete Target**: 35-45 development days
 
 ---
 
@@ -483,22 +534,22 @@ The following features are **intentionally NOT included** to keep the app simple
 - ✅ **Unit Tests**: Implemented for Phase 1, 2 & 3 (COMPLETE)
   - `GetPullRequestsUseCaseTest` (5 tests)
   - `CurrentWorkViewModelTest` (11 tests)
-  - `PRReviewViewModelTest` (19 tests)
-  - `FileNavigationButtonsTest` (6 tests)
-  - `PRReviewIntegrationTest` (13 tests)
-  - `PRMetadataCardTest` (3 tests)
+  - `PRReviewViewModelTest` (18 tests)
+  - `FileNavigationButtonsTest` (7 tests)
+  - `PRReviewIntegrationTest` (12 tests)
+  - `PRMetadataCardTest` (4 tests)
   - `DiffParserTest` (15 tests)
   - `DiffLineTest` (7 tests)
   - `DiffHunkTest` (7 tests)
   - `DiffViewTest` (9 tests)
   - `InlineDiffViewTest` (13 tests)
   - `DiffViewerValidationTest` (25 tests) - **Phase 3.4**
-  - `FileDiffDtoTest` (data layer test)
+  - `FileDiffDtoTest` (5 tests)
   - **Total: 138 tests - All passing ✅**
 - ✅ **Integration Tests**: Implemented (PR Review complete)
 - ⚠️ **UI Tests**: Not implemented yet (future enhancement)
 
-### Testing Plan (Phase 8 - Future)
+### Testing Plan (Phase 9 - Future)
 - [x] ViewModels and business logic tests (Phase 1 & 2 complete)
 - [x] Use case tests (GetPullRequestsUseCase complete)
 - [ ] Repository implementation tests
@@ -530,7 +581,7 @@ The following features are **intentionally NOT included** to keep the app simple
 - Phase 3.2 (Diff Display Components) is now COMPLETE
 - Phase 3.3 (Inline Diff View) is now COMPLETE
 - Phase 3.4 (Testing & Validation) is now COMPLETE
-- Next: Phase 4 (Implement Review Submission) - Create review UI components
+- Next: Phase 4 (Gesture Navigation) - Implement swipe gestures for file navigation
 
 ### Known Issues
 - None currently
