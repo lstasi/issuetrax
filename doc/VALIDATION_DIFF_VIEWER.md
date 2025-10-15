@@ -775,13 +775,13 @@ Comprehensive automated tests are located in:
 
 ## Test Execution Checklist
 
-### Automated Tests (all should pass)
+### Automated Tests (all passing)
 - [x] DiffParserTest (15 tests) - ✅ PASSING
-- [x] DiffViewTest (10 tests) - ✅ PASSING
+- [x] DiffViewTest (9 tests) - ✅ PASSING
 - [x] DiffLineTest (7 tests) - ✅ PASSING
 - [x] DiffHunkTest (7 tests) - ✅ PASSING
 - [x] InlineDiffViewTest (13 tests) - ✅ PASSING
-- [ ] DiffViewerValidationTest (30 tests) - ⏳ TO BE RUN
+- [x] DiffViewerValidationTest (25 tests) - ✅ PASSING
 
 ### Manual Tests (Phase 3.4 Requirements)
 - [ ] Test Case 1: Small Diff - Single Line Addition

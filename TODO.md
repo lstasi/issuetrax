@@ -253,7 +253,7 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 
 **Testing Implementation**:
 - Created comprehensive validation test suite in `DiffViewerValidationTest.kt`
-- 30 new automated tests covering all requirements
+- 25 new automated tests covering all requirements
 - Tests organized by category (small/large diffs, file types, readability, edge cases)
 - Created validation guide in `doc/VALIDATION_DIFF_VIEWER.md`
 - Manual testing procedures documented for 25 test scenarios
@@ -490,9 +490,9 @@ The following features are **intentionally NOT included** to keep the app simple
   - `DiffParserTest` (15 tests)
   - `DiffLineTest` (7 tests)
   - `DiffHunkTest` (7 tests)
-  - `DiffViewTest` (10 tests)
+  - `DiffViewTest` (9 tests)
   - `InlineDiffViewTest` (13 tests)
-  - `DiffViewerValidationTest` (30 tests) - **Phase 3.4**
+  - `DiffViewerValidationTest` (25 tests) - **Phase 3.4**
   - `FileDiffDtoTest` (data layer test)
   - **Total: 138 tests - All passing ✅**
 - ✅ **Integration Tests**: Implemented (PR Review complete)

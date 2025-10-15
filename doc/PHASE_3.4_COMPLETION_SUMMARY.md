@@ -17,7 +17,7 @@ All requirements for Phase 3.4 have been met:
 
 ### 1. Comprehensive Test Suite
 
-Created `DiffViewerValidationTest.kt` with **30 new automated tests** covering:
+Created `DiffViewerValidationTest.kt` with **25 new automated tests** covering:
 
 #### Small Diff Tests (5 tests)
 - Single line addition
@@ -72,7 +72,7 @@ All automated tests are passing:
 
 ```
 Total Test Count: 138 tests
-Phase 3.4 New Tests: 30 tests
+Phase 3.4 New Tests: 25 tests
 Status: ✅ ALL PASSING
 Build: ✅ SUCCESSFUL
 ```
@@ -82,18 +82,18 @@ Build: ✅ SUCCESSFUL
 | Component | Test File | Test Count | Status |
 |-----------|-----------|------------|--------|
 | Diff Parser | DiffParserTest.kt | 15 | ✅ PASSING |
-| Diff View | DiffViewTest.kt | 10 | ✅ PASSING |
+| Diff View | DiffViewTest.kt | 9 | ✅ PASSING |
 | Diff Line | DiffLineTest.kt | 7 | ✅ PASSING |
 | Diff Hunk | DiffHunkTest.kt | 7 | ✅ PASSING |
 | Inline Diff View | InlineDiffViewTest.kt | 13 | ✅ PASSING |
-| **Phase 3.4 Validation** | **DiffViewerValidationTest.kt** | **30** | ✅ **PASSING** |
-| PR Review ViewModel | PRReviewViewModelTest.kt | 19 | ✅ PASSING |
-| File Navigation | FileNavigationButtonsTest.kt | 6 | ✅ PASSING |
-| PR Review Integration | PRReviewIntegrationTest.kt | 13 | ✅ PASSING |
-| PR Metadata Card | PRMetadataCardTest.kt | 3 | ✅ PASSING |
+| **Phase 3.4 Validation** | **DiffViewerValidationTest.kt** | **25** | ✅ **PASSING** |
+| PR Review ViewModel | PRReviewViewModelTest.kt | 18 | ✅ PASSING |
+| File Navigation | FileNavigationButtonsTest.kt | 7 | ✅ PASSING |
+| PR Review Integration | PRReviewIntegrationTest.kt | 12 | ✅ PASSING |
+| PR Metadata Card | PRMetadataCardTest.kt | 4 | ✅ PASSING |
 | Current Work ViewModel | CurrentWorkViewModelTest.kt | 11 | ✅ PASSING |
 | Use Cases | GetPullRequestsUseCaseTest.kt | 5 | ✅ PASSING |
-| Data Models | FileDiffDtoTest.kt | 1 | ✅ PASSING |
+| Data Models | FileDiffDtoTest.kt | 5 | ✅ PASSING |
 
 ### 4. Test Coverage Analysis
 
@@ -212,7 +212,7 @@ Consider adding:
 
 ### New Files
 1. `app/src/test/java/com/issuetrax/app/presentation/ui/pr_review/DiffViewerValidationTest.kt`
-   - 30 comprehensive test cases
+   - 25 comprehensive test cases
    - ~850 lines of code
    - Full coverage of Phase 3.4 requirements
 

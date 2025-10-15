@@ -290,14 +290,14 @@ class DiffViewerValidationTest {
         val fileDiff = createFileDiff("LargeClass.kt", patchLines, additions = 120, deletions = 90)
         
         // When
-        val startTime = System.currentTimeMillis()
+        val startTime = System.nanoTime()
         val hunks = DiffParser.parse(fileDiff.patch)
-        val parseTime = System.currentTimeMillis() - startTime
+        val parseTimeMs = (System.nanoTime() - startTime) / 1_000_000
         
         // Then
         assertEquals("Should parse all hunks", 1, hunks.size)
         assertTrue("Should have significant number of lines", hunks[0].lines.size > 100)
-        assertTrue("Should parse quickly (< 100ms)", parseTime < 100)
+        assertTrue("Should parse quickly (< 50ms)", parseTimeMs < 50)
     }
     
     // ========================================
