@@ -223,17 +223,17 @@ This file contains a comprehensive checklist of all tasks needed to execute the 
 - [x] Identify additions, deletions, context lines
 - [x] Handle special cases (binary files, no newline at EOF)
 
-### 3.2 Create Diff Display Components
-- [ ] Create `DiffView` composable for file display
-- [ ] Create `DiffHunk` composable for each hunk
-- [ ] Create `DiffLine` composable for individual lines
-- [ ] Apply color coding:
-  - [ ] Green background for additions
-  - [ ] Red background for deletions
-  - [ ] Gray for context lines
-- [ ] Show line numbers (old and new)
-- [ ] Use monospace font for code
-- [ ] Handle long lines with horizontal scroll
+### 3.2 Create Diff Display Components ✅ COMPLETE
+- [x] Create `DiffView` composable for file display
+- [x] Create `DiffHunk` composable for each hunk
+- [x] Create `DiffLine` composable for individual lines
+- [x] Apply color coding:
+  - [x] Green background for additions
+  - [x] Red background for deletions
+  - [x] Gray for context lines
+- [x] Show line numbers (old and new)
+- [x] Use monospace font for code
+- [x] Handle long lines with horizontal scroll
 
 ### 3.3 Implement Inline Diff View
 - [ ] Create `InlineDiffView` composable
@@ -468,13 +468,17 @@ The following features are **intentionally NOT included** to keep the app simple
 ## Testing Strategy 🧪
 
 ### Current Testing Status
-- ✅ **Unit Tests**: Implemented for Phase 1 & 2
+- ✅ **Unit Tests**: Implemented for Phase 1, 2 & 3 (partial)
   - `GetPullRequestsUseCaseTest` (5 tests)
   - `CurrentWorkViewModelTest` (11 tests)
   - `PRReviewViewModelTest` (19 tests)
   - `FileNavigationButtonsTest` (6 tests)
   - `PRReviewIntegrationTest` (13 tests)
   - `PRMetadataCardTest` (3 tests)
+  - `DiffParserTest` (15 tests)
+  - `DiffLineTest` (7 tests)
+  - `DiffHunkTest` (7 tests)
+  - `DiffViewTest` (10 tests)
   - `FileDiffDtoTest` (data layer test)
 - ⚠️ **Integration Tests**: Partially implemented (PR Review complete)
 - ⚠️ **UI Tests**: Not implemented yet (future enhancement)
@@ -504,11 +508,12 @@ The following features are **intentionally NOT included** to keep the app simple
 ## Notes & Blockers 📝
 
 ### Current Focus
-🎯 **Phase 3: Implement Diff Viewer** (Next Phase)
+🎯 **Phase 3: Implement Diff Viewer** (In Progress - 66% complete)
 - Phase 1 (Current Work Screen) is now COMPLETE (100%)
 - Phase 2 (PR Review Screen - Basic Display) is now COMPLETE (100%)
-- Next: Implement diff viewer for displaying code changes
-- Focus on parsing diffs and creating mobile-optimized diff display
+- Phase 3.1 (Diff Parser) is now COMPLETE
+- Phase 3.2 (Diff Display Components) is now COMPLETE
+- Next: Phase 3.3 (Inline Diff View) - Optimize for mobile screen width
 
 ### Known Issues
 - None currently
