@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
+import com.issuetrax.app.presentation.ui.pr_review.components.DiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileNavigationButtons
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
@@ -121,6 +122,11 @@ fun PRReviewScreen(
                                     currentFileIndex = uiState.currentFileIndex,
                                     onFileClick = { index -> viewModel.navigateToFile(index) }
                                 )
+                            }
+                            
+                            // Current File Diff View
+                            uiState.currentFile?.let { currentFile ->
+                                DiffView(fileDiff = currentFile)
                             }
                         }
                     }
