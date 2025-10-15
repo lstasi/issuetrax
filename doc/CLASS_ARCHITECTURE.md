@@ -369,6 +369,44 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - Uses monospace font (12sp)
 - Horizontal scroll for long lines
 
+#### `InlineDiffView`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Mobile-optimized inline diff viewer with expand/collapse functionality
+
+**Parameters**:
+- `fileDiff: FileDiff` - The file diff to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Optimized for mobile screen widths
+- Shows old and new lines together in compact format
+- File header with name and statistics
+- Multiple hunks with numbered headers
+- Automatic expansion for small hunks (≤10 lines)
+- Collapsible large hunks (>10 lines) with expand/collapse button
+- Shows first 5 lines when collapsed with line count indicator
+- Handles binary files gracefully
+- Uses existing DiffLine component for consistent styling
+
+#### `InlineDiffHunk`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a single hunk in inline format with expand/collapse capability
+
+**Parameters**:
+- `hunk: CodeHunk` - The code hunk to display
+- `hunkIndex: Int` - The 1-based index of this hunk
+- `totalHunks: Int` - The total number of hunks in the file
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Collapsible header showing hunk number and line ranges
+- Expand/collapse icon button (for hunks >10 lines)
+- Shows all lines when expanded
+- Shows first 5 lines when collapsed with "... N more lines" indicator
+- Default expanded state for small hunks (≤10 lines)
+
 ---
 
 ### 2.7 Theme Components
@@ -1602,11 +1640,13 @@ This section provides a granular, step-by-step roadmap starting from the Current
 - [x] Integrate DiffView into PRReviewScreen
 - [x] Create comprehensive unit tests (DiffLineTest, DiffHunkTest, DiffViewTest)
 
-#### 3.3 Implement Inline Diff View
-- [ ] Create `InlineDiffView` composable
-- [ ] Show old and new lines together
-- [ ] Optimize for mobile screen width
-- [ ] Add expand/collapse for large hunks
+#### 3.3 Implement Inline Diff View ✅ COMPLETE
+- [x] Create `InlineDiffView` composable
+- [x] Show old and new lines together
+- [x] Optimize for mobile screen width
+- [x] Add expand/collapse for large hunks
+- [x] Add view toggle in PRReviewScreen (Inline vs Standard)
+- [x] Create comprehensive tests for InlineDiffView
 
 #### 3.4 Testing & Validation
 - [ ] Test with small diffs (1-5 lines)
