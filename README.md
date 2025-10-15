@@ -133,6 +133,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Material Design 3](https://m3.material.io/)
 - [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
 
+## 🔐 Signing (release builds)
+
+Release signing uses a keystore file on disk. Provide the keystore via either:
+
+- `SIGNING_KEY_FILE` environment variable (absolute or relative path), or
+- Place a file named `signing-key.jks` in the repository root.
+
+Also set these environment variables:
+
+- `KEY_ALIAS`
+- `KEY_STORE_PASSWORD`
+- `KEY_PASSWORD`
+
+See `doc/KEYSTORE_SETUP.md` for full instructions and security notes.
+
 ---
 
 **Issuetrax** - Revolutionizing mobile code reviews with simplified workflow and gesture-based navigation. 

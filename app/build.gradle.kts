@@ -1,3 +1,5 @@
+import java.io.File
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -17,11 +19,47 @@ android {
         minSdk = 34
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    // Load keystore from environment variables (same as GitHub Actions)
+    // Required environment variables:
+    //   SIGNING_KEY_BASE64 - Base64-encoded keystore file
+    //   KEY_ALIAS - Key alias
+    //   KEY_STORE_PASSWORD - Keystore password
+    //   KEY_PASSWORD - Key password
+    signingConfigs {
+        create("release") {
+            // Signing configuration now uses a file on disk for easier local use and CI.
+            // Use either the SIGNING_KEY_FILE environment variable (absolute or relative path),
+            // or a default file located at the repository root: `signing-key.jks`.
+            val signingKeyFileEnv = System.getenv("SIGNING_KEY_FILE")
+            val repoRootKeystore = File(rootProject.projectDir, "signing-key.jks")
+            val keystoreFile = when {
+                signingKeyFileEnv != null && signingKeyFileEnv.isNotBlank() -> File(rootProject.projectDir, signingKeyFileEnv)
+                repoRootKeystore.exists() -> repoRootKeystore
+                else -> null
+            }
+
+            val envKeyAlias = System.getenv("KEY_ALIAS")
+            val envStorePassword = System.getenv("KEY_STORE_PASSWORD")
+            val envKeyPassword = System.getenv("KEY_PASSWORD")
+
+            if (keystoreFile != null && keystoreFile.exists() && envKeyAlias != null && envStorePassword != null && envKeyPassword != null) {
+                storeFile = keystoreFile
+                storePassword = envStorePassword
+                keyAlias = envKeyAlias
+                keyPassword = envKeyPassword
+                println("✓ Using keystore file: ${keystoreFile.absolutePath}")
+            }
+            else {
+                println("WARNING: Release signing config is not fully configured. Release APKs will be unsigned (debug signing may be used).")
+            }
         }
     }
 
@@ -32,7 +70,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // Use proper signing config for release
+            // Only set signing config if a storeFile is present (env-based signing created it)
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile != null) {
+                signingConfig = releaseSigning
+            } else {
+                println("NOTICE: Release signing config has no storeFile; release APK will be unsigned (debug signing may be used).")
+            }
         }
     }
 
