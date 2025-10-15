@@ -654,6 +654,51 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 
 ---
 
+### 3.4 Utilities
+
+#### `DiffParser`
+**Package**: `com.issuetrax.app.domain.util`  
+**Type**: Object (Singleton)  
+**Purpose**: Parse unified diff format patches from GitHub PR files
+
+**Method**:
+- `fun parse(patch: String?): List<CodeHunk>` - Parse unified diff patch into code hunks
+
+**Logic**:
+1. Return empty list if patch is null, blank, or binary file
+2. Iterate through patch lines looking for hunk headers (format: `@@ -oldStart,oldCount +newStart,newCount @@`)
+3. For each hunk, parse all lines:
+   - Lines starting with `+` → Addition (new line number only)
+   - Lines starting with `-` → Deletion (old line number only)
+   - Lines starting with `\` → Special marker like "No newline at end of file"
+   - Lines starting with space or empty → Context (both line numbers)
+4. Track line numbers separately for old and new files
+5. Return list of CodeHunk objects with all parsed DiffLine objects
+
+**Special Cases Handled**:
+- Binary files (returns empty list)
+- No newline at EOF marker (`\ No newline at end of file`)
+- Hunk headers with or without line count (defaults to 1 if omitted)
+- Hunk headers with section names (e.g., function names)
+- Empty lines in diffs (treated as context lines)
+
+**Example Usage**:
+```kotlin
+val patch = """
+@@ -1,3 +1,4 @@
+ context line
+-deleted line
++added line
++another added line
+ context line
+"""
+
+val hunks = DiffParser.parse(patch)
+// Returns List<CodeHunk> with parsed diff information
+```
+
+---
+
 ## 4. Data Layer
 
 ### 4.1 API Models (DTOs)
@@ -1486,12 +1531,12 @@ This section provides a granular, step-by-step roadmap starting from the Current
 
 ### Phase 3: Implement Diff Viewer (Core Feature)
 
-#### 3.1 Create Diff Parser
-- [ ] Create `DiffParser` utility class
-- [ ] Parse unified diff format from `FileDiff.patch`
-- [ ] Extract code hunks with line numbers
-- [ ] Identify additions, deletions, context lines
-- [ ] Handle special cases (binary files, no newline at EOF)
+#### 3.1 Create Diff Parser ✅ COMPLETE
+- [x] Create `DiffParser` utility class
+- [x] Parse unified diff format from `FileDiff.patch`
+- [x] Extract code hunks with line numbers
+- [x] Identify additions, deletions, context lines
+- [x] Handle special cases (binary files, no newline at EOF)
 
 #### 3.2 Create Diff Display Components
 - [ ] Create `DiffView` composable for file display
