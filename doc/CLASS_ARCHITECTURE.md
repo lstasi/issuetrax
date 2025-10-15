@@ -364,8 +364,8 @@ This document provides a detailed reference of all classes in the Issuetrax appl
   - Green for additions (DiffAdded)
   - Red for deletions (DiffRemoved)
   - Default surface for context
-  - Gray text for NO_NEWLINE markers
-- Shows old and new line numbers (4 chars wide each)
+  - Subdued color (onSurfaceVariant) for NO_NEWLINE markers
+- Shows old and new line numbers (40dp width each)
 - Uses monospace font (12sp)
 - Horizontal scroll for long lines
 
