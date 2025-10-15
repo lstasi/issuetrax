@@ -319,6 +319,56 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - Gesture-based navigation between files
 - Review submission interface
 
+#### `DiffView`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a complete file diff with file info and code hunks
+
+**Parameters**:
+- `fileDiff: FileDiff` - The file diff to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Shows file name with full path
+- Displays addition/deletion statistics
+- Parses patch using DiffParser
+- Renders all code hunks
+- Handles binary files gracefully
+
+#### `DiffHunk`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a code hunk with header and all lines
+
+**Parameters**:
+- `hunk: CodeHunk` - The code hunk to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Shows hunk header with line number ranges (e.g., `@@ -10,5 +12,6 @@`)
+- Renders all diff lines in order
+- Uses monospace font
+- Proper spacing between lines
+
+#### `DiffLine`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a single line in a code diff with line numbers and color coding
+
+**Parameters**:
+- `line: DiffLine` - The diff line to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Color-coded backgrounds:
+  - Green for additions (DiffAdded)
+  - Red for deletions (DiffRemoved)
+  - Default surface for context
+  - Subdued color (onSurfaceVariant) for NO_NEWLINE markers
+- Shows old and new line numbers (40dp width each)
+- Uses monospace font (12sp)
+- Horizontal scroll for long lines
+
 ---
 
 ### 2.7 Theme Components
@@ -651,6 +701,51 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - `APPROVE` - Approve PR
 - `REQUEST_CHANGES` - Request changes
 - `COMMENT` - Comment only
+
+---
+
+### 3.4 Utilities
+
+#### `DiffParser`
+**Package**: `com.issuetrax.app.domain.util`  
+**Type**: Object (Singleton)  
+**Purpose**: Parse unified diff format patches from GitHub PR files
+
+**Method**:
+- `fun parse(patch: String?): List<CodeHunk>` - Parse unified diff patch into code hunks
+
+**Logic**:
+1. Return empty list if patch is null, blank, or binary file
+2. Iterate through patch lines looking for hunk headers (format: `@@ -oldStart,oldCount +newStart,newCount @@`)
+3. For each hunk, parse all lines:
+   - Lines starting with `+` → Addition (new line number only)
+   - Lines starting with `-` → Deletion (old line number only)
+   - Lines starting with `\` → Special marker like "No newline at end of file"
+   - Lines starting with space or empty → Context (both line numbers)
+4. Track line numbers separately for old and new files
+5. Return list of CodeHunk objects with all parsed DiffLine objects
+
+**Special Cases Handled**:
+- Binary files (returns empty list)
+- No newline at EOF marker (`\ No newline at end of file`)
+- Hunk headers with or without line count (defaults to 1 if omitted)
+- Hunk headers with section names (e.g., function names)
+- Empty lines in diffs (treated as context lines)
+
+**Example Usage**:
+```kotlin
+val patch = """
+@@ -1,3 +1,4 @@
+ context line
+-deleted line
++added line
++another added line
+ context line
+"""
+
+val hunks = DiffParser.parse(patch)
+// Returns List<CodeHunk> with parsed diff information
+```
 
 ---
 
@@ -1470,12 +1565,12 @@ This section provides a granular, step-by-step roadmap starting from the Current
 - [x] Show file counter (e.g., "File 1 of 12")
 - [x] Add `navigateToFile(index)` function to ViewModel
 
-#### 2.4 Basic File Navigation
-- [ ] Add navigation buttons (Previous/Next file)
-- [ ] Implement `navigateToNextFile()` (already in ViewModel)
-- [ ] Implement `navigateToPreviousFile()` (already in ViewModel)
-- [ ] Show current file index
-- [ ] Disable previous/next when at boundaries
+#### 2.4 Basic File Navigation ✅ COMPLETE
+- [x] Add navigation buttons (Previous/Next file)
+- [x] Implement `navigateToNextFile()` (already in ViewModel)
+- [x] Implement `navigateToPreviousFile()` (already in ViewModel)
+- [x] Show current file index
+- [x] Disable previous/next when at boundaries
 
 #### 2.5 Testing & Validation
 - [ ] Test with PR that has 1 file
@@ -1486,24 +1581,26 @@ This section provides a granular, step-by-step roadmap starting from the Current
 
 ### Phase 3: Implement Diff Viewer (Core Feature)
 
-#### 3.1 Create Diff Parser
-- [ ] Create `DiffParser` utility class
-- [ ] Parse unified diff format from `FileDiff.patch`
-- [ ] Extract code hunks with line numbers
-- [ ] Identify additions, deletions, context lines
-- [ ] Handle special cases (binary files, no newline at EOF)
+#### 3.1 Create Diff Parser ✅ COMPLETE
+- [x] Create `DiffParser` utility class
+- [x] Parse unified diff format from `FileDiff.patch`
+- [x] Extract code hunks with line numbers
+- [x] Identify additions, deletions, context lines
+- [x] Handle special cases (binary files, no newline at EOF)
 
-#### 3.2 Create Diff Display Components
-- [ ] Create `DiffView` composable for file display
-- [ ] Create `DiffHunk` composable for each hunk
-- [ ] Create `DiffLine` composable for individual lines
-- [ ] Apply color coding:
-  - [ ] Green background for additions
-  - [ ] Red background for deletions
-  - [ ] Gray for context lines
-- [ ] Show line numbers (old and new)
-- [ ] Use monospace font for code
-- [ ] Handle long lines with horizontal scroll
+#### 3.2 Create Diff Display Components ✅ COMPLETE
+- [x] Create `DiffView` composable for file display
+- [x] Create `DiffHunk` composable for each hunk
+- [x] Create `DiffLine` composable for individual lines
+- [x] Apply color coding:
+  - [x] Green background for additions
+  - [x] Red background for deletions
+  - [x] Gray for context lines
+- [x] Show line numbers (old and new)
+- [x] Use monospace font for code
+- [x] Handle long lines with horizontal scroll
+- [x] Integrate DiffView into PRReviewScreen
+- [x] Create comprehensive unit tests (DiffLineTest, DiffHunkTest, DiffViewTest)
 
 #### 3.3 Implement Inline Diff View
 - [ ] Create `InlineDiffView` composable
