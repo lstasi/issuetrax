@@ -117,3 +117,6 @@ lint/tmp/
 # Test API responses from validation script
 *_live.json
 .env
+
+# Signing Key
+*.jks
