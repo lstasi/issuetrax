@@ -30,9 +30,10 @@ import com.issuetrax.app.domain.util.DiffParser
 
 /**
  * Configuration constants for inline diff view behavior.
+ * These can be adjusted to customize the expand/collapse behavior.
  */
-private const val COLLAPSE_THRESHOLD_LINES = 10
-private const val PREVIEW_LINES_WHEN_COLLAPSED = 5
+const val COLLAPSE_THRESHOLD_LINES = 10
+const val PREVIEW_LINES_WHEN_COLLAPSED = 5
 
 /**
  * Inline diff view optimized for mobile screens.
