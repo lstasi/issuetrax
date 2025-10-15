@@ -319,6 +319,56 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - Gesture-based navigation between files
 - Review submission interface
 
+#### `DiffView`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a complete file diff with file info and code hunks
+
+**Parameters**:
+- `fileDiff: FileDiff` - The file diff to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Shows file name with full path
+- Displays addition/deletion statistics
+- Parses patch using DiffParser
+- Renders all code hunks
+- Handles binary files gracefully
+
+#### `DiffHunk`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a code hunk with header and all lines
+
+**Parameters**:
+- `hunk: CodeHunk` - The code hunk to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Shows hunk header with line number ranges (e.g., `@@ -10,5 +12,6 @@`)
+- Renders all diff lines in order
+- Uses monospace font
+- Proper spacing between lines
+
+#### `DiffLine`
+**Package**: `com.issuetrax.app.presentation.ui.pr_review.components`  
+**Type**: Composable Function  
+**Purpose**: Display a single line in a code diff with line numbers and color coding
+
+**Parameters**:
+- `line: DiffLine` - The diff line to display
+- `modifier: Modifier` - Optional modifier
+
+**Features**:
+- Color-coded backgrounds:
+  - Green for additions (DiffAdded)
+  - Red for deletions (DiffRemoved)
+  - Default surface for context
+  - Subdued color (onSurfaceVariant) for NO_NEWLINE markers
+- Shows old and new line numbers (40dp width each)
+- Uses monospace font (12sp)
+- Horizontal scroll for long lines
+
 ---
 
 ### 2.7 Theme Components
@@ -1538,17 +1588,19 @@ This section provides a granular, step-by-step roadmap starting from the Current
 - [x] Identify additions, deletions, context lines
 - [x] Handle special cases (binary files, no newline at EOF)
 
-#### 3.2 Create Diff Display Components
-- [ ] Create `DiffView` composable for file display
-- [ ] Create `DiffHunk` composable for each hunk
-- [ ] Create `DiffLine` composable for individual lines
-- [ ] Apply color coding:
-  - [ ] Green background for additions
-  - [ ] Red background for deletions
-  - [ ] Gray for context lines
-- [ ] Show line numbers (old and new)
-- [ ] Use monospace font for code
-- [ ] Handle long lines with horizontal scroll
+#### 3.2 Create Diff Display Components ✅ COMPLETE
+- [x] Create `DiffView` composable for file display
+- [x] Create `DiffHunk` composable for each hunk
+- [x] Create `DiffLine` composable for individual lines
+- [x] Apply color coding:
+  - [x] Green background for additions
+  - [x] Red background for deletions
+  - [x] Gray for context lines
+- [x] Show line numbers (old and new)
+- [x] Use monospace font for code
+- [x] Handle long lines with horizontal scroll
+- [x] Integrate DiffView into PRReviewScreen
+- [x] Create comprehensive unit tests (DiffLineTest, DiffHunkTest, DiffViewTest)
 
 #### 3.3 Implement Inline Diff View
 - [ ] Create `InlineDiffView` composable
