@@ -29,6 +29,12 @@ import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.util.DiffParser
 
 /**
+ * Configuration constants for inline diff view behavior.
+ */
+private const val COLLAPSE_THRESHOLD_LINES = 10
+private const val PREVIEW_LINES_WHEN_COLLAPSED = 5
+
+/**
  * Inline diff view optimized for mobile screens.
  * 
  * Shows old and new lines together in a compact format:
@@ -123,7 +129,8 @@ fun InlineDiffView(
 /**
  * Displays a single hunk in inline format with expand/collapse capability.
  * 
- * Large hunks (more than 10 lines) can be collapsed to save screen space.
+ * Large hunks (more than [COLLAPSE_THRESHOLD_LINES] lines) can be collapsed to save screen space.
+ * When collapsed, shows first [PREVIEW_LINES_WHEN_COLLAPSED] lines.
  * The hunk header shows the line ranges and hunk number.
  * 
  * @param hunk The code hunk to display
@@ -138,8 +145,8 @@ fun InlineDiffHunk(
     totalHunks: Int,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(hunk.lines.size <= 10) }
-    val shouldShowToggle = hunk.lines.size > 10
+    var isExpanded by remember { mutableStateOf(hunk.lines.size <= COLLAPSE_THRESHOLD_LINES) }
+    val shouldShowToggle = hunk.lines.size > COLLAPSE_THRESHOLD_LINES
     
     Column(
         modifier = modifier.fillMaxWidth()
@@ -178,21 +185,21 @@ fun InlineDiffHunk(
             }
         }
         
-        // Show diff lines (all if expanded, or first 5 if collapsed)
+        // Show diff lines (all if expanded, or preview lines if collapsed)
         if (isExpanded) {
             hunk.lines.forEach { line ->
                 DiffLine(line = line)
             }
         } else {
-            // Show first 5 lines when collapsed
-            hunk.lines.take(5).forEach { line ->
+            // Show first preview lines when collapsed
+            hunk.lines.take(PREVIEW_LINES_WHEN_COLLAPSED).forEach { line ->
                 DiffLine(line = line)
             }
             
             // Show count of hidden lines
-            if (hunk.lines.size > 5) {
+            if (hunk.lines.size > PREVIEW_LINES_WHEN_COLLAPSED) {
                 Text(
-                    text = "... ${hunk.lines.size - 5} more lines",
+                    text = "... ${hunk.lines.size - PREVIEW_LINES_WHEN_COLLAPSED} more lines",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
