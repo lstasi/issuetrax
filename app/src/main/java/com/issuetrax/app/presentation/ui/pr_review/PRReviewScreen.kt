@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
+import com.issuetrax.app.presentation.ui.common.gesture.GestureCallbacks
+import com.issuetrax.app.presentation.ui.common.gesture.detectSwipeGestures
 import com.issuetrax.app.presentation.ui.pr_review.components.DiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileNavigationButtons
@@ -151,12 +153,25 @@ fun PRReviewScreen(
                                 }
                             }
                             
-                            // Current File Diff View (Inline or Standard)
+                            // Current File Diff View (Inline or Standard) with gesture detection
                             uiState.currentFile?.let { currentFile ->
-                                if (useInlineView) {
-                                    InlineDiffView(fileDiff = currentFile)
-                                } else {
-                                    DiffView(fileDiff = currentFile)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .detectSwipeGestures(
+                                            callbacks = GestureCallbacks(
+                                                onSwipeLeft = { viewModel.navigateToNextFile() },
+                                                onSwipeRight = { viewModel.navigateToPreviousFile() }
+                                                // onSwipeUp and onSwipeDown reserved for future hunk navigation
+                                            ),
+                                            enabled = uiState.files.isNotEmpty()
+                                        )
+                                ) {
+                                    if (useInlineView) {
+                                        InlineDiffView(fileDiff = currentFile)
+                                    } else {
+                                        DiffView(fileDiff = currentFile)
+                                    }
                                 }
                             }
                         }
