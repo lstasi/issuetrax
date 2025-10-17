@@ -409,7 +409,86 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 
 ---
 
-### 2.7 Theme Components
+### 2.7 Gesture Detection
+
+#### `GestureConfig`
+**Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
+**Type**: Data Class  
+**Purpose**: Configuration for gesture detection thresholds and constraints
+
+**Properties**:
+- `horizontalMinDistance: Dp = 100.dp` - Minimum horizontal swipe distance
+- `horizontalMinVelocity: Float = 500f` - Minimum horizontal velocity (dp/s)
+- `verticalMinDistance: Dp = 80.dp` - Minimum vertical swipe distance
+- `verticalMinVelocity: Float = 400f` - Minimum vertical velocity (dp/s)
+- `maxAngleDeviation: Float = 30f` - Maximum angle deviation (degrees)
+- `scrollTolerance: Dp = 10.dp` - Movement tolerance for scroll detection
+
+**Companion Object**:
+- `Default` - Default configuration following UI_UX_DESIGN.md specifications
+
+#### `SwipeDirection`
+**Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
+**Type**: Enum  
+**Purpose**: Represents detected swipe direction
+
+**Values**:
+- `LEFT` - Swipe left gesture
+- `RIGHT` - Swipe right gesture
+- `UP` - Swipe up gesture
+- `DOWN` - Swipe down gesture
+
+#### `GestureDetector`
+**Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
+**Type**: Class  
+**Purpose**: Core gesture detection logic for PR review navigation
+
+**Constructor Parameters**:
+- `config: GestureConfig` - Gesture configuration
+- `density: Density` - Screen density for dp/pixel conversion
+
+**Methods**:
+- `detectSwipe(dragAmount: Offset, velocity: Offset): SwipeDirection?` - Analyzes drag gesture and returns direction if thresholds met
+
+**Detection Logic**:
+1. Converts pixel values to dp for consistent thresholds
+2. Calculates drag angle to determine primary direction
+3. Validates distance meets minimum threshold
+4. Validates velocity meets minimum threshold
+5. Validates angle is within deviation constraints
+6. Returns SwipeDirection or null if gesture doesn't qualify
+
+#### `GestureCallbacks`
+**Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
+**Type**: Data Class  
+**Purpose**: Callback functions for gesture events
+
+**Properties**:
+- `onSwipeLeft: (() -> Unit)?` - Called on left swipe
+- `onSwipeRight: (() -> Unit)?` - Called on right swipe
+- `onSwipeUp: (() -> Unit)?` - Called on up swipe
+- `onSwipeDown: (() -> Unit)?` - Called on down swipe
+
+#### `Modifier.detectSwipeGestures()`
+**Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
+**Type**: Composable Modifier Extension  
+**Purpose**: Compose modifier for detecting swipe gestures
+
+**Parameters**:
+- `config: GestureConfig = GestureConfig.Default` - Gesture configuration
+- `callbacks: GestureCallbacks` - Gesture event callbacks
+- `enabled: Boolean = true` - Whether gesture detection is enabled
+
+**Features**:
+- Uses Compose pointerInput API for gesture detection
+- Tracks drag start position and time
+- Calculates velocity from drag distance and duration
+- Invokes appropriate callback based on detected direction
+- Consumes pointer events to prevent interference with other gestures
+
+---
+
+### 2.8 Theme Components
 
 #### `Color`
 **Package**: `com.issuetrax.app.presentation.ui.common.theme`  
@@ -1680,17 +1759,17 @@ This section provides a granular, step-by-step roadmap starting from the Current
 ### Phase 5: Add Gesture Navigation (Advanced)
 
 #### 5.1 Implement Gesture Detection
-- [ ] Create `GestureDetector` for swipe gestures
-- [ ] Detect horizontal swipes (left/right)
-- [ ] Detect vertical swipes (up/down)
-- [ ] Add velocity thresholds
-- [ ] Prevent conflicts with scroll
+- [x] Create `GestureDetector` for swipe gestures
+- [x] Detect horizontal swipes (left/right)
+- [x] Detect vertical swipes (up/down)
+- [x] Add velocity thresholds
+- [x] Prevent conflicts with scroll
 
 #### 5.2 Map Gestures to Actions
-- [ ] Swipe left → Next file
-- [ ] Swipe right → Previous file
-- [ ] Swipe up → Next hunk (future)
-- [ ] Swipe down → Previous hunk (future)
+- [x] Swipe left → Next file
+- [x] Swipe right → Previous file
+- [x] Swipe up → Next hunk (future)
+- [x] Swipe down → Previous hunk (future)
 
 #### 5.3 Add Visual Feedback
 - [ ] Show swipe indicators
