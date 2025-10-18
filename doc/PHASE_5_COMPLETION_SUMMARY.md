@@ -372,7 +372,7 @@ All requirements for Phase 5 have been met:
 
 ## Files Added/Modified
 
-### New Files (9)
+### New Files (11)
 1. `app/src/main/java/com/issuetrax/app/presentation/ui/common/markdown/MarkdownRenderer.kt` (229 lines)
 2. `app/src/main/java/com/issuetrax/app/presentation/ui/pr_review/components/PRActionToolbar.kt` (185 lines)
 3. `app/src/main/java/com/issuetrax/app/domain/usecase/ApprovePullRequestUseCase.kt` (33 lines)
