@@ -57,6 +57,24 @@ interface GitHubApiService {
         @Path("number") number: Int,
         @Body reviewRequest: CreateReviewRequest
     ): Response<ReviewDto>
+    
+    @PUT("repos/{owner}/{repo}/pulls/{number}/merge")
+    suspend fun mergePullRequest(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("number") number: Int,
+        @Body mergeRequest: MergePullRequestRequest
+    ): Response<MergeResultDto>
+    
+    @PATCH("repos/{owner}/{repo}/pulls/{number}")
+    suspend fun updatePullRequest(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("number") number: Int,
+        @Body updateRequest: UpdatePullRequestRequest
+    ): Response<PullRequestDto>
 }
 
 @Serializable
@@ -71,4 +89,25 @@ data class ReviewCommentRequest(
     val path: String,
     val position: Int,
     val body: String
+)
+
+@Serializable
+data class MergePullRequestRequest(
+    val commit_title: String? = null,
+    val commit_message: String? = null,
+    val merge_method: String = "merge" // "merge", "squash", or "rebase"
+)
+
+@Serializable
+data class MergeResultDto(
+    val sha: String,
+    val merged: Boolean,
+    val message: String
+)
+
+@Serializable
+data class UpdatePullRequestRequest(
+    val state: String? = null, // "open" or "closed"
+    val title: String? = null,
+    val body: String? = null
 )
