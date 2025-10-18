@@ -22,21 +22,22 @@ import com.issuetrax.app.presentation.ui.current_work.PRStats
 import com.issuetrax.app.presentation.ui.current_work.timeAgo
 
 /**
- * Displays comprehensive metadata for a pull request.
+ * Displays compact metadata for a pull request.
  * 
- * Shows:
- * - PR title
+ * Simplified version showing only:
  * - PR state (open/closed/merged)
  * - Author information
- * - Created/updated dates
  * - Branch information (head → base)
- * - PR description (body)
  * - Stats (commits, files changed, additions, deletions)
+ * - Timestamps
+ * 
+ * Note: PR title is now shown in the top toolbar, and description is available via the info button.
  */
 @Composable
 fun PRMetadataCard(
     pullRequest: PullRequest,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = true
 ) {
     Card(
         modifier = modifier.fillMaxWidth()
@@ -44,8 +45,8 @@ fun PRMetadataCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Header: PR number and state
             Row(
@@ -53,31 +54,25 @@ fun PRMetadataCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "#${pullRequest.number}",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "#${pullRequest.number}",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Text(
+                        text = "by ${pullRequest.author.login}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 
                 PRStateIndicator(state = pullRequest.state)
             }
-            
-            // Title
-            Text(
-                text = pullRequest.title,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            // Author information
-            Text(
-                text = "by ${pullRequest.author.login}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Divider()
             
             // Branch information
             BranchInfo(
@@ -85,51 +80,24 @@ fun PRMetadataCard(
                 baseRef = pullRequest.baseRef
             )
             
-            Divider()
-            
-            // Timestamps
-            TimeInfo(
-                createdAt = timeAgo(pullRequest.createdAt),
-                updatedAt = timeAgo(pullRequest.updatedAt),
-                mergedAt = pullRequest.mergedAt?.let { timeAgo(it) },
-                closedAt = pullRequest.closedAt?.let { timeAgo(it) }
-            )
-            
-            Divider()
-            
-            // Stats
-            PRStats(
-                changedFiles = pullRequest.changedFiles ?: 0,
-                additions = pullRequest.additions ?: 0,
-                deletions = pullRequest.deletions ?: 0
-            )
-            
-            // Commits count
-            if (pullRequest.commits != null && pullRequest.commits > 0) {
+            // Stats and timestamps in a row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Stats
+                PRStats(
+                    changedFiles = pullRequest.changedFiles ?: 0,
+                    additions = pullRequest.additions ?: 0,
+                    deletions = pullRequest.deletions ?: 0
+                )
+                
+                // Updated timestamp
                 Text(
-                    text = "${pullRequest.commits} ${if (pullRequest.commits == 1) "commit" else "commits"}",
+                    text = "Updated ${timeAgo(pullRequest.updatedAt)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            // Description (body)
-            if (!pullRequest.body.isNullOrBlank()) {
-                Divider()
-                
-                Text(
-                    text = "Description",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = pullRequest.body,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 10,
-                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -178,6 +146,8 @@ private fun BranchInfo(
 
 /**
  * Displays timestamp information (created, updated, merged, closed).
+ * 
+ * Note: This is now only used in non-compact mode (future feature).
  */
 @Composable
 private fun TimeInfo(

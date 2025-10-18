@@ -49,6 +49,8 @@ class PRReviewViewModelTest {
     
     private lateinit var gitHubRepository: GitHubRepository
     private lateinit var submitReviewUseCase: SubmitReviewUseCase
+    private lateinit var approvePullRequestUseCase: com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase
+    private lateinit var closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -56,7 +58,9 @@ class PRReviewViewModelTest {
         Dispatchers.setMain(testDispatcher)
         gitHubRepository = mockk()
         submitReviewUseCase = mockk()
-        viewModel = PRReviewViewModel(gitHubRepository, submitReviewUseCase)
+        approvePullRequestUseCase = mockk()
+        closePullRequestUseCase = mockk()
+        viewModel = PRReviewViewModel(gitHubRepository, submitReviewUseCase, approvePullRequestUseCase, closePullRequestUseCase)
     }
     
     @After

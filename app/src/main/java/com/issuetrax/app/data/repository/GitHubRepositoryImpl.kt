@@ -160,4 +160,89 @@ class GitHubRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+    
+    override suspend fun approvePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        comment: String?
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val request = CreateReviewRequest(
+                body = comment ?: "Approved via Issuetrax",
+                event = "APPROVE",
+                comments = emptyList()
+            )
+            
+            val response = apiService.createReview("Bearer $token", owner, repo, prNumber, request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to approve PR: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun closePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val request = com.issuetrax.app.data.api.UpdatePullRequestRequest(
+                state = "closed"
+            )
+            
+            val response = apiService.updatePullRequest("Bearer $token", owner, repo, prNumber, request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to close PR: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun mergePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        commitTitle: String?,
+        commitMessage: String?,
+        mergeMethod: String
+    ): Result<String> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val request = com.issuetrax.app.data.api.MergePullRequestRequest(
+                commit_title = commitTitle,
+                commit_message = commitMessage,
+                merge_method = mergeMethod
+            )
+            
+            val response = apiService.mergePullRequest("Bearer $token", owner, repo, prNumber, request)
+            if (response.isSuccessful) {
+                val result = response.body()
+                if (result != null && result.merged) {
+                    Result.success(result.sha)
+                } else {
+                    Result.failure(Exception("Failed to merge PR: ${result?.message ?: "Unknown error"}"))
+                }
+            } else {
+                Result.failure(Exception("Failed to merge PR: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -37,6 +37,28 @@ interface GitHubRepository {
         event: String, // "APPROVE", "REQUEST_CHANGES", "COMMENT"
         comments: List<ReviewComment> = emptyList()
     ): Result<Review>
+    
+    suspend fun approvePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        comment: String? = null
+    ): Result<Unit>
+    
+    suspend fun closePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int
+    ): Result<Unit>
+    
+    suspend fun mergePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        commitTitle: String? = null,
+        commitMessage: String? = null,
+        mergeMethod: String = "merge"
+    ): Result<String>
 }
 
 data class ReviewComment(
