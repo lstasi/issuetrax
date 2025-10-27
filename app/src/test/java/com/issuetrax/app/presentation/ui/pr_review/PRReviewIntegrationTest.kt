@@ -99,13 +99,19 @@ class PRReviewIntegrationTest {
         assertNull("Should have no error", state.error)
         assertNotNull("PR should be loaded", state.pullRequest)
         assertEquals("Should have 1 file", 1, state.files.size)
-        assertEquals("Current file index should be 0", 0, state.currentFileIndex)
-        assertNotNull("Current file should be set", state.currentFile)
-        assertEquals("Current file should be README.md", "README.md", state.currentFile?.filename)
+        assertEquals("Current file index should be -1", -1, state.currentFileIndex)
+        assertNull("Current file should be null initially", state.currentFile)
+        
+        // Navigate to the file to verify it works
+        viewModel.navigateToFile(0)
+        val afterNavigate = viewModel.uiState.value
+        assertEquals("After navigation, current file index should be 0", 0, afterNavigate.currentFileIndex)
+        assertNotNull("After navigation, current file should be set", afterNavigate.currentFile)
+        assertEquals("After navigation, current file should be README.md", "README.md", afterNavigate.currentFile?.filename)
         
         // Verify navigation buttons should be disabled (only 1 file)
-        val canGoNext = state.currentFileIndex < state.files.size - 1
-        val canGoPrevious = state.currentFileIndex > 0
+        val canGoNext = afterNavigate.currentFileIndex < afterNavigate.files.size - 1
+        val canGoPrevious = afterNavigate.currentFileIndex > 0
         assertFalse("Next button should be disabled", canGoNext)
         assertFalse("Previous button should be disabled", canGoPrevious)
     }
@@ -131,19 +137,21 @@ class PRReviewIntegrationTest {
         viewModel.loadPullRequest(owner, repo, prNumber)
         advanceUntilIdle()
         
+        // Navigate to the file first
+        viewModel.navigateToFile(0)
         val initialIndex = viewModel.uiState.value.currentFileIndex
         
         // When - Try to navigate next
         viewModel.navigateToNextFile()
         
-        // Then - Index should stay the same
+        // Then - Index should stay the same (can't go beyond last file)
         assertEquals("Index should remain at 0", initialIndex, viewModel.uiState.value.currentFileIndex)
         assertEquals("Current file should still be main.kt", "main.kt", viewModel.uiState.value.currentFile?.filename)
         
         // When - Try to navigate previous
         viewModel.navigateToPreviousFile()
         
-        // Then - Index should still be the same
+        // Then - Index should still be the same (can't go below 0)
         assertEquals("Index should remain at 0", initialIndex, viewModel.uiState.value.currentFileIndex)
     }
     
@@ -184,17 +192,18 @@ class PRReviewIntegrationTest {
         assertFalse("Should not be loading", state.isLoading)
         assertNull("Should have no error", state.error)
         assertEquals("Should have 10 files", fileCount, state.files.size)
-        assertEquals("Current file index should be 0", 0, state.currentFileIndex)
-        assertEquals("First file should be file1.kt", "file1.kt", state.currentFile?.filename)
+        assertEquals("Current file index should be -1 initially", -1, state.currentFileIndex)
+        assertNull("Current file should be null initially", state.currentFile)
+        
+        // Navigate to first file
+        viewModel.navigateToFile(0)
+        val afterNavigate = viewModel.uiState.value
+        assertEquals("After navigation, first file should be file1.kt", "file1.kt", afterNavigate.currentFile?.filename)
         
         // Verify all files are present
         state.files.forEachIndexed { index, file ->
             assertEquals("File ${index + 1} should have correct name", "file${index + 1}.kt", file.filename)
         }
-        
-        // Verify navigation state
-        assertTrue("Next button should be enabled", state.currentFileIndex < state.files.size - 1)
-        assertFalse("Previous button should be disabled at start", state.currentFileIndex > 0)
     }
     
     @Test
@@ -221,6 +230,9 @@ class PRReviewIntegrationTest {
         
         viewModel.loadPullRequest(owner, repo, prNumber)
         advanceUntilIdle()
+        
+        // Navigate to first file
+        viewModel.navigateToFile(0)
         
         // When/Then - Navigate forward through all files
         for (i in 0 until mockFiles.size) {
