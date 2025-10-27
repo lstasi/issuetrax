@@ -141,41 +141,57 @@ Code Font: JetBrains Mono 14sp/20sp (Code blocks, diffs)
 
 ### 3. PR Review Screen (Primary Focus)
 
-The PR Review screen is the core of the application, optimized for mobile code review with gesture navigation and inline diff viewing.
+The PR Review screen is the core of the application, optimized for mobile code review with a simplified navigation pattern focused on file list → file diff → chunk detail.
 
-#### PR Overview & File Navigation
+#### Main View: File List
+
+The default view shows a list of all changed files in the pull request.
 
 ```
 ┌─────────────────────────────────────┐
 │  [←]  #47: Add gesture navigation   │
 │                              [⋮][✓] │
 ├─────────────────────────────────────┤
-│  📊 Files (8) • 💬 Comments (5)     │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
-├─────────────────────────────────────┤
-│  📂 GestureDetector.kt (1/8)       │
-│  +45 -12 lines • Modified          │
-├─────────────────────────────────────┤
+│  📋 Files Changed (8)               │
 │                                     │
-│  📋 File List:                      │
-│  • GestureDetector.kt ✓            │
-│  • PRReviewScreen.kt                │
-│  • MainActivity.kt                  │
-│  • navigation/Routes.kt             │
-│  • ... (+4 more)                   │
+│  ┌─────────────────────────────┐   │
+│  │ 📄 GestureDetector.kt       │   │
+│  │ +45 -12 • Modified          │   │
+│  └─────────────────────────────┘   │
 │                                     │
-│     [View Current File Diff]        │
+│  ┌─────────────────────────────┐   │
+│  │ 📄 PRReviewScreen.kt        │   │
+│  │ +23 -8 • Modified           │   │
+│  └─────────────────────────────┘   │
+│                                     │
+│  ┌─────────────────────────────┐   │
+│  │ 📄 MainActivity.kt          │   │
+│  │ +10 -5 • Modified           │   │
+│  └─────────────────────────────┘   │
+│                                     │
+│  ... (+5 more files)               │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
-#### Inline Diff Viewer (Mobile Optimized)
+**Navigation:**
+- Tap on a file → View file diff
+- Pull request metadata is shown in the top bar
+
+#### File Diff View
+
+When a file is selected, the full diff is displayed.
 
 ```
 ┌─────────────────────────────────────┐
-│  📂 GestureDetector.kt (1/8)       │
-│  [Inline View] • Hunk 2/5          │
+│  [←]  #47: Add gesture navigation   │
+│                              [⋮][✓] │
 ├─────────────────────────────────────┤
+│  📂 GestureDetector.kt              │
+│  +45 -12 lines • Modified           │
+├─────────────────────────────────────┤
+│  Hunk 1/5: @@ -15,3 +15,6 @@       │
+│                                     │
 │ 15  class GestureDetector {         │
 │ 16  private val threshold = 50.dp   │ 
 │ 17 -fun detectSwipe() {             │
@@ -185,54 +201,55 @@ The PR Review screen is the core of the application, optimized for mobile code r
 │ 21      if (dragAmount > threshold) │
 │ 22          onSwipeDetected()       │
 │ 23  }                               │
-│     │                             │
-│ 💬  │ @reviewer commented:         │
-│     │ "Good improvement! Consider  │
-│     │  validation for sensitivity" │
-│     │ 👍 2 • ↩️ Reply                │
-│     │                             │
+│                                     │
 ├─────────────────────────────────────┤
-│  📱 Swipe Guide:                   │
-│  ← → Next/Prev File                │
-│  ↑ ↓ Next/Prev Hunk                │
-│  👆 Long Press: Comment             │
-└─────────────────────────────────────┘
-```
-│     │                             │
-├─────────────────────────────────────┤
-│  📱 Swipe Guide:                   │
-│  ← → Next/Prev File                │
-│  ↑ ↓ Next/Prev Hunk                │
-│  ⚫⚫ Toggle View • 👆 Long Comment  │
+│  Hunk 2/5: @@ -45,2 +48,8 @@       │
+│  ...                                │
 └─────────────────────────────────────┘
 ```
 
-#### Gesture Overlay System
+**Navigation:**
+- Swipe right (→) → Return to file list
+- Tap on a chunk → View chunk in full screen
+
+#### Chunk Detail View
+
+When a chunk is selected, it's displayed in full screen.
 
 ```
-When user starts swiping:
-
 ┌─────────────────────────────────────┐
+│  Chunk 2 of 5                  [✕]  │
+│  GestureDetector.kt                 │
+├─────────────────────────────────────┤
 │                                     │
-│           ←  📁  →                  │
-│        Prev    Next                 │
-│         File   File                 │
+│  @@ -45,2 +48,8 @@                  │
 │                                     │
-│                ↑                    │
-│           Next Hunk                 │
+│ 45  fun handleGesture(              │
+│ 46      event: MotionEvent          │
+│ 47  ): Boolean {                    │
+│ 48 -    return false                │
+│ 49 +    val handled = detector.     │
+│ 50 +        onTouchEvent(event)     │
+│ 51 +    if (handled) {               │
+│ 52 +        triggerHaptic()         │
+│ 53 +    }                            │
+│ 54 +    return handled               │
+│ 55  }                                │
 │                                     │
-│           🔍 Current                 │
 │                                     │
-│                ↓                    │
-│          Prev Hunk                  │
 │                                     │
 └─────────────────────────────────────┘
+```
 
-Visual feedback during gestures:
-- Semi-transparent overlay
-- Directional arrows with labels
-- Progress indicators
-- Haptic feedback on action completion
+**Navigation:**
+- Tap close button (✕) → Return to file diff
+
+#### Gesture Support
+
+```
+Gesture navigation:
+- Swipe right in file diff view → Return to file list
+- No other swipe gestures (removed for simplification)
 ```
 
 #### Source Code Browser
