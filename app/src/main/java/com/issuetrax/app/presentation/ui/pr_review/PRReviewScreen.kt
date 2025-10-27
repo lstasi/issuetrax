@@ -20,6 +20,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +46,9 @@ import com.issuetrax.app.presentation.ui.pr_review.components.DiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileNavigationButtons
 import com.issuetrax.app.presentation.ui.pr_review.components.InlineDiffView
+import com.issuetrax.app.presentation.ui.pr_review.components.PRActionToolbar
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,24 +60,60 @@ fun PRReviewScreen(
     viewModel: PRReviewViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     
     // Load pull request data when screen launches
     LaunchedEffect(owner, repo, prNumber) {
         viewModel.loadPullRequest(owner, repo, prNumber)
     }
     
+    // Show action message in snackbar
+    LaunchedEffect(uiState.actionMessage) {
+        uiState.actionMessage?.let { message ->
+            scope.launch {
+                snackbarHostState.showSnackbar(message)
+                viewModel.clearActionMessage()
+            }
+        }
+    }
+    
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("$owner/$repo #$prNumber")
+                    Column {
+                        Text(
+                            text = uiState.pullRequest?.title ?: "$owner/$repo #$prNumber",
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "$owner/$repo #$prNumber",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    // PR Action Toolbar
+                    uiState.pullRequest?.let { pr ->
+                        PRActionToolbar(
+                            pullRequest = pr,
+                            onApprove = { viewModel.approvePullRequest(owner, repo, prNumber) },
+                            onClose = { viewModel.closePullRequest(owner, repo, prNumber) }
+                        )
+                    }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Box(

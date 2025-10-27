@@ -17,7 +17,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PRReviewViewModel @Inject constructor(
     private val gitHubRepository: GitHubRepository,
-    private val submitReviewUseCase: SubmitReviewUseCase
+    private val submitReviewUseCase: SubmitReviewUseCase,
+    private val approvePullRequestUseCase: com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase,
+    private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -104,6 +106,60 @@ class PRReviewViewModel @Inject constructor(
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
+    
+    /**
+     * Approves the pull request with an optional comment.
+     */
+    fun approvePullRequest(owner: String, repo: String, prNumber: Int, comment: String? = null) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = approvePullRequestUseCase(owner, repo, prNumber, comment)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    reviewSubmitted = true,
+                    actionMessage = "Pull request approved successfully"
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to approve pull request"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Closes the pull request without merging.
+     */
+    fun closePullRequest(owner: String, repo: String, prNumber: Int) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = closePullRequestUseCase(owner, repo, prNumber)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    actionMessage = "Pull request closed successfully"
+                )
+                // Reload PR to update state
+                loadPullRequest(owner, repo, prNumber)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to close pull request"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Clears action message after it's been displayed.
+     */
+    fun clearActionMessage() {
+        _uiState.value = _uiState.value.copy(actionMessage = null)
+    }
 }
 
 data class PRReviewUiState(
@@ -113,7 +169,8 @@ data class PRReviewUiState(
     val files: List<FileDiff> = emptyList(),
     val currentFileIndex: Int = -1,
     val reviewSubmitted: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val actionMessage: String? = null
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {
