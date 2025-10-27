@@ -283,4 +283,4 @@ For issues with Dependabot configuration:
 - [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin)
 - [Kotlin Release Notes](https://kotlinlang.org/docs/releases.html)
 - [Jetpack Compose Release Notes](https://developer.android.com/jetpack/androidx/releases/compose)
-- [Project Dependencies Documentation](MINIMAL_DEPENDENCIES.md)
+- [Project Dependencies Documentation](./MINIMAL_DEPENDENCIES.md)

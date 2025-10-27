@@ -83,7 +83,7 @@ updates:
     # Ignore patterns for Android compatibility
     ignore:
       # Kotlin: Stay on stable 2.x for Android 14+ compatibility
-      - dependency-name: "org.jetbrains.kotlin:*"
+      - dependency-name: "org.jetbrains.kotlin*"
         update-types: ["version-update:semver-major"]
       # Android Gradle Plugin: Major updates require careful migration
       - dependency-name: "com.android.tools.build:gradle"
