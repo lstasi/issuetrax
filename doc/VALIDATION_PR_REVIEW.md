@@ -185,7 +185,7 @@ Comprehensive automated tests are located in:
 **Steps**:
 1. Open a specific PR in the app (note the PR number)
 2. Open the same PR in GitHub web interface
-3. Compare the data points
+3. Compare the data points:
 
 **Data to Verify**:
 - PR number

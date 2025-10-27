@@ -209,7 +209,7 @@ When a file is selected, the full diff is displayed.
 ```
 
 **Navigation:**
-- Swipe right (→) → Return to file list
+- Swipe right → Return to file list
 - Tap on a chunk → View chunk in full screen
 
 #### Chunk Detail View
