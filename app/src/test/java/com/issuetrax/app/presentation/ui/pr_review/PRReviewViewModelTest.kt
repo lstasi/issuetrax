@@ -80,6 +80,8 @@ class PRReviewViewModelTest {
         assertFalse("Review submitted should be false", state.reviewSubmitted)
         assertNull("Error should be null", state.error)
         assertNull("Current file should be null", state.currentFile)
+        assertEquals("View state should be FILE_LIST", PRReviewViewState.FILE_LIST, state.viewState)
+        assertEquals("Selected chunk index should be -1", -1, state.selectedChunkIndex)
     }
     
     @Test
@@ -327,7 +329,7 @@ class PRReviewViewModelTest {
     }
     
     @Test
-    fun `navigateToFile should set currentFileIndex to specified valid index`() = runTest {
+    fun `navigateToFile should set currentFileIndex to specified valid index and change to FILE_DIFF state`() = runTest {
         // Given
         val owner = "testuser"
         val repo = "test-repo"
@@ -355,6 +357,7 @@ class PRReviewViewModelTest {
         // Then
         assertEquals("Current file index should be 2", 2, viewModel.uiState.value.currentFileIndex)
         assertEquals("Current file should be third file", "file3.kt", viewModel.uiState.value.currentFile?.filename)
+        assertEquals("View state should be FILE_DIFF", PRReviewViewState.FILE_DIFF, viewModel.uiState.value.viewState)
     }
     
     @Test
@@ -532,6 +535,105 @@ class PRReviewViewModelTest {
         // Then
         assertNotNull("Current file should not be null", state.currentFile)
         assertEquals("Current file should be second file", "file2.kt", state.currentFile?.filename)
+    }
+    
+    @Test
+    fun `returnToFileList should change view state to FILE_LIST`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified"),
+            createTestFileDiff("file2.kt", "added")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // Navigate to a file first (goes to FILE_DIFF state)
+        viewModel.navigateToFile(0)
+        assertEquals("View state should be FILE_DIFF", PRReviewViewState.FILE_DIFF, viewModel.uiState.value.viewState)
+        
+        // When
+        viewModel.returnToFileList()
+        
+        // Then
+        assertEquals("View state should be FILE_LIST", PRReviewViewState.FILE_LIST, viewModel.uiState.value.viewState)
+    }
+    
+    @Test
+    fun `showChunkDetail should change view state to CHUNK_DETAIL and set selectedChunkIndex`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // Navigate to file first
+        viewModel.navigateToFile(0)
+        
+        // When
+        viewModel.showChunkDetail(2)
+        
+        // Then
+        assertEquals("View state should be CHUNK_DETAIL", PRReviewViewState.CHUNK_DETAIL, viewModel.uiState.value.viewState)
+        assertEquals("Selected chunk index should be 2", 2, viewModel.uiState.value.selectedChunkIndex)
+    }
+    
+    @Test
+    fun `returnToFileDiff should change view state to FILE_DIFF and reset selectedChunkIndex`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 123
+        val mockPR = createTestPullRequest(prNumber, "Test PR")
+        val mockFiles = listOf(
+            createTestFileDiff("file1.kt", "modified")
+        )
+        
+        coEvery { 
+            gitHubRepository.getPullRequest(owner, repo, prNumber) 
+        } returns Result.success(mockPR)
+        coEvery { 
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber) 
+        } returns Result.success(mockFiles)
+        
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+        
+        // Navigate to file and then to chunk detail
+        viewModel.navigateToFile(0)
+        viewModel.showChunkDetail(2)
+        assertEquals("View state should be CHUNK_DETAIL", PRReviewViewState.CHUNK_DETAIL, viewModel.uiState.value.viewState)
+        
+        // When
+        viewModel.returnToFileDiff()
+        
+        // Then
+        assertEquals("View state should be FILE_DIFF", PRReviewViewState.FILE_DIFF, viewModel.uiState.value.viewState)
+        assertEquals("Selected chunk index should be -1", -1, viewModel.uiState.value.selectedChunkIndex)
     }
     
     // Helper functions to create test data
