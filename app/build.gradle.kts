@@ -3,7 +3,7 @@ import java.io.File
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("kotlinx-serialization")
@@ -112,10 +112,10 @@ android {
 configurations.all {
     resolutionStrategy {
         // Force consistent Kotlin version across all dependencies to avoid DEX conflicts
-        force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.2.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
         
         // Prefer newer versions to avoid conflicts
         preferProjectModules()
