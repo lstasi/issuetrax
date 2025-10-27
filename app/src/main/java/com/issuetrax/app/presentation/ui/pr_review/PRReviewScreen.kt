@@ -42,12 +42,14 @@ import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import com.issuetrax.app.presentation.ui.common.gesture.GestureCallbacks
 import com.issuetrax.app.presentation.ui.common.gesture.GestureDetectionBox
+import com.issuetrax.app.presentation.ui.pr_review.PRViewMode
 import com.issuetrax.app.presentation.ui.pr_review.components.DiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.FileNavigationButtons
 import com.issuetrax.app.presentation.ui.pr_review.components.InlineDiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.PRActionToolbar
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
+import com.issuetrax.app.presentation.ui.pr_review.components.HunkDetailView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,76 +146,52 @@ fun PRReviewScreen(
                     }
                 }
                 uiState.pullRequest != null -> {
-                    uiState.pullRequest?.let { pullRequest ->
-                        var useInlineView by remember { mutableStateOf(true) }
-                        
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            // PR Metadata Card
-                            PRMetadataCard(pullRequest = pullRequest)
-                            
-                            // File Navigation Buttons
-                            if (uiState.files.isNotEmpty()) {
-                                FileNavigationButtons(
-                                    currentFileIndex = uiState.currentFileIndex,
-                                    totalFiles = uiState.files.size,
-                                    onPreviousClick = { viewModel.navigateToPreviousFile() },
-                                    onNextClick = { viewModel.navigateToNextFile() }
-                                )
-                            }
-                            
-                            // File List View
-                            if (uiState.files.isNotEmpty()) {
-                                FileListView(
-                                    files = uiState.files,
-                                    currentFileIndex = uiState.currentFileIndex,
-                                    onFileClick = { index -> viewModel.navigateToFile(index) }
-                                )
-                            }
-                            
-                            // View toggle (Inline vs Standard)
-                            if (uiState.currentFile != null) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    FilterChip(
-                                        selected = useInlineView,
-                                        onClick = { useInlineView = true },
-                                        label = { Text("Inline View") }
-                                    )
-                                    FilterChip(
-                                        selected = !useInlineView,
-                                        onClick = { useInlineView = false },
-                                        label = { Text("Standard View") }
-                                    )
-                                }
-                            }
-                            
-                            // Current File Diff View (Inline or Standard) with enhanced gesture detection
+                    when (uiState.viewMode) {
+                        PRViewMode.FILE_LIST -> {
+                            // Show file list view
+                            FileListView(
+                                files = uiState.files,
+                                currentFileIndex = uiState.currentFileIndex,
+                                onFileClick = { index -> viewModel.navigateToFile(index) },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                            )
+                        }
+                        PRViewMode.FILE_DIFF -> {
+                            // Show file diff with swipe to return
                             uiState.currentFile?.let { currentFile ->
                                 GestureDetectionBox(
                                     callbacks = GestureCallbacks(
-                                        onSwipeLeft = { viewModel.navigateToNextFile() },
-                                        onSwipeRight = { viewModel.navigateToPreviousFile() }
-                                        // onSwipeUp and onSwipeDown reserved for future hunk navigation
+                                        onSwipeRight = { viewModel.navigateToFileList() }
                                     ),
-                                    enabled = uiState.files.isNotEmpty(),
+                                    enabled = true,
                                     showVisualFeedback = true,
                                     enableHapticFeedback = true,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxSize()
                                 ) {
-                                    if (useInlineView) {
-                                        InlineDiffView(fileDiff = currentFile)
-                                    } else {
-                                        DiffView(fileDiff = currentFile)
-                                    }
+                                    InlineDiffView(
+                                        fileDiff = currentFile,
+                                        onHunkClick = { hunk, index -> 
+                                            viewModel.selectHunk(hunk, index)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp)
+                                    )
                                 }
+                            }
+                        }
+                        PRViewMode.HUNK_DETAIL -> {
+                            // Show full-screen hunk detail with close button
+                            uiState.selectedHunk?.let { hunk ->
+                                HunkDetailView(
+                                    hunk = hunk,
+                                    hunkIndex = uiState.selectedHunkIndex,
+                                    fileName = uiState.currentFile?.filename ?: "",
+                                    onClose = { viewModel.closeHunkDetail() },
+                                    modifier = Modifier.fillMaxSize()
+                                )
                             }
                         }
                     }
