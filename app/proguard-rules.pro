@@ -108,3 +108,8 @@
 -keepclassmembers class <1> {
    static kotlinx.serialization.KSerializer serializer();
 }
+
+# Keep domain utility classes - these are used in Compose and other runtime contexts
+# Specifically keep DiffParser which is used in InlineDiffView composable
+-keep class com.issuetrax.app.domain.util.** { *; }
+-keepclassmembers class com.issuetrax.app.domain.util.** { *; }
