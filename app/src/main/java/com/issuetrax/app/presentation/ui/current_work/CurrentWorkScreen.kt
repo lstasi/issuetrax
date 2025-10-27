@@ -234,19 +234,23 @@ fun PullRequestItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            PRStats(
-                changedFiles = pullRequest.changedFiles ?: 0,
-                additions = pullRequest.additions ?: 0,
-                deletions = pullRequest.deletions ?: 0
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = timeAgo(pullRequest.updatedAt),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PRStats(
+                    changedFiles = pullRequest.changedFiles ?: 0,
+                    additions = pullRequest.additions ?: 0,
+                    deletions = pullRequest.deletions ?: 0
+                )
+                
+                Text(
+                    text = timeAgo(pullRequest.updatedAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
