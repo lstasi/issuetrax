@@ -80,8 +80,40 @@ class PRReviewViewModel @Inject constructor(
     fun navigateToFile(index: Int) {
         val currentState = _uiState.value
         if (index >= 0 && index < currentState.files.size) {
-            _uiState.value = currentState.copy(currentFileIndex = index)
+            _uiState.value = currentState.copy(
+                currentFileIndex = index,
+                viewState = PRReviewViewState.FILE_DIFF
+            )
         }
+    }
+    
+    /**
+     * Returns to the file list view.
+     */
+    fun returnToFileList() {
+        _uiState.value = _uiState.value.copy(
+            viewState = PRReviewViewState.FILE_LIST
+        )
+    }
+    
+    /**
+     * Shows a specific chunk in full screen.
+     */
+    fun showChunkDetail(chunkIndex: Int) {
+        _uiState.value = _uiState.value.copy(
+            viewState = PRReviewViewState.CHUNK_DETAIL,
+            selectedChunkIndex = chunkIndex
+        )
+    }
+    
+    /**
+     * Returns from chunk detail to file diff view.
+     */
+    fun returnToFileDiff() {
+        _uiState.value = _uiState.value.copy(
+            viewState = PRReviewViewState.FILE_DIFF,
+            selectedChunkIndex = -1
+        )
     }
     
     fun submitReview(owner: String, repo: String, prNumber: Int, body: String?, event: ReviewEvent) {
@@ -162,6 +194,18 @@ class PRReviewViewModel @Inject constructor(
     }
 }
 
+/**
+ * Navigation view state for PR review screen.
+ */
+enum class PRReviewViewState {
+    /** Showing the list of files */
+    FILE_LIST,
+    /** Showing the diff for a specific file */
+    FILE_DIFF,
+    /** Showing a specific chunk in full screen */
+    CHUNK_DETAIL
+}
+
 data class PRReviewUiState(
     val isLoading: Boolean = false,
     val isSubmittingReview: Boolean = false,
@@ -170,7 +214,9 @@ data class PRReviewUiState(
     val currentFileIndex: Int = -1,
     val reviewSubmitted: Boolean = false,
     val error: String? = null,
-    val actionMessage: String? = null
+    val actionMessage: String? = null,
+    val viewState: PRReviewViewState = PRReviewViewState.FILE_LIST,
+    val selectedChunkIndex: Int = -1
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {
