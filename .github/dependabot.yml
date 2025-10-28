@@ -1,9 +1,11 @@
 # Dependabot configuration for Issuetrax
 # Automatically checks for dependency updates across multiple ecosystems
+# Configured for Android 14+ (API 34) compatibility
 
 version: 2
 updates:
   # Gradle dependencies (Android app dependencies)
+  # Groups related dependencies for easier review and testing
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -16,9 +18,88 @@ updates:
     labels:
       - "dependencies"
       - "gradle"
+      - "android"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    # Group related dependencies for atomic updates
+    groups:
+      # Kotlin ecosystem - keep all Kotlin dependencies in sync
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx:kotlinx-coroutines*"
+          - "org.jetbrains.kotlinx:kotlinx-serialization*"
+        update-types:
+          - "minor"
+          - "patch"
+      # AndroidX Compose - Compose BOM and related libraries
+      compose:
+        patterns:
+          - "androidx.compose*"
+        update-types:
+          - "minor"
+          - "patch"
+      # AndroidX Core libraries
+      androidx-core:
+        patterns:
+          - "androidx.activity*"
+          - "androidx.lifecycle*"
+          - "androidx.navigation*"
+          - "androidx.datastore*"
+          - "androidx.security*"
+          - "androidx.browser*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Hilt dependency injection
+      hilt:
+        patterns:
+          - "com.google.dagger:hilt*"
+          - "androidx.hilt*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Networking stack (Retrofit + OkHttp)
+      networking:
+        patterns:
+          - "com.squareup.retrofit2*"
+          - "com.squareup.okhttp3*"
+          - "com.jakewharton.retrofit*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Testing frameworks
+      testing:
+        patterns:
+          - "junit:junit"
+          - "org.jetbrains.kotlinx:kotlinx-coroutines-test"
+          - "io.mockk*"
+          - "androidx.test*"
+          - "androidx.arch.core:core-testing"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore patterns for Android compatibility
+    ignore:
+      # Kotlin: Stay on stable 2.x for Android 14+ compatibility
+      - dependency-name: "org.jetbrains.kotlin*"
+        update-types: ["version-update:semver-major"]
+      # Android Gradle Plugin: Major updates require careful migration
+      - dependency-name: "com.android.tools.build:gradle"
+        update-types: ["version-update:semver-major"]
+      # Compose BOM: Major updates may introduce breaking changes
+      - dependency-name: "androidx.compose:compose-bom"
+        update-types: ["version-update:semver-major"]
+      # Hilt: Major updates require migration
+      - dependency-name: "com.google.dagger:hilt*"
+        update-types: ["version-update:semver-major"]
+      # Retrofit: Stay on stable 2.x
+      - dependency-name: "com.squareup.retrofit2:*"
+        update-types: ["version-update:semver-major"]
+      # OkHttp: Stay on stable 4.x for Android compatibility
+      - dependency-name: "com.squareup.okhttp3:*"
+        update-types: ["version-update:semver-major"]
 
   # GitHub Actions workflow dependencies
   - package-ecosystem: "github-actions"
@@ -33,9 +114,18 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+      - "ci-cd"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    groups:
+      # Group all GitHub Actions together for batch updates
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   # Docker dependencies
   - package-ecosystem: "docker"
@@ -50,6 +140,14 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+      - "ci-cd"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    ignore:
+      # Keep JDK 17 for Android compatibility (required by Android Gradle Plugin 8.x)
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
+      # Only patch updates for nginx
+      - dependency-name: "nginx"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
