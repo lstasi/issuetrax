@@ -58,7 +58,12 @@ fun RepositorySelectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.repo_selection_title)) },
+                title = { 
+                    Text(
+                        text = stringResource(R.string.repo_selection_subtitle),
+                        style = MaterialTheme.typography.bodyMedium
+                    ) 
+                },
                 actions = {
                     IconButton(onClick = { viewModel.loadRepositories() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
@@ -117,15 +122,6 @@ fun RepositorySelectionScreen(
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item {
-                            Text(
-                                text = stringResource(R.string.repo_selection_subtitle),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                        }
-                        
                         items(uiState.repositories) { repository ->
                             RepositoryItem(
                                 repository = repository,
@@ -166,37 +162,13 @@ fun RepositoryItem(
                 overflow = TextOverflow.Ellipsis
             )
             
-            if (repository.description != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = repository.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            
             Spacer(modifier = Modifier.height(8.dp))
             
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                if (repository.language != null) {
-                    Text(
-                        text = repository.language,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                
-                Text(
-                    text = "${repository.openIssuesCount} open issues",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Text(
+                text = "${repository.openIssuesCount} open issues",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
