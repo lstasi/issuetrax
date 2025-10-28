@@ -2,6 +2,7 @@ package com.issuetrax.app.presentation.ui.pr_review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.issuetrax.app.domain.entity.CodeHunk
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.repository.GitHubRepository
@@ -13,6 +14,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * View mode for the PR Review screen
+ */
+enum class PRViewMode {
+    FILE_LIST,     // Show list of changed files
+    FILE_DIFF,     // Show diff for selected file
+    HUNK_DETAIL    // Show full-screen hunk detail
+}
 
 @HiltViewModel
 class PRReviewViewModel @Inject constructor(
@@ -42,7 +52,8 @@ class PRReviewViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         files = files,
-                        currentFileIndex = if (files.isNotEmpty()) 0 else -1
+                        currentFileIndex = -1,
+                        viewMode = PRViewMode.FILE_LIST
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
@@ -80,8 +91,35 @@ class PRReviewViewModel @Inject constructor(
     fun navigateToFile(index: Int) {
         val currentState = _uiState.value
         if (index >= 0 && index < currentState.files.size) {
-            _uiState.value = currentState.copy(currentFileIndex = index)
+            _uiState.value = currentState.copy(
+                currentFileIndex = index,
+                viewMode = PRViewMode.FILE_DIFF
+            )
         }
+    }
+    
+    fun navigateToFileList() {
+        _uiState.value = _uiState.value.copy(
+            viewMode = PRViewMode.FILE_LIST,
+            currentFileIndex = -1,
+            selectedHunk = null
+        )
+    }
+    
+    fun selectHunk(hunk: CodeHunk, hunkIndex: Int) {
+        _uiState.value = _uiState.value.copy(
+            selectedHunk = hunk,
+            selectedHunkIndex = hunkIndex,
+            viewMode = PRViewMode.HUNK_DETAIL
+        )
+    }
+    
+    fun closeHunkDetail() {
+        _uiState.value = _uiState.value.copy(
+            selectedHunk = null,
+            selectedHunkIndex = -1,
+            viewMode = PRViewMode.FILE_DIFF
+        )
     }
     
     fun submitReview(owner: String, repo: String, prNumber: Int, body: String?, event: ReviewEvent) {
@@ -170,7 +208,10 @@ data class PRReviewUiState(
     val currentFileIndex: Int = -1,
     val reviewSubmitted: Boolean = false,
     val error: String? = null,
-    val actionMessage: String? = null
+    val actionMessage: String? = null,
+    val viewMode: PRViewMode = PRViewMode.FILE_LIST,
+    val selectedHunk: CodeHunk? = null,
+    val selectedHunkIndex: Int = -1
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {
