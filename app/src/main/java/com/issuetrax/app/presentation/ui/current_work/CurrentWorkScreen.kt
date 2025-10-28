@@ -234,19 +234,28 @@ fun PullRequestItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            PRStats(
-                changedFiles = pullRequest.changedFiles ?: 0,
-                additions = pullRequest.additions ?: 0,
-                deletions = pullRequest.deletions ?: 0
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = timeAgo(pullRequest.updatedAt),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Only show stats if we have data (changedFiles is null from list endpoint)
+                if (pullRequest.changedFiles != null) {
+                    PRStats(
+                        changedFiles = pullRequest.changedFiles,
+                        additions = pullRequest.additions ?: 0,
+                        deletions = pullRequest.deletions ?: 0
+                    )
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+                
+                Text(
+                    text = timeAgo(pullRequest.updatedAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
