@@ -80,6 +80,19 @@ android {
         }
     }
 
+    applicationVariants.all {
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val versionName = defaultConfig.versionName
+            
+            // Set output file name for release builds
+            // The file will be unsigned initially and signed by CI/CD pipeline
+            if (buildType.name == "release") {
+                output.outputFileName = "issuetrax-v${versionName}-unsigned.apk"
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
