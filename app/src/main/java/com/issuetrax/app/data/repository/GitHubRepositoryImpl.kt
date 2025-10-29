@@ -245,4 +245,70 @@ class GitHubRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+    
+    override suspend fun createIssueComment(
+        owner: String,
+        repo: String,
+        issueNumber: Int,
+        body: String
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val request = com.issuetrax.app.data.api.CreateIssueCommentRequest(body = body)
+            
+            val response = apiService.createIssueComment("Bearer $token", owner, repo, issueNumber, request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to create comment: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun getCommitStatus(
+        owner: String,
+        repo: String,
+        ref: String
+    ): Result<com.issuetrax.app.domain.entity.CommitStatus> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.getCommitStatus("Bearer $token", owner, repo, ref)
+            if (response.isSuccessful) {
+                val statusDto = response.body()!!
+                val commitStatus = com.issuetrax.app.domain.entity.CommitStatus(
+                    state = statusDto.state.toCommitState(),
+                    statuses = statusDto.statuses.map { status ->
+                        com.issuetrax.app.domain.entity.Status(
+                            state = status.state.toCommitState(),
+                            context = status.context,
+                            description = status.description,
+                            targetUrl = status.target_url
+                        )
+                    },
+                    totalCount = statusDto.total_count
+                )
+                Result.success(commitStatus)
+            } else {
+                Result.failure(Exception("Failed to get commit status: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    private fun String.toCommitState(): com.issuetrax.app.domain.entity.CommitState {
+        return when (this.lowercase()) {
+            "pending" -> com.issuetrax.app.domain.entity.CommitState.PENDING
+            "success" -> com.issuetrax.app.domain.entity.CommitState.SUCCESS
+            "failure" -> com.issuetrax.app.domain.entity.CommitState.FAILURE
+            "error" -> com.issuetrax.app.domain.entity.CommitState.ERROR
+            else -> com.issuetrax.app.domain.entity.CommitState.PENDING
+        }
+    }
 }
