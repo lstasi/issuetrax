@@ -1,6 +1,7 @@
 package com.issuetrax.app.presentation.ui.pr_review.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,15 +44,18 @@ const val PREVIEW_LINES_WHEN_COLLAPSED = 5
  * - Context lines are shown once (not duplicated)
  * - Line numbers are optimized for space
  * - Large hunks can be collapsed/expanded
+ * - Hunks can be clicked to view in full-screen detail
  * 
  * This view is designed for mobile screen widths where horizontal space is limited.
  * 
  * @param fileDiff The file diff to display
+ * @param onHunkClick Callback when a hunk is clicked for full-screen view
  * @param modifier Modifier to be applied to the card
  */
 @Composable
 fun InlineDiffView(
     fileDiff: FileDiff,
+    onHunkClick: ((CodeHunk, Int) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -110,7 +114,10 @@ fun InlineDiffView(
                         InlineDiffHunk(
                             hunk = hunk,
                             hunkIndex = index + 1,
-                            totalHunks = hunks.size
+                            totalHunks = hunks.size,
+                            onHunkClick = onHunkClick?.let { callback ->
+                                { callback(hunk, index + 1) }
+                            }
                         )
                     }
                 }
@@ -133,10 +140,12 @@ fun InlineDiffView(
  * Large hunks (more than [COLLAPSE_THRESHOLD_LINES] lines) can be collapsed to save screen space.
  * When collapsed, shows first [PREVIEW_LINES_WHEN_COLLAPSED] lines.
  * The hunk header shows the line ranges and hunk number.
+ * Clicking on the hunk opens it in full-screen detail view.
  * 
  * @param hunk The code hunk to display
  * @param hunkIndex The 1-based index of this hunk
  * @param totalHunks The total number of hunks in the file
+ * @param onHunkClick Callback when the hunk is clicked for full-screen view
  * @param modifier Modifier to be applied to the column
  */
 @Composable
@@ -144,13 +153,22 @@ fun InlineDiffHunk(
     hunk: CodeHunk,
     hunkIndex: Int,
     totalHunks: Int,
+    onHunkClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(hunk.lines.size <= COLLAPSE_THRESHOLD_LINES) }
     val shouldShowToggle = hunk.lines.size > COLLAPSE_THRESHOLD_LINES
     
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (onHunkClick != null) {
+                    Modifier.clickable { onHunkClick() }
+                } else {
+                    Modifier
+                }
+            )
     ) {
         // Hunk header with expand/collapse button
         Row(
