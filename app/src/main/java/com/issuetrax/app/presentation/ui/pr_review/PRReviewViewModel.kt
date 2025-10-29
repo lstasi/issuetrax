@@ -2,6 +2,7 @@ package com.issuetrax.app.presentation.ui.pr_review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.issuetrax.app.domain.entity.CodeHunk
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.repository.GitHubRepository
@@ -13,6 +14,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * View mode for the PR Review screen
+ */
+enum class PRViewMode {
+    FILE_LIST,     // Show list of changed files
+    FILE_DIFF,     // Show diff for selected file
+    HUNK_DETAIL    // Show full-screen hunk detail
+}
 
 @HiltViewModel
 class PRReviewViewModel @Inject constructor(
@@ -42,7 +52,8 @@ class PRReviewViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         files = files,
-                        currentFileIndex = if (files.isNotEmpty()) 0 else -1
+                        currentFileIndex = -1,
+                        viewMode = PRViewMode.FILE_LIST
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
@@ -82,37 +93,32 @@ class PRReviewViewModel @Inject constructor(
         if (index >= 0 && index < currentState.files.size) {
             _uiState.value = currentState.copy(
                 currentFileIndex = index,
-                viewState = PRReviewViewState.FILE_DIFF
+                viewMode = PRViewMode.FILE_DIFF
             )
         }
     }
     
-    /**
-     * Returns to the file list view.
-     */
-    fun returnToFileList() {
+    fun navigateToFileList() {
         _uiState.value = _uiState.value.copy(
-            viewState = PRReviewViewState.FILE_LIST
+            viewMode = PRViewMode.FILE_LIST,
+            currentFileIndex = -1,
+            selectedHunk = null
         )
     }
     
-    /**
-     * Shows a specific chunk in full screen.
-     */
-    fun showChunkDetail(chunkIndex: Int) {
+    fun selectHunk(hunk: CodeHunk, hunkIndex: Int) {
         _uiState.value = _uiState.value.copy(
-            viewState = PRReviewViewState.CHUNK_DETAIL,
-            selectedChunkIndex = chunkIndex
+            selectedHunk = hunk,
+            selectedHunkIndex = hunkIndex,
+            viewMode = PRViewMode.HUNK_DETAIL
         )
     }
     
-    /**
-     * Returns from chunk detail to file diff view.
-     */
-    fun returnToFileDiff() {
+    fun closeHunkDetail() {
         _uiState.value = _uiState.value.copy(
-            viewState = PRReviewViewState.FILE_DIFF,
-            selectedChunkIndex = -1
+            selectedHunk = null,
+            selectedHunkIndex = -1,
+            viewMode = PRViewMode.FILE_DIFF
         )
     }
     
@@ -194,18 +200,6 @@ class PRReviewViewModel @Inject constructor(
     }
 }
 
-/**
- * Navigation view state for PR review screen.
- */
-enum class PRReviewViewState {
-    /** Showing the list of files */
-    FILE_LIST,
-    /** Showing the diff for a specific file */
-    FILE_DIFF,
-    /** Showing a specific chunk in full screen */
-    CHUNK_DETAIL
-}
-
 data class PRReviewUiState(
     val isLoading: Boolean = false,
     val isSubmittingReview: Boolean = false,
@@ -215,8 +209,9 @@ data class PRReviewUiState(
     val reviewSubmitted: Boolean = false,
     val error: String? = null,
     val actionMessage: String? = null,
-    val viewState: PRReviewViewState = PRReviewViewState.FILE_LIST,
-    val selectedChunkIndex: Int = -1
+    val viewMode: PRViewMode = PRViewMode.FILE_LIST,
+    val selectedHunk: CodeHunk? = null,
+    val selectedHunkIndex: Int = -1
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {

@@ -141,46 +141,46 @@ Code Font: JetBrains Mono 14sp/20sp (Code blocks, diffs)
 
 ### 3. PR Review Screen (Primary Focus)
 
-The PR Review screen is the core of the application, optimized for mobile code review with a simplified navigation pattern focused on file list → file diff → chunk detail.
+The PR Review screen is the core of the application, optimized for mobile code review with a simplified navigation flow.
 
-#### Main View: File List
+#### File List View (Main View)
 
-The default view shows a list of all changed files in the pull request.
+The main view displays a list of changed files, without extra navigation elements.
 
 ```
 ┌─────────────────────────────────────┐
 │  [←]  #47: Add gesture navigation   │
 │                              [⋮][✓] │
 ├─────────────────────────────────────┤
-│  📋 Files Changed (8)               │
 │                                     │
-│  ┌─────────────────────────────┐   │
-│  │ 📄 GestureDetector.kt       │   │
-│  │ +45 -12 • Modified          │   │
-│  └─────────────────────────────┘   │
+│  📋 File List (8 files changed)     │
 │                                     │
-│  ┌─────────────────────────────┐   │
-│  │ 📄 PRReviewScreen.kt        │   │
-│  │ +23 -8 • Modified           │   │
-│  └─────────────────────────────┘   │
+│  ┌─────────────────────────────────┐│
+│  │ 📄 GestureDetector.kt           ││
+│  │ +45 -12 • Modified              ││
+│  └─────────────────────────────────┘│
 │                                     │
-│  ┌─────────────────────────────┐   │
-│  │ 📄 MainActivity.kt          │   │
-│  │ +10 -5 • Modified           │   │
-│  └─────────────────────────────┘   │
+│  ┌─────────────────────────────────┐│
+│  │ 📄 PRReviewScreen.kt            ││
+│  │ +23 -8 • Modified               ││
+│  └─────────────────────────────────┘│
 │                                     │
-│  ... (+5 more files)               │
+│  ┌─────────────────────────────────┐│
+│  │ 📄 MainActivity.kt              ││
+│  │ +12 -5 • Modified               ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  ... (+5 more files)                │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
 **Navigation:**
-- Tap on a file → View file diff
-- Pull request metadata is shown in the top bar
+- Tap on a file to view its diff
 
-#### File Diff View
+#### Inline Diff Viewer
 
-When a file is selected, the full diff is displayed.
+When a file is selected, the diff view is shown. Swipe right-to-left to return to file list.
 
 ```
 ┌─────────────────────────────────────┐
@@ -188,10 +188,9 @@ When a file is selected, the full diff is displayed.
 │                              [⋮][✓] │
 ├─────────────────────────────────────┤
 │  📂 GestureDetector.kt              │
-│  +45 -12 lines • Modified           │
+│  +45 -12 lines                      │
 ├─────────────────────────────────────┤
-│  Hunk 1/5: @@ -15,3 +15,6 @@       │
-│                                     │
+│  Hunk 1/3: @@ -15,6 +15,9 @@        │
 │ 15  class GestureDetector {         │
 │ 16  private val threshold = 50.dp   │ 
 │ 17 -fun detectSwipe() {             │
@@ -202,39 +201,43 @@ When a file is selected, the full diff is displayed.
 │ 22          onSwipeDetected()       │
 │ 23  }                               │
 │                                     │
+│  Hunk 2/3: @@ -30,4 +33,8 @@        │
+│  ... (collapsed)                    │
+│                                     │
 ├─────────────────────────────────────┤
-│  Hunk 2/5: @@ -45,2 +48,8 @@       │
-│  ...                                │
+│  📱 Swipe Guide:                    │
+│  → Swipe right: Back to file list   │
+│  👆 Tap hunk: Full screen view      │
 └─────────────────────────────────────┘
 ```
 
 **Navigation:**
 - Swipe right → Return to file list
-- Tap on a chunk → View chunk in full screen
+- Tap on a hunk → View hunk in full screen
 
-#### Chunk Detail View
+#### Full-Screen Hunk Detail
 
-When a chunk is selected, it's displayed in full screen.
+When a hunk is selected, it's displayed in full screen with a close button.
 
 ```
 ┌─────────────────────────────────────┐
-│  Chunk 2 of 5                  [✕]  │
-│  GestureDetector.kt                 │
+│  GestureDetector.kt           [✕]  │
+│  Hunk 2                             │
 ├─────────────────────────────────────┤
+│  @@ -30,4 +33,8 @@                  │
+│ 30  fun handleGesture(              │
+│ 31      direction: SwipeDirection   │
+│ 32  ) {                             │
+│ 33 -    // Basic handling            │
+│ 34 +    // Enhanced handling         │
+│ 35 +    when (direction) {          │
+│ 36 +        SwipeDirection.LEFT ->  │
+│ 37 +            onSwipeLeft()       │
+│ 38 +        SwipeDirection.RIGHT -> │
+│ 39 +            onSwipeRight()      │
+│ 40 +    }                           │
+│ 41  }                               │
 │                                     │
-│  @@ -45,2 +48,8 @@                  │
-│                                     │
-│ 45  fun handleGesture(              │
-│ 46      event: MotionEvent          │
-│ 47  ): Boolean {                    │
-│ 48 -    return false                │
-│ 49 +    val handled = detector.     │
-│ 50 +        onTouchEvent(event)     │
-│ 51 +    if (handled) {               │
-│ 52 +        triggerHaptic()         │
-│ 53 +    }                            │
-│ 54 +    return handled               │
-│ 55  }                                │
 │                                     │
 │                                     │
 │                                     │
@@ -242,15 +245,7 @@ When a chunk is selected, it's displayed in full screen.
 ```
 
 **Navigation:**
-- Tap close button (✕) → Return to file diff
-
-#### Gesture Support
-
-```
-Gesture navigation:
-- Swipe right in file diff view → Return to file list
-- No other swipe gestures (removed for simplification)
-```
+- Tap close button (✕) → Return to diff view
 
 #### Source Code Browser
 
@@ -317,23 +312,21 @@ Review Submission:
 ### 1. Swipe Sensitivity & Thresholds
 
 ```
-Horizontal Swipes (File Navigation):
+Horizontal Swipes (Navigation Back):
 - Minimum Distance: 100dp
 - Minimum Velocity: 500dp/s
 - Maximum Angle Deviation: 30°
-
-Vertical Swipes (Hunk Navigation): 
-- Minimum Distance: 80dp
-- Minimum Velocity: 400dp/s
-- Maximum Angle Deviation: 30°
+- Direction: Right-to-left swipe returns to file list from diff view
 
 Double Tap:
 - Max Time Between Taps: 300ms
 - Max Distance Between Taps: 40dp
+- Used for future expand/collapse functionality
 
 Long Press:
 - Duration: 500ms
 - Movement Tolerance: 10dp
+- Used for commenting (future feature)
 ```
 
 ### 2. Visual Feedback System
@@ -364,10 +357,10 @@ Gesture Cancellation:
 
 ```
 Voice Accessibility:
-- "Swipe right to next file"
-- "Swipe left to previous file"
-- "Swipe up to next change"
-- "Double tap to expand hunk"
+- "Swipe right to return to file list"
+- "Tap file to view diff"
+- "Tap hunk to view full screen"
+- "Tap close button to return"
 
 Alternative Navigation:
 - Hardware buttons support

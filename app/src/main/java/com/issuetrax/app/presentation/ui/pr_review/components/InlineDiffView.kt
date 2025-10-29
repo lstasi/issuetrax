@@ -44,18 +44,18 @@ const val PREVIEW_LINES_WHEN_COLLAPSED = 5
  * - Context lines are shown once (not duplicated)
  * - Line numbers are optimized for space
  * - Large hunks can be collapsed/expanded
- * - Chunks are clickable to view in full screen
+ * - Hunks can be clicked to view in full-screen detail
  * 
  * This view is designed for mobile screen widths where horizontal space is limited.
  * 
  * @param fileDiff The file diff to display
- * @param onChunkClick Callback when a chunk is clicked
+ * @param onHunkClick Callback when a hunk is clicked for full-screen view
  * @param modifier Modifier to be applied to the card
  */
 @Composable
 fun InlineDiffView(
     fileDiff: FileDiff,
-    onChunkClick: ((Int) -> Unit)? = null,
+    onHunkClick: ((CodeHunk, Int) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -115,9 +115,9 @@ fun InlineDiffView(
                             hunk = hunk,
                             hunkIndex = index + 1,
                             totalHunks = hunks.size,
-                            onClick = if (onChunkClick != null) {
-                                { onChunkClick(index) }
-                            } else null
+                            onHunkClick = onHunkClick?.let { callback ->
+                                { callback(hunk, index + 1) }
+                            }
                         )
                     }
                 }
@@ -140,12 +140,12 @@ fun InlineDiffView(
  * Large hunks (more than [COLLAPSE_THRESHOLD_LINES] lines) can be collapsed to save screen space.
  * When collapsed, shows first [PREVIEW_LINES_WHEN_COLLAPSED] lines.
  * The hunk header shows the line ranges and hunk number.
- * Chunks are clickable to view in full screen.
+ * Clicking on the hunk opens it in full-screen detail view.
  * 
  * @param hunk The code hunk to display
  * @param hunkIndex The 1-based index of this hunk
  * @param totalHunks The total number of hunks in the file
- * @param onClick Callback when the chunk is clicked
+ * @param onHunkClick Callback when the hunk is clicked for full-screen view
  * @param modifier Modifier to be applied to the column
  */
 @Composable
@@ -153,7 +153,7 @@ fun InlineDiffHunk(
     hunk: CodeHunk,
     hunkIndex: Int,
     totalHunks: Int,
-    onClick: (() -> Unit)? = null,
+    onHunkClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(hunk.lines.size <= COLLAPSE_THRESHOLD_LINES) }
@@ -163,8 +163,8 @@ fun InlineDiffHunk(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
+                if (onHunkClick != null) {
+                    Modifier.clickable { onHunkClick() }
                 } else {
                     Modifier
                 }
