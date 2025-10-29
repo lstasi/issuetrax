@@ -1,9 +1,11 @@
 package com.issuetrax.app.presentation.ui.pr_review.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -284,11 +286,67 @@ fun PRActionToolbar(
                         maxLines = 5
                     )
                     
-                    Text(
-                        text = "Merge method: $mergeMethod",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    // Merge method selection
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Merge method:",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.material3.RadioButton(
+                                selected = mergeMethod == "merge",
+                                onClick = { mergeMethod = "merge" }
+                            )
+                            Text(
+                                text = "Merge",
+                                modifier = Modifier
+                                    .clickable { mergeMethod = "merge" }
+                                    .padding(start = 4.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.material3.RadioButton(
+                                selected = mergeMethod == "squash",
+                                onClick = { mergeMethod = "squash" }
+                            )
+                            Text(
+                                text = "Squash and merge",
+                                modifier = Modifier
+                                    .clickable { mergeMethod = "squash" }
+                                    .padding(start = 4.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.material3.RadioButton(
+                                selected = mergeMethod == "rebase",
+                                onClick = { mergeMethod = "rebase" }
+                            )
+                            Text(
+                                text = "Rebase and merge",
+                                modifier = Modifier
+                                    .clickable { mergeMethod = "rebase" }
+                                    .padding(start = 4.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
                 }
             },
             icon = {

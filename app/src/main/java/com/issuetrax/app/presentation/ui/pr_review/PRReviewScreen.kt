@@ -165,7 +165,7 @@ fun PRReviewScreen(
                                         onSwipeRight = { viewModel.navigateToFileList() }
                                     ),
                                     enabled = true,
-                                    showVisualFeedback = true,
+                                    showVisualFeedback = false,
                                     enableHapticFeedback = true,
                                     modifier = Modifier.fillMaxSize()
                                 ) {

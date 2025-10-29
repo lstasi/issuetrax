@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -82,9 +81,7 @@ fun FileListView(
         
         // File list
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp), // Fixed height to prevent layout issues in scrollable parent
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(files) { index, file ->
@@ -159,30 +156,7 @@ private fun FileItem(
                 }
             }
             
-            // Change statistics
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (file.additions > 0) {
-                    Text(
-                        text = "+${file.additions}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                
-                if (file.deletions > 0) {
-                    Text(
-                        text = "-${file.deletions}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                
-                // File status label
-                FileStatusLabel(status = file.status)
-            }
+
         }
     }
 }

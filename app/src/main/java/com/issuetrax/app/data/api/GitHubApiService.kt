@@ -85,14 +85,6 @@ interface GitHubApiService {
         @Body commentRequest: CreateIssueCommentRequest
     ): Response<IssueCommentDto>
     
-    @POST("repos/{owner}/{repo}/actions/runs/{run_id}/rerun")
-    suspend fun rerunWorkflow(
-        @Header("Authorization") authorization: String,
-        @Path("owner") owner: String,
-        @Path("repo") repo: String,
-        @Path("run_id") runId: Long
-    ): Response<Unit>
-    
     @GET("repos/{owner}/{repo}/commits/{ref}/status")
     suspend fun getCommitStatus(
         @Header("Authorization") authorization: String,
