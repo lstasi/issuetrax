@@ -69,12 +69,19 @@ jobs:
         VERSION="${{ steps.version.outputs.VERSION }}"
         cd app/build/outputs/apk/release
         # The sign-android-release action creates a file with -signed suffix
-        # Rename it to have a cleaner name
-        if [ -f "issuetrax-v${VERSION}-unsigned-signed.apk" ]; then
-          mv "issuetrax-v${VERSION}-unsigned-signed.apk" "issuetrax-v${VERSION}.apk"
-          echo "✓ Renamed signed APK to issuetrax-v${VERSION}.apk"
+        # Find and rename it to have a cleaner name
+        SIGNED_APK=$(ls issuetrax-v${VERSION}*-signed.apk 2>/dev/null | head -n1)
+        if [ -n "$SIGNED_APK" ]; then
+          mv "$SIGNED_APK" "issuetrax-v${VERSION}.apk"
+          echo "✓ Renamed $SIGNED_APK to issuetrax-v${VERSION}.apk"
+        else
+          echo "⚠ Warning: No signed APK found matching pattern issuetrax-v${VERSION}*-signed.apk"
+          echo "Available files:"
+          ls -1 *.apk || echo "No APK files found"
+          exit 1
         fi
         # List final files
+        echo "Final APK files:"
         ls -lh *.apk
 
     - name: Generate changelog
