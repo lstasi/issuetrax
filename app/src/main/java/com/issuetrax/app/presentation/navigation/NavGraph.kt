@@ -8,6 +8,7 @@ import com.issuetrax.app.presentation.ui.auth.AuthScreen
 import com.issuetrax.app.presentation.ui.current_work.CurrentWorkScreen
 import com.issuetrax.app.presentation.ui.pr_review.PRReviewScreen
 import com.issuetrax.app.presentation.ui.repository_selection.RepositorySelectionScreen
+import com.issuetrax.app.presentation.ui.create_issue.CreateIssueScreen
 
 @Composable
 fun NavGraph() {
@@ -45,6 +46,9 @@ fun NavGraph() {
                 onNavigateToPR = { prNumber ->
                     navController.navigate(Routes.PRReview.createRoute(owner, repo, prNumber))
                 },
+                onNavigateToCreateIssue = {
+                    navController.navigate(Routes.CreateIssue.createRoute(owner, repo))
+                },
                 onNavigateBack = {
                     navController.navigate(Routes.RepositorySelection.route) {
                         popUpTo(Routes.RepositorySelection.route) { inclusive = false }
@@ -62,6 +66,19 @@ fun NavGraph() {
                 owner = owner,
                 repo = repo,
                 prNumber = prNumber,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.CreateIssue.route) { backStackEntry ->
+            val owner = backStackEntry.arguments?.getString("owner") ?: ""
+            val repo = backStackEntry.arguments?.getString("repo") ?: ""
+
+            CreateIssueScreen(
+                owner = owner,
+                repo = repo,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

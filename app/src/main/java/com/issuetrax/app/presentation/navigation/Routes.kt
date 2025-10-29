@@ -13,4 +13,9 @@ sealed class Routes(val route: String) {
             return "pr_review/$owner/$repo/$prNumber"
         }
     }
+    object CreateIssue : Routes("create_issue/{owner}/{repo}") {
+        fun createRoute(owner: String, repo: String): String {
+            return "create_issue/$owner/$repo"
+        }
+    }
 }

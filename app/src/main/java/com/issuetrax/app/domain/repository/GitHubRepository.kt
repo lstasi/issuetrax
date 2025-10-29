@@ -59,6 +59,14 @@ interface GitHubRepository {
         commitMessage: String? = null,
         mergeMethod: String = "merge"
     ): Result<String>
+    
+    suspend fun createIssue(
+        owner: String,
+        repo: String,
+        title: String,
+        body: String?,
+        assignees: List<String> = emptyList()
+    ): Result<com.issuetrax.app.domain.entity.Issue>
 }
 
 data class ReviewComment(

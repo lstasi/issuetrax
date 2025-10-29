@@ -5,6 +5,7 @@ import com.issuetrax.app.data.api.model.RepositoryDto
 import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.FileDiffDto
+import com.issuetrax.app.data.api.model.IssueDto
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
@@ -75,6 +76,14 @@ interface GitHubApiService {
         @Path("number") number: Int,
         @Body updateRequest: UpdatePullRequestRequest
     ): Response<PullRequestDto>
+    
+    @POST("repos/{owner}/{repo}/issues")
+    suspend fun createIssue(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Body issueRequest: CreateIssueRequest
+    ): Response<IssueDto>
 }
 
 @Serializable
@@ -110,4 +119,11 @@ data class UpdatePullRequestRequest(
     val state: String? = null, // "open" or "closed"
     val title: String? = null,
     val body: String? = null
+)
+
+@Serializable
+data class CreateIssueRequest(
+    val title: String,
+    val body: String? = null,
+    val assignees: List<String> = emptyList()
 )

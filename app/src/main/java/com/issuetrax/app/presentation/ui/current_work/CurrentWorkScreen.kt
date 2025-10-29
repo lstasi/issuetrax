@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
@@ -56,6 +57,7 @@ fun CurrentWorkScreen(
     owner: String,
     repo: String,
     onNavigateToPR: (Int) -> Unit,
+    onNavigateToCreateIssue: () -> Unit,
     onNavigateBack: () -> Unit,
     viewModel: CurrentWorkViewModel = hiltViewModel()
 ) {
@@ -77,6 +79,9 @@ fun CurrentWorkScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToCreateIssue) {
+                        Icon(Icons.Default.Add, contentDescription = "Create Issue")
+                    }
                     IconButton(onClick = { viewModel.refreshPullRequests() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }

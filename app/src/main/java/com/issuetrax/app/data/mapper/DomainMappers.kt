@@ -5,6 +5,7 @@ import com.issuetrax.app.data.api.model.PullRequestDto
 import com.issuetrax.app.data.api.model.RepositoryDto
 import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
+import com.issuetrax.app.data.api.model.IssueDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -117,6 +118,24 @@ fun ReviewDto.toDomain(): Review {
         submittedAt = submittedAt?.let { parseDateTime(it) },
         commitId = commitId,
         authorAssociation = authorAssociation
+    )
+}
+
+fun IssueDto.toDomain(): Issue {
+    return Issue(
+        id = id,
+        number = number,
+        title = title,
+        body = body,
+        state = when (state.lowercase()) {
+            "closed" -> IssueState.CLOSED
+            else -> IssueState.OPEN
+        },
+        author = user.toDomain(),
+        assignees = assignees.map { it.toDomain() },
+        createdAt = parseDateTime(created_at),
+        updatedAt = parseDateTime(updated_at),
+        htmlUrl = html_url
     )
 }
 
