@@ -1,4 +1,3 @@
-import com.android.build.api.variant.BuiltArtifactsLoader
 import com.android.build.gradle.api.ApkVariantOutput
 import java.io.File
 
