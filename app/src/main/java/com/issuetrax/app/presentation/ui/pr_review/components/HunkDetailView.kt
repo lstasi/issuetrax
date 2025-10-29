@@ -63,7 +63,7 @@ fun HunkDetailView(
                         .padding(end = 48.dp)
                 ) {
                     Text(
-                        text = fileName,
+                        text = fileName.substringAfterLast('/'),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,8 +14,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import com.issuetrax.app.domain.entity.FileStatus
  * 
  * Shows:
  * - File counter (e.g., "File 1 of 12")
+ * - Build status indicator
  * - List of files with:
  *   - File name with full path
  *   - Change type (added/modified/removed/renamed) with icon
@@ -46,30 +48,40 @@ fun FileListView(
     files: List<FileDiff>,
     currentFileIndex: Int,
     onFileClick: (Int) -> Unit,
+    commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // File counter
-        if (files.isNotEmpty()) {
-            Text(
-                text = if (currentFileIndex >= 0) {
-                    "File ${currentFileIndex + 1} of ${files.size}"
-                } else {
-                    "${files.size} ${if (files.size == 1) "file" else "files"} changed"
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+        // File counter and build status
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (files.isNotEmpty()) {
+                Text(
+                    text = if (currentFileIndex >= 0) {
+                        "File ${currentFileIndex + 1} of ${files.size}"
+                    } else {
+                        "${files.size} ${if (files.size == 1) "file" else "files"} changed"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            
+            // Build status indicator
+            commitStatus?.let { status ->
+                BuildStatusIndicator(status = status)
+            }
         }
         
         // File list
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp), // Fixed height to prevent layout issues in scrollable parent
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(files) { index, file ->
@@ -144,30 +156,7 @@ private fun FileItem(
                 }
             }
             
-            // Change statistics
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (file.additions > 0) {
-                    Text(
-                        text = "+${file.additions}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                
-                if (file.deletions > 0) {
-                    Text(
-                        text = "-${file.deletions}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                
-                // File status label
-                FileStatusLabel(status = file.status)
-            }
+
         }
     }
 }
@@ -243,4 +232,68 @@ private fun FileStatusLabel(
         color = color,
         modifier = modifier
     )
+}
+
+/**
+ * Displays a build status indicator showing the overall commit status.
+ */
+@Composable
+private fun BuildStatusIndicator(
+    status: com.issuetrax.app.domain.entity.CommitStatus,
+    modifier: Modifier = Modifier
+) {
+    data class StatusDisplay(
+        val icon: androidx.compose.ui.graphics.vector.ImageVector,
+        val backgroundColor: androidx.compose.ui.graphics.Color,
+        val iconColor: androidx.compose.ui.graphics.Color,
+        val text: String
+    )
+    
+    val display = when (status.state) {
+        com.issuetrax.app.domain.entity.CommitState.SUCCESS -> StatusDisplay(
+            icon = Icons.Default.CheckCircle,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            iconColor = MaterialTheme.colorScheme.onPrimary,
+            text = "Checks passed"
+        )
+        com.issuetrax.app.domain.entity.CommitState.FAILURE -> StatusDisplay(
+            icon = Icons.Default.Close,
+            backgroundColor = MaterialTheme.colorScheme.error,
+            iconColor = MaterialTheme.colorScheme.onError,
+            text = "Checks failed"
+        )
+        com.issuetrax.app.domain.entity.CommitState.PENDING -> StatusDisplay(
+            icon = Icons.Default.Refresh,
+            backgroundColor = MaterialTheme.colorScheme.tertiary,
+            iconColor = MaterialTheme.colorScheme.onTertiary,
+            text = "Checks pending"
+        )
+        com.issuetrax.app.domain.entity.CommitState.ERROR -> StatusDisplay(
+            icon = Icons.Default.Close,
+            backgroundColor = MaterialTheme.colorScheme.error,
+            iconColor = MaterialTheme.colorScheme.onError,
+            text = "Checks error"
+        )
+    }
+    
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = display.icon,
+            contentDescription = display.text,
+            modifier = Modifier
+                .size(20.dp)
+                .background(display.backgroundColor, CircleShape)
+                .padding(3.dp),
+            tint = display.iconColor
+        )
+        Text(
+            text = display.text,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
 }

@@ -75,6 +75,23 @@ interface GitHubApiService {
         @Path("number") number: Int,
         @Body updateRequest: UpdatePullRequestRequest
     ): Response<PullRequestDto>
+    
+    @POST("repos/{owner}/{repo}/issues/{number}/comments")
+    suspend fun createIssueComment(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("number") number: Int,
+        @Body commentRequest: CreateIssueCommentRequest
+    ): Response<IssueCommentDto>
+    
+    @GET("repos/{owner}/{repo}/commits/{ref}/status")
+    suspend fun getCommitStatus(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("ref") ref: String
+    ): Response<CommitStatusDto>
 }
 
 @Serializable
@@ -110,4 +127,33 @@ data class UpdatePullRequestRequest(
     val state: String? = null, // "open" or "closed"
     val title: String? = null,
     val body: String? = null
+)
+
+@Serializable
+data class CreateIssueCommentRequest(
+    val body: String
+)
+
+@Serializable
+data class IssueCommentDto(
+    val id: Long,
+    val body: String,
+    val user: UserDto,
+    val created_at: String,
+    val updated_at: String
+)
+
+@Serializable
+data class CommitStatusDto(
+    val state: String, // "pending", "success", "failure", "error"
+    val statuses: List<StatusDto>,
+    val total_count: Int
+)
+
+@Serializable
+data class StatusDto(
+    val state: String,
+    val context: String,
+    val description: String?,
+    val target_url: String?
 )

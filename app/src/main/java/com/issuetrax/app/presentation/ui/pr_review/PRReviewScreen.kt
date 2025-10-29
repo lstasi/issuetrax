@@ -54,6 +54,7 @@ fun PRReviewScreen(
     // Load pull request data when screen launches
     LaunchedEffect(owner, repo, prNumber) {
         viewModel.loadPullRequest(owner, repo, prNumber)
+        viewModel.loadCommitStatus(owner, repo)
     }
     
     // Show action message in snackbar
@@ -94,7 +95,18 @@ fun PRReviewScreen(
                         PRActionToolbar(
                             pullRequest = pr,
                             onApprove = { viewModel.approvePullRequest(owner, repo, prNumber) },
-                            onClose = { viewModel.closePullRequest(owner, repo, prNumber) }
+                            onClose = { viewModel.closePullRequest(owner, repo, prNumber) },
+                            onMerge = { mergeMethod, commitTitle, commitMessage ->
+                                viewModel.mergePullRequest(owner, repo, prNumber, commitTitle, commitMessage, mergeMethod)
+                            },
+                            onComment = { body ->
+                                viewModel.createComment(owner, repo, prNumber, body)
+                            },
+                            onApproveWorkflow = {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Workflow approval: Feature not yet implemented")
+                                }
+                            }
                         )
                     }
                 }
@@ -139,6 +151,7 @@ fun PRReviewScreen(
                                 files = uiState.files,
                                 currentFileIndex = uiState.currentFileIndex,
                                 onFileClick = { index -> viewModel.navigateToFile(index) },
+                                commitStatus = uiState.commitStatus,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(16.dp)
@@ -152,7 +165,7 @@ fun PRReviewScreen(
                                         onSwipeRight = { viewModel.navigateToFileList() }
                                     ),
                                     enabled = true,
-                                    showVisualFeedback = true,
+                                    showVisualFeedback = false,
                                     enableHapticFeedback = true,
                                     modifier = Modifier.fillMaxSize()
                                 ) {
