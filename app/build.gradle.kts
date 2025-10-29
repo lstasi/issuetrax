@@ -1,3 +1,4 @@
+import com.android.build.gradle.api.ApkVariantOutput
 import java.io.File
 
 plugins {
@@ -76,6 +77,19 @@ android {
                 signingConfig = releaseSigning
             } else {
                 println("NOTICE: Release signing config has no storeFile; release APK will be unsigned (debug signing may be used).")
+            }
+        }
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            val apkOutput = this as? ApkVariantOutput
+            val versionName = defaultConfig.versionName
+            
+            // Set output file name for release builds
+            // The file will be unsigned initially and signed by CI/CD pipeline
+            if (buildType.name == "release" && apkOutput != null) {
+                apkOutput.outputFileName = "issuetrax-v${versionName}-unsigned.apk"
             }
         }
     }

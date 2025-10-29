@@ -64,6 +64,26 @@ jobs:
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
 
+    - name: Rename signed APK
+      run: |
+        VERSION="${{ steps.version.outputs.VERSION }}"
+        cd app/build/outputs/apk/release
+        # The sign-android-release action creates a file with -signed suffix
+        # Find and rename it to have a cleaner name
+        SIGNED_APK=$(ls issuetrax-v${VERSION}*-signed.apk 2>/dev/null | head -n1)
+        if [ -n "$SIGNED_APK" ]; then
+          mv "$SIGNED_APK" "issuetrax-v${VERSION}.apk"
+          echo "✓ Renamed $SIGNED_APK to issuetrax-v${VERSION}.apk"
+        else
+          echo "⚠ Warning: No signed APK found matching pattern issuetrax-v${VERSION}*-signed.apk"
+          echo "Available files:"
+          ls -1 *.apk || echo "No APK files found"
+          exit 1
+        fi
+        # List final files
+        echo "Final APK files:"
+        ls -lh *.apk
+
     - name: Generate changelog
       id: changelog
       run: |
@@ -77,7 +97,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          app/build/outputs/apk/release/*.apk
+          app/build/outputs/apk/release/issuetrax-v${{ steps.version.outputs.VERSION }}.apk
         name: Release ${{ steps.version.outputs.VERSION }}
         body: |
           ## Changes in this Release
