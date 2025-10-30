@@ -29,7 +29,10 @@ class PRReviewViewModel @Inject constructor(
     private val gitHubRepository: GitHubRepository,
     private val submitReviewUseCase: SubmitReviewUseCase,
     private val approvePullRequestUseCase: com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase,
-    private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase
+    private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase,
+    private val mergePullRequestUseCase: com.issuetrax.app.domain.usecase.MergePullRequestUseCase,
+    private val createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase,
+    private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -198,6 +201,76 @@ class PRReviewViewModel @Inject constructor(
     fun clearActionMessage() {
         _uiState.value = _uiState.value.copy(actionMessage = null)
     }
+    
+    /**
+     * Merges the pull request.
+     */
+    fun mergePullRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        commitTitle: String? = null,
+        commitMessage: String? = null,
+        mergeMethod: String = "merge"
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = mergePullRequestUseCase(owner, repo, prNumber, commitTitle, commitMessage, mergeMethod)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    actionMessage = "Pull request merged successfully"
+                )
+                // Reload PR to update state
+                loadPullRequest(owner, repo, prNumber)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to merge pull request"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Creates a comment on the pull request.
+     */
+    fun createComment(owner: String, repo: String, prNumber: Int, body: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = createCommentUseCase(owner, repo, prNumber, body)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    actionMessage = "Comment posted successfully"
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to post comment"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Loads commit status for the PR's head reference.
+     */
+    fun loadCommitStatus(owner: String, repo: String) {
+        viewModelScope.launch {
+            val pullRequest = _uiState.value.pullRequest ?: return@launch
+            
+            val result = getCommitStatusUseCase(owner, repo, pullRequest.headRef)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    commitStatus = result.getOrNull()
+                )
+            }
+            // Silently fail - commit status is optional information
+        }
+    }
 }
 
 data class PRReviewUiState(
@@ -211,7 +284,8 @@ data class PRReviewUiState(
     val actionMessage: String? = null,
     val viewMode: PRViewMode = PRViewMode.FILE_LIST,
     val selectedHunk: CodeHunk? = null,
-    val selectedHunkIndex: Int = -1
+    val selectedHunkIndex: Int = -1,
+    val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {

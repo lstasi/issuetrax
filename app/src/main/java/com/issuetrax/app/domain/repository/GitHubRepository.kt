@@ -1,5 +1,6 @@
 package com.issuetrax.app.domain.repository
 
+import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
@@ -67,6 +68,19 @@ interface GitHubRepository {
         body: String?,
         assignees: List<String> = emptyList()
     ): Result<com.issuetrax.app.domain.entity.Issue>
+    
+    suspend fun createIssueComment(
+        owner: String,
+        repo: String,
+        issueNumber: Int,
+        body: String
+    ): Result<Unit>
+    
+    suspend fun getCommitStatus(
+        owner: String,
+        repo: String,
+        ref: String
+    ): Result<CommitStatus>
 }
 
 data class ReviewComment(
