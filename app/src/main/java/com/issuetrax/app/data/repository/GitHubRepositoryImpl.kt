@@ -3,12 +3,14 @@ package com.issuetrax.app.data.repository
 import com.issuetrax.app.data.api.GitHubApiService
 import com.issuetrax.app.data.api.CreateReviewRequest
 import com.issuetrax.app.data.api.ReviewCommentRequest
+import com.issuetrax.app.data.api.CreateIssueRequest
 import com.issuetrax.app.data.mapper.toDomain
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
 import com.issuetrax.app.domain.entity.Review
 import com.issuetrax.app.domain.entity.User
+import com.issuetrax.app.domain.entity.Issue
 import com.issuetrax.app.domain.repository.AuthRepository
 import com.issuetrax.app.domain.repository.GitHubRepository
 import com.issuetrax.app.domain.repository.ReviewComment
@@ -240,6 +242,39 @@ class GitHubRepositoryImpl @Inject constructor(
                 }
             } else {
                 Result.failure(Exception("Failed to merge PR: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun createIssue(
+        owner: String,
+        repo: String,
+        title: String,
+        body: String?,
+        assignees: List<String>
+    ): Result<Issue> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val request = CreateIssueRequest(
+                title = title,
+                body = body,
+                assignees = assignees
+            )
+            
+            val response = apiService.createIssue("Bearer $token", owner, repo, request)
+            if (response.isSuccessful) {
+                val issueDto = response.body()
+                if (issueDto != null) {
+                    Result.success(issueDto.toDomain())
+                } else {
+                    Result.failure(Exception("Failed to create issue: response body is null"))
+                }
+            } else {
+                Result.failure(Exception("Failed to create issue: ${response.code()} - ${response.message()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

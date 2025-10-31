@@ -61,6 +61,14 @@ interface GitHubRepository {
         mergeMethod: String = "merge"
     ): Result<String>
     
+    suspend fun createIssue(
+        owner: String,
+        repo: String,
+        title: String,
+        body: String?,
+        assignees: List<String> = emptyList()
+    ): Result<com.issuetrax.app.domain.entity.Issue>
+    
     suspend fun createIssueComment(
         owner: String,
         repo: String,

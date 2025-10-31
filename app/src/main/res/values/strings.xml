@@ -36,6 +36,16 @@
     <string name="pr_review_comments">Comments</string>
     <string name="pr_review_submit">Submit Review</string>
     
+    <!-- Create Issue -->
+    <string name="create_issue_title">Create Issue</string>
+    <string name="create_issue_preset_next_task">Move to Next Task in TODO.md</string>
+    <string name="create_issue_custom_title">Custom Issue</string>
+    <string name="create_issue_title_label">Issue Title</string>
+    <string name="create_issue_body_label">Issue Description (optional)</string>
+    <string name="create_issue_submit">Create Issue</string>
+    <string name="create_issue_success">Issue created successfully</string>
+    <string name="create_issue_error">Failed to create issue</string>
+    
     <!-- Common -->
     <string name="loading">Loading…</string>
     <string name="error_generic">Something went wrong. Please try again.</string>
