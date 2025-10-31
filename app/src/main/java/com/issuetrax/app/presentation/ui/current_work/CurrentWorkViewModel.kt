@@ -86,22 +86,23 @@ class CurrentWorkViewModel @Inject constructor(
     
     private fun loadCommitStatuses(owner: String, repo: String, pullRequests: List<PullRequest>) {
         viewModelScope.launch {
+            // Create a map for efficient lookup by PR number
+            val prMap = pullRequests.associateBy { it.number }.toMutableMap()
+            
+            // Fetch commit statuses for all PRs concurrently
             pullRequests.forEach { pr ->
-                // Fetch commit status for the head ref
-                val statusResult = getCommitStatusUseCase(owner, repo, pr.headRef)
-                if (statusResult.isSuccess) {
-                    val commitStatus = statusResult.getOrNull()
-                    // Update the PR with the commit status
-                    val updatedPr = pr.copy(commitStatus = commitStatus)
-                    
-                    // Update the PR in allPullRequests
-                    allPullRequests = allPullRequests.map { 
-                        if (it.number == pr.number) updatedPr else it 
+                launch {
+                    val statusResult = getCommitStatusUseCase(owner, repo, pr.headRef)
+                    if (statusResult.isSuccess) {
+                        val commitStatus = statusResult.getOrNull()
+                        // Update the PR in the map
+                        prMap[pr.number] = pr.copy(commitStatus = commitStatus)
+                        
+                        // Update allPullRequests and UI state once per status
+                        allPullRequests = prMap.values.toList()
+                        val filtered = applyFilterAndSort(allPullRequests)
+                        _uiState.value = _uiState.value.copy(pullRequests = filtered)
                     }
-                    
-                    // Update the UI state with the new PR list
-                    val filtered = applyFilterAndSort(allPullRequests)
-                    _uiState.value = _uiState.value.copy(pullRequests = filtered)
                 }
             }
         }
