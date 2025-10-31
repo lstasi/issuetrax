@@ -32,7 +32,9 @@ class PRReviewViewModel @Inject constructor(
     private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase,
     private val mergePullRequestUseCase: com.issuetrax.app.domain.usecase.MergePullRequestUseCase,
     private val createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase,
-    private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
+    private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase,
+    private val getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase,
+    private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -271,6 +273,56 @@ class PRReviewViewModel @Inject constructor(
             // Silently fail - commit status is optional information
         }
     }
+    
+    /**
+     * Loads workflow runs for the repository.
+     */
+    fun loadWorkflowRuns(owner: String, repo: String) {
+        viewModelScope.launch {
+            val result = getWorkflowRunsUseCase(owner, repo, event = "pull_request", status = "waiting")
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    workflowRuns = result.getOrNull() ?: emptyList()
+                )
+            }
+            // Silently fail - workflow runs are optional information
+        }
+    }
+    
+    /**
+     * Approves a workflow run that requires manual approval.
+     */
+    fun approveWorkflowRun(owner: String, repo: String) {
+        viewModelScope.launch {
+            // Find the first waiting workflow run
+            val workflowRuns = _uiState.value.workflowRuns
+            val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
+            
+            if (waitingRun == null) {
+                _uiState.value = _uiState.value.copy(
+                    actionMessage = "No workflow runs require approval"
+                )
+                return@launch
+            }
+            
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    actionMessage = "Workflow run approved successfully"
+                )
+                // Reload workflow runs to update status
+                loadWorkflowRuns(owner, repo)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to approve workflow run"
+                )
+            }
+        }
+    }
 }
 
 data class PRReviewUiState(
@@ -285,7 +337,8 @@ data class PRReviewUiState(
     val viewMode: PRViewMode = PRViewMode.FILE_LIST,
     val selectedHunk: CodeHunk? = null,
     val selectedHunkIndex: Int = -1,
-    val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null
+    val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null,
+    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList()
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {

@@ -337,6 +337,62 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
+    override suspend fun getWorkflowRuns(
+        owner: String,
+        repo: String,
+        event: String?,
+        status: String?
+    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.getWorkflowRuns(
+                authorization = "Bearer $token",
+                owner = owner,
+                repo = repo,
+                event = event,
+                status = status
+            )
+            
+            if (response.isSuccessful) {
+                val workflowRunsResponse = response.body()!!
+                val workflowRuns = workflowRunsResponse.workflow_runs.map { it.toDomain() }
+                Result.success(workflowRuns)
+            } else {
+                Result.failure(Exception("Failed to get workflow runs: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun approveWorkflowRun(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.approveWorkflowRun(
+                authorization = "Bearer $token",
+                owner = owner,
+                repo = repo,
+                runId = runId
+            )
+            
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to approve workflow run: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     private fun String.toCommitState(): com.issuetrax.app.domain.entity.CommitState {
         return when (this.lowercase()) {
             "pending" -> com.issuetrax.app.domain.entity.CommitState.PENDING

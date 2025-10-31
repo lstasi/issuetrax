@@ -55,6 +55,7 @@ fun PRReviewScreen(
     LaunchedEffect(owner, repo, prNumber) {
         viewModel.loadPullRequest(owner, repo, prNumber)
         viewModel.loadCommitStatus(owner, repo)
+        viewModel.loadWorkflowRuns(owner, repo)
     }
     
     // Show action message in snackbar
@@ -103,9 +104,7 @@ fun PRReviewScreen(
                                 viewModel.createComment(owner, repo, prNumber, body)
                             },
                             onApproveWorkflow = {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Workflow approval: Feature not yet implemented")
-                                }
+                                viewModel.approveWorkflowRun(owner, repo)
                             }
                         )
                     }
