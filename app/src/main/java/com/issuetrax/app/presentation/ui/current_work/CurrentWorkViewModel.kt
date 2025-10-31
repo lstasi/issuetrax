@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
 import com.issuetrax.app.domain.repository.GitHubRepository
+import com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
 import com.issuetrax.app.domain.usecase.GetPullRequestsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ enum class PRSortOrder {
 @HiltViewModel
 class CurrentWorkViewModel @Inject constructor(
     private val getPullRequestsUseCase: GetPullRequestsUseCase,
-    private val gitHubRepository: GitHubRepository
+    private val gitHubRepository: GitHubRepository,
+    private val getCommitStatusUseCase: GetCommitStatusUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(CurrentWorkUiState())
@@ -62,6 +64,10 @@ class CurrentWorkViewModel @Inject constructor(
                 if (result.isSuccess) {
                     val pullRequests = result.getOrNull() ?: emptyList()
                     allPullRequests = pullRequests
+                    
+                    // Fetch commit status for each PR in the background
+                    loadCommitStatuses(owner, repo, pullRequests)
+                    
                     val filtered = applyFilterAndSort(pullRequests)
                     _uiState.value = _uiState.value.copy(
                         isLoadingPRs = false,
@@ -73,6 +79,29 @@ class CurrentWorkViewModel @Inject constructor(
                         isLoadingPRs = false,
                         error = result.exceptionOrNull()?.message ?: "Failed to load pull requests"
                     )
+                }
+            }
+        }
+    }
+    
+    private fun loadCommitStatuses(owner: String, repo: String, pullRequests: List<PullRequest>) {
+        viewModelScope.launch {
+            pullRequests.forEach { pr ->
+                // Fetch commit status for the head ref
+                val statusResult = getCommitStatusUseCase(owner, repo, pr.headRef)
+                if (statusResult.isSuccess) {
+                    val commitStatus = statusResult.getOrNull()
+                    // Update the PR with the commit status
+                    val updatedPr = pr.copy(commitStatus = commitStatus)
+                    
+                    // Update the PR in allPullRequests
+                    allPullRequests = allPullRequests.map { 
+                        if (it.number == pr.number) updatedPr else it 
+                    }
+                    
+                    // Update the UI state with the new PR list
+                    val filtered = applyFilterAndSort(allPullRequests)
+                    _uiState.value = _uiState.value.copy(pullRequests = filtered)
                 }
             }
         }

@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -45,11 +47,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
+import com.issuetrax.app.domain.entity.CommitState
 import com.issuetrax.app.domain.entity.PRState
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import java.time.Duration
 import java.time.LocalDateTime
+import androidx.compose.foundation.layout.size
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,23 +206,11 @@ fun PullRequestItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "#${pullRequest.number}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(0.2f)
-                )
-
-                PRStateIndicator(
-                    state = pullRequest.state,
-                    modifier = Modifier.weight(0.3f)
-                )
-            }
+            Text(
+                text = "#${pullRequest.number}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -232,7 +224,7 @@ fun PullRequestItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "by ${pullRequest.author.login}",
+                text = "by ${pullRequest.author.login} • ${timeAgo(pullRequest.updatedAt)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -244,22 +236,24 @@ fun PullRequestItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Only show stats if we have data (changedFiles is null from list endpoint)
-                if (pullRequest.changedFiles != null) {
-                    PRStats(
-                        changedFiles = pullRequest.changedFiles,
-                        additions = pullRequest.additions ?: 0,
-                        deletions = pullRequest.deletions ?: 0
-                    )
-                } else {
-                    Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Show build status if available
+                    pullRequest.commitStatus?.let { status ->
+                        BuildStatusIndicator(state = status.state)
+                    }
+                    
+                    // Only show stats if we have data (changedFiles is null from list endpoint)
+                    if (pullRequest.changedFiles != null) {
+                        PRStats(
+                            changedFiles = pullRequest.changedFiles,
+                            additions = pullRequest.additions ?: 0,
+                            deletions = pullRequest.deletions ?: 0
+                        )
+                    }
                 }
-                
-                Text(
-                    text = timeAgo(pullRequest.updatedAt),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
@@ -281,6 +275,36 @@ fun PRStateIndicator(
         style = MaterialTheme.typography.labelSmall,
         color = color,
         modifier = modifier
+    )
+}
+
+@Composable
+fun BuildStatusIndicator(
+    state: CommitState
+) {
+    val (icon, color, contentDescription) = when (state) {
+        CommitState.SUCCESS -> Triple(
+            Icons.Default.CheckCircle,
+            MaterialTheme.colorScheme.primary,
+            "Build succeeded"
+        )
+        CommitState.FAILURE, CommitState.ERROR -> Triple(
+            Icons.Default.Close,
+            MaterialTheme.colorScheme.error,
+            "Build failed"
+        )
+        CommitState.PENDING -> Triple(
+            Icons.Default.Refresh,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            "Build pending"
+        )
+    }
+    
+    Icon(
+        imageVector = icon,
+        contentDescription = contentDescription,
+        tint = color,
+        modifier = Modifier.size(16.dp)
     )
 }
 
