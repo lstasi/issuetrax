@@ -6,6 +6,8 @@ import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.FileDiffDto
 import com.issuetrax.app.data.api.model.IssueDto
+import com.issuetrax.app.data.api.model.WorkflowRunsResponseDto
+import com.issuetrax.app.data.api.model.WorkflowRunApprovalResponseDto
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
@@ -101,6 +103,24 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("ref") ref: String
     ): Response<CommitStatusDto>
+    
+    @GET("repos/{owner}/{repo}/actions/runs")
+    suspend fun getWorkflowRuns(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("event") event: String? = null,
+        @Query("status") status: String? = null,
+        @Query("per_page") perPage: Int = 10
+    ): Response<WorkflowRunsResponseDto>
+    
+    @POST("repos/{owner}/{repo}/actions/runs/{run_id}/approve")
+    suspend fun approveWorkflowRun(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("run_id") runId: Long
+    ): Response<WorkflowRunApprovalResponseDto>
 }
 
 @Serializable

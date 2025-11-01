@@ -81,6 +81,19 @@ interface GitHubRepository {
         repo: String,
         ref: String
     ): Result<CommitStatus>
+    
+    suspend fun getWorkflowRuns(
+        owner: String,
+        repo: String,
+        event: String? = null,
+        status: String? = null
+    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
+    
+    suspend fun approveWorkflowRun(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit>
 }
 
 data class ReviewComment(

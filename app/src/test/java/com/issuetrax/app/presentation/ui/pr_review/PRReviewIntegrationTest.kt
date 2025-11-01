@@ -55,6 +55,8 @@ class PRReviewIntegrationTest {
     private lateinit var mergePullRequestUseCase: com.issuetrax.app.domain.usecase.MergePullRequestUseCase
     private lateinit var createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase
     private lateinit var getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
+    private lateinit var getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
+    private lateinit var approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -67,6 +69,8 @@ class PRReviewIntegrationTest {
         mergePullRequestUseCase = mockk()
         createCommentUseCase = mockk()
         getCommitStatusUseCase = mockk()
+        getWorkflowRunsUseCase = mockk()
+        approveWorkflowRunUseCase = mockk()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -74,7 +78,9 @@ class PRReviewIntegrationTest {
             closePullRequestUseCase,
             mergePullRequestUseCase,
             createCommentUseCase,
-            getCommitStatusUseCase
+            getCommitStatusUseCase,
+            getWorkflowRunsUseCase,
+            approveWorkflowRunUseCase
         )
     }
     
