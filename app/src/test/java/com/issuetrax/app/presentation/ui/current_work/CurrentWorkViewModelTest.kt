@@ -47,6 +47,7 @@ class CurrentWorkViewModelTest {
     
     private lateinit var getPullRequestsUseCase: GetPullRequestsUseCase
     private lateinit var gitHubRepository: GitHubRepository
+    private lateinit var getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
     private lateinit var viewModel: CurrentWorkViewModel
     
     @Before
@@ -54,7 +55,10 @@ class CurrentWorkViewModelTest {
         Dispatchers.setMain(testDispatcher)
         getPullRequestsUseCase = mockk()
         gitHubRepository = mockk()
-        viewModel = CurrentWorkViewModel(getPullRequestsUseCase, gitHubRepository)
+        getCommitStatusUseCase = mockk()
+        // Mock getCommitStatusUseCase to return failure by default (no status available)
+        coEvery { getCommitStatusUseCase(any(), any(), any()) } returns Result.failure(Exception("No status"))
+        viewModel = CurrentWorkViewModel(getPullRequestsUseCase, gitHubRepository, getCommitStatusUseCase)
     }
     
     @After
