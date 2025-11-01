@@ -6,6 +6,7 @@ import com.issuetrax.app.data.api.model.RepositoryDto
 import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.IssueDto
+import com.issuetrax.app.data.api.model.WorkflowRunDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -135,6 +136,17 @@ fun IssueDto.toDomain(): Issue {
         assignees = assignees.map { it.toDomain() },
         createdAt = parseDateTime(created_at),
         updatedAt = parseDateTime(updated_at),
+        htmlUrl = html_url
+    )
+}
+
+fun WorkflowRunDto.toDomain(): WorkflowRun {
+    return WorkflowRun(
+        id = id,
+        name = name,
+        status = status,
+        conclusion = conclusion,
+        headSha = head_sha,
         htmlUrl = html_url
     )
 }
