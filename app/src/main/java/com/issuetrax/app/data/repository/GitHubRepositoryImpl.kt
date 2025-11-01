@@ -1,5 +1,7 @@
 package com.issuetrax.app.data.repository
 
+import android.util.Log
+import com.issuetrax.app.data.api.ApiErrorParser
 import com.issuetrax.app.data.api.GitHubApiService
 import com.issuetrax.app.data.api.CreateReviewRequest
 import com.issuetrax.app.data.api.ReviewCommentRequest
@@ -22,6 +24,10 @@ class GitHubRepositoryImpl @Inject constructor(
     private val apiService: GitHubApiService,
     private val authRepository: AuthRepository
 ) : GitHubRepository {
+    
+    companion object {
+        private const val TAG = "GitHubRepositoryImpl"
+    }
     
     override suspend fun getCurrentUser(): Result<User> {
         return try {
@@ -265,18 +271,26 @@ class GitHubRepositoryImpl @Inject constructor(
                 assignees = assignees
             )
             
+            Log.d(TAG, "Creating issue in $owner/$repo with title: '$title', assignees: $assignees")
+            
             val response = apiService.createIssue("Bearer $token", owner, repo, request)
             if (response.isSuccessful) {
                 val issueDto = response.body()
                 if (issueDto != null) {
+                    Log.d(TAG, "Issue created successfully: #${issueDto.number}")
                     Result.success(issueDto.toDomain())
                 } else {
-                    Result.failure(Exception("Failed to create issue: response body is null"))
+                    val error = "Failed to create issue: response body is null"
+                    Log.e(TAG, error)
+                    Result.failure(Exception(error))
                 }
             } else {
-                Result.failure(Exception("Failed to create issue: ${response.code()} - ${response.message()}"))
+                val errorMessage = ApiErrorParser.parseErrorResponse(response)
+                Log.e(TAG, "Failed to create issue: $errorMessage")
+                Result.failure(Exception("Failed to create issue: $errorMessage"))
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Exception while creating issue", e)
             Result.failure(e)
         }
     }

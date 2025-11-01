@@ -38,7 +38,7 @@ class CreateIssueViewModel @Inject constructor(
                 repo = repo,
                 title = title,
                 body = body,
-                assignees = listOf("copilot") // Auto-assign to GitHub Copilot
+                assignees = emptyList() // Don't auto-assign to avoid validation errors
             )
 
             result.fold(
