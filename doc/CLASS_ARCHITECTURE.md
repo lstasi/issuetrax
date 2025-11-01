@@ -469,22 +469,38 @@ This document provides a detailed reference of all classes in the Issuetrax appl
 - `onSwipeUp: (() -> Unit)?` - Called on up swipe
 - `onSwipeDown: (() -> Unit)?` - Called on down swipe
 
-#### `Modifier.detectSwipeGestures()`
+#### `Modifier.detectSwipeGestures()` ⚠️ DEPRECATED
 **Package**: `com.issuetrax.app.presentation.ui.common.gesture`  
-**Type**: Composable Modifier Extension  
-**Purpose**: Compose modifier for detecting swipe gestures
+**Type**: Composable Modifier Extension (REMOVED)  
+**Status**: ⛔ **DEPRECATED** - Removed in favor of `GestureDetectionBox`
 
-**Parameters**:
-- `config: GestureConfig = GestureConfig.Default` - Gesture configuration
-- `callbacks: GestureCallbacks` - Gesture event callbacks
-- `enabled: Boolean = true` - Whether gesture detection is enabled
+**Migration**: Use `GestureDetectionBox` instead, which provides:
+- Visual feedback overlay with swipe indicators
+- Haptic feedback on gesture events
+- Progress-based animations
+- All the functionality of the old modifier plus enhanced UX
 
-**Features**:
-- Uses Compose pointerInput API for gesture detection
-- Tracks drag start position and time
-- Calculates velocity from drag distance and duration
-- Invokes appropriate callback based on detected direction
-- Consumes pointer events to prevent interference with other gestures
+**Previous Features** (for reference):
+- Used Compose pointerInput API for gesture detection
+- Tracked drag start position and time
+- Calculated velocity from drag distance and duration
+- Invoked appropriate callback based on detected direction
+- Consumed pointer events to prevent interference with other gestures
+
+**Replacement Example**:
+```kotlin
+// Old approach (DEPRECATED):
+Box(modifier = Modifier.detectSwipeGestures(
+    callbacks = GestureCallbacks(onSwipeLeft = { ... })
+)) { content() }
+
+// New approach (RECOMMENDED):
+GestureDetectionBox(
+    callbacks = GestureCallbacks(onSwipeLeft = { ... }),
+    showVisualFeedback = true,
+    enableHapticFeedback = true
+) { content() }
+```
 
 ---
 

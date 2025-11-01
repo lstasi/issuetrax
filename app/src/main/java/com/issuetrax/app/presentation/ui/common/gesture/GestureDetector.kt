@@ -1,12 +1,6 @@
 package com.issuetrax.app.presentation.ui.common.gesture
 
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -88,6 +82,8 @@ class GestureDetector(
 
 /**
  * Callbacks for gesture events
+ * 
+ * Used by GestureDetectionBox to handle swipe gestures in PR review navigation.
  */
 data class GestureCallbacks(
     val onSwipeLeft: (() -> Unit)? = null,
@@ -95,76 +91,3 @@ data class GestureCallbacks(
     val onSwipeUp: (() -> Unit)? = null,
     val onSwipeDown: (() -> Unit)? = null
 )
-
-/**
- * Composable modifier that detects swipe gestures for PR review navigation
- * 
- * @param config Gesture detection configuration
- * @param callbacks Gesture event callbacks
- * @param enabled Whether gesture detection is enabled
- */
-@Composable
-fun Modifier.detectSwipeGestures(
-    config: GestureConfig = GestureConfig.Default,
-    callbacks: GestureCallbacks,
-    enabled: Boolean = true
-): Modifier {
-    val density = LocalDensity.current
-    val gestureDetector = remember(config, density) { 
-        GestureDetector(config, density) 
-    }
-    
-    return if (enabled) {
-        this.pointerInput(Unit) {
-            var dragStart = Offset.Zero
-            var dragEnd = Offset.Zero
-            var dragStartTime = 0L
-            
-            detectDragGestures(
-                onDragStart = { offset ->
-                    dragStart = offset
-                    dragStartTime = System.currentTimeMillis()
-                },
-                onDragEnd = {
-                    val dragAmount = dragEnd - dragStart
-                    val dragDuration = (System.currentTimeMillis() - dragStartTime).toFloat() / 1000f
-                    
-                    // Calculate velocity in pixels per second
-                    val velocity = if (dragDuration > 0) {
-                        Offset(
-                            dragAmount.x / dragDuration,
-                            dragAmount.y / dragDuration
-                        )
-                    } else {
-                        Offset.Zero
-                    }
-                    
-                    // Detect swipe direction
-                    gestureDetector.detectSwipe(dragAmount, velocity)?.let { direction ->
-                        when (direction) {
-                            SwipeDirection.LEFT -> callbacks.onSwipeLeft?.invoke()
-                            SwipeDirection.RIGHT -> callbacks.onSwipeRight?.invoke()
-                            SwipeDirection.UP -> callbacks.onSwipeUp?.invoke()
-                            SwipeDirection.DOWN -> callbacks.onSwipeDown?.invoke()
-                        }
-                    }
-                    
-                    // Reset state
-                    dragStart = Offset.Zero
-                    dragEnd = Offset.Zero
-                },
-                onDragCancel = {
-                    // Reset state on cancel
-                    dragStart = Offset.Zero
-                    dragEnd = Offset.Zero
-                },
-                onDrag = { change, dragAmount ->
-                    dragEnd += dragAmount
-                    change.consume()
-                }
-            )
-        }
-    } else {
-        this
-    }
-}
