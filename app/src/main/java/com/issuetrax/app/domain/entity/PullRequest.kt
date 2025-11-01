@@ -23,7 +23,8 @@ data class PullRequest(
     val commits: Int?,
     val headRef: String,
     val baseRef: String,
-    val htmlUrl: String
+    val htmlUrl: String,
+    val commitStatus: CommitStatus? = null
 )
 
 enum class PRState {
