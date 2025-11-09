@@ -1,3 +1,5 @@
+# Workflow to automatically assign new issues to the Copilot agent
+# This ensures all newly created issues are assigned to Copilot for tracking and management
 name: Assign Issue to Copilot
 
 on:
@@ -16,9 +18,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.addAssignees({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              assignees: ['copilot']
-            });
+            try {
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                assignees: ['copilot']
+              });
+              console.log(`Successfully assigned issue #${context.issue.number} to Copilot agent`);
+            } catch (error) {
+              console.error(`Failed to assign issue: ${error.message}`);
+              // Don't fail the workflow if assignment fails (e.g., if copilot user doesn't exist)
+            }
