@@ -189,7 +189,11 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to approve PR: ${response.code()} - ${response.message()}"))
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to approve PR"
+                )
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -213,7 +217,11 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to close PR: ${response.code()} - ${response.message()}"))
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to close PR"
+                )
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -247,7 +255,11 @@ class GitHubRepositoryImpl @Inject constructor(
                     Result.failure(Exception("Failed to merge PR: ${result?.message ?: "Unknown error"}"))
                 }
             } else {
-                Result.failure(Exception("Failed to merge PR: ${response.code()} - ${response.message()}"))
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to merge PR"
+                )
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -400,7 +412,11 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to approve workflow run: ${response.code()} - ${response.message()}"))
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to approve workflow run"
+                )
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
