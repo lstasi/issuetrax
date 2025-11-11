@@ -1,5 +1,9 @@
 name: Docker Build
 
+# This workflow builds Docker containers for the application
+# For PRs from forks or first-time contributors, manual approval is required for security
+# See .github/WORKFLOW_APPROVAL.md for more information
+
 on:
   push:
     branches: [ main, develop ]
