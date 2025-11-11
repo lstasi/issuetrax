@@ -128,6 +128,10 @@ This project follows clean architecture principles and emphasizes:
 - **Performance optimization**: 60fps gesture recognition and smooth animations
 - **Accessibility**: Full support for screen readers and alternative navigation
 
+### Pull Request Workflow
+
+When submitting a pull request, please note that workflows require manual approval for first-time contributors and forks for security reasons. See [.github/WORKFLOW_APPROVAL.md](.github/WORKFLOW_APPROVAL.md) for details on the workflow approval process.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
