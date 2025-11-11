@@ -1,0 +1,117 @@
+name: PR Validation
+
+# This workflow runs automatically on PRs without requiring approval
+# It performs basic validation and provides information about the PR
+# For security, it uses pull_request_target which runs in the context of the base branch
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add PR validation comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const prAuthor = context.payload.pull_request.user.login;
+            const baseBranch = context.payload.pull_request.base.ref;
+            const headBranch = context.payload.pull_request.head.ref;
+            const isDraft = context.payload.pull_request.draft;
+            
+            // Check if this is from a fork
+            const isFork = context.payload.pull_request.head.repo.fork;
+            
+            let message = `## 🤖 PR Validation\n\n`;
+            message += `**Author:** @${prAuthor}\n`;
+            message += `**Branch:** \`${headBranch}\` → \`${baseBranch}\`\n`;
+            message += `**Fork:** ${isFork ? '✅ Yes' : '❌ No'}\n`;
+            message += `**Draft:** ${isDraft ? '✅ Yes' : '❌ No'}\n\n`;
+            
+            if (isFork) {
+              message += `### ⚠️ Workflow Approval Required\n\n`;
+              message += `This PR is from a fork. For security reasons, workflows that build and test code require manual approval from a maintainer before they will run.\n\n`;
+              message += `**Maintainers:** Please review the PR code changes and then approve the workflows in the [Actions tab](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) if they look safe.\n\n`;
+            } else {
+              message += `### ✅ Workflows Running\n\n`;
+              message += `This PR is from the main repository. CI/CD workflows should run automatically.\n\n`;
+            }
+            
+            message += `---\n`;
+            message += `*This is an automated validation check that runs without requiring approval.*`;
+            
+            // Check if we already commented on this PR
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComments = comments.data.filter(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('PR Validation')
+            );
+            
+            if (botComments.length > 0) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComments[0].id,
+                body: message
+              });
+              console.log('Updated existing PR validation comment');
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: message
+              });
+              console.log('Created new PR validation comment');
+            }
+
+      - name: Check PR title format
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const validPrefixes = ['feat:', 'fix:', 'docs:', 'chore:', 'refactor:', 'test:', 'ci:', 'perf:', 'style:', 'build:'];
+            
+            const hasValidPrefix = validPrefixes.some(prefix => prTitle.toLowerCase().startsWith(prefix));
+            
+            if (!hasValidPrefix) {
+              console.log(`⚠️ PR title doesn't follow conventional commit format: "${prTitle}"`);
+              console.log(`Consider using one of: ${validPrefixes.join(', ')}`);
+            } else {
+              console.log(`✅ PR title follows conventional commit format`);
+            }
+
+      - name: Add workflow approval label if needed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isFork = context.payload.pull_request.head.repo.fork;
+            
+            if (isFork) {
+              // Add a label to indicate this PR needs workflow approval
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: ['needs-workflow-approval']
+                });
+                console.log('Added "needs-workflow-approval" label');
+              } catch (error) {
+                console.log('Could not add label (may not exist):', error.message);
+              }
+            }
