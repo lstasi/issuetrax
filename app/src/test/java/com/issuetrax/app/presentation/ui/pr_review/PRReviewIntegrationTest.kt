@@ -57,6 +57,7 @@ class PRReviewIntegrationTest {
     private lateinit var getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
     private lateinit var getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
     private lateinit var approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
+    private lateinit var rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -71,6 +72,7 @@ class PRReviewIntegrationTest {
         getCommitStatusUseCase = mockk()
         getWorkflowRunsUseCase = mockk()
         approveWorkflowRunUseCase = mockk()
+        rerunWorkflowUseCase = mockk()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -80,7 +82,8 @@ class PRReviewIntegrationTest {
             createCommentUseCase,
             getCommitStatusUseCase,
             getWorkflowRunsUseCase,
-            approveWorkflowRunUseCase
+            approveWorkflowRunUseCase,
+            rerunWorkflowUseCase
         )
     }
     
