@@ -45,7 +45,7 @@ import com.issuetrax.app.presentation.ui.common.markdown.MarkdownText
  * - Approve button: Quick approve without detailed review
  * - Comment button: Add a comment starting with @copilot
  * - Close PR button: Close the PR without merging
- * - Run workflow button: Approve workflow runs (for PRs with pending workflows)
+ * - Re-run workflow button: Re-run workflow runs for the PR
  */
 @Composable
 fun PRActionToolbar(
@@ -54,7 +54,7 @@ fun PRActionToolbar(
     onClose: () -> Unit,
     onMerge: (String, String?, String?) -> Unit,
     onComment: (String) -> Unit,
-    onApproveWorkflow: () -> Unit = {},
+    onRerunWorkflow: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showDescription by remember { mutableStateOf(false) }
@@ -99,12 +99,12 @@ fun PRActionToolbar(
             }
         }
         
-        // Approve workflow button - only for open PRs
+        // Re-run workflow button - only for open PRs
         if (pullRequest.state == PRState.OPEN) {
-            IconButton(onClick = onApproveWorkflow) {
+            IconButton(onClick = onRerunWorkflow) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Approve workflow run",
+                    contentDescription = "Re-run workflow",
                     tint = MaterialTheme.colorScheme.secondary
                 )
             }

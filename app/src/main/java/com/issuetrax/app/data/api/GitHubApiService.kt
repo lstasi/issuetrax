@@ -87,6 +87,15 @@ interface GitHubApiService {
         @Body issueRequest: CreateIssueRequest
     ): Response<IssueDto>
     
+    @POST("repos/{owner}/{repo}/issues/{issue_number}/assignees")
+    suspend fun addAssigneesToIssue(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("issue_number") issueNumber: Int,
+        @Body assigneesRequest: AddAssigneesRequest
+    ): Response<IssueDto>
+    
     @POST("repos/{owner}/{repo}/issues/{number}/comments")
     suspend fun createIssueComment(
         @Header("Authorization") authorization: String,
@@ -121,6 +130,29 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("run_id") runId: Long
     ): Response<WorkflowRunApprovalResponseDto>
+    
+    /**
+     * Re-run a workflow run.
+     * This works for any workflow run (not just fork PRs like approve).
+     */
+    @POST("repos/{owner}/{repo}/actions/runs/{run_id}/rerun")
+    suspend fun rerunWorkflowRun(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("run_id") runId: Long
+    ): Response<Unit>
+    
+    /**
+     * Re-run only the failed jobs in a workflow run.
+     */
+    @POST("repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs")
+    suspend fun rerunFailedJobs(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("run_id") runId: Long
+    ): Response<Unit>
     
     /**
      * Mark a draft pull request as ready for review using GitHub GraphQL API.
@@ -176,6 +208,11 @@ data class CreateIssueRequest(
 )
 
 @Serializable
+data class AddAssigneesRequest(
+    val assignees: List<String>
+)
+
+@Serializable
 data class CreateIssueCommentRequest(
     val body: String
 )
@@ -218,7 +255,45 @@ data class GraphQLResponse(
 
 @Serializable
 data class GraphQLData(
-    val markPullRequestReadyForReview: MarkPullRequestReadyForReviewPayload? = null
+    val markPullRequestReadyForReview: MarkPullRequestReadyForReviewPayload? = null,
+    val repository: GraphQLRepository? = null,
+    val replaceActorsForAssignable: ReplaceActorsPayload? = null
+)
+
+@Serializable
+data class GraphQLRepository(
+    val id: String? = null,
+    val issue: GraphQLIssue? = null,
+    val suggestedActors: SuggestedActorsConnection? = null
+)
+
+@Serializable
+data class GraphQLIssue(
+    val id: String,
+    val title: String? = null
+)
+
+@Serializable
+data class SuggestedActorsConnection(
+    val nodes: List<SuggestedActor>? = null
+)
+
+@Serializable
+data class SuggestedActor(
+    val login: String,
+    val id: String,
+    @Suppress("PropertyName")
+    val __typename: String? = null
+)
+
+@Serializable
+data class ReplaceActorsPayload(
+    val assignable: AssignablePayload? = null
+)
+
+@Serializable
+data class AssignablePayload(
+    val id: String? = null
 )
 
 @Serializable

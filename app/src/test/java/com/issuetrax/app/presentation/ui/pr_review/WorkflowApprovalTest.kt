@@ -73,7 +73,7 @@ class WorkflowApprovalTest {
     }
     
     @Test
-    fun `loadWorkflowRuns updates state with workflow runs`() = runTest {
+    fun `loadWorkflowRuns updates state with all workflow runs`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
@@ -85,21 +85,75 @@ class WorkflowApprovalTest {
                 conclusion = null,
                 headSha = "abc123",
                 htmlUrl = "https://github.com/owner/repo/actions/runs/123456"
+            ),
+            WorkflowRun(
+                id = 789012L,
+                name = "Tests",
+                status = "completed",
+                conclusion = "success",
+                headSha = "abc123",
+                htmlUrl = "https://github.com/owner/repo/actions/runs/789012"
             )
         )
         
+        // No status filter - get all workflow runs for pull_request
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(mockWorkflowRuns)
         
         // When
         viewModel.loadWorkflowRuns(owner, repo)
         advanceUntilIdle()
         
-        // Then
+        // Then - all runs should be stored (no filtering)
         val state = viewModel.uiState.value
-        assertEquals(mockWorkflowRuns, state.workflowRuns)
-        coVerify { getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") }
+        assertEquals(2, state.workflowRuns.size)
+        coVerify { getWorkflowRunsUseCase(owner, repo, "pull_request", null) }
+    }
+    
+    @Test
+    fun `approveWorkflowRun prioritizes waiting status`() = runTest {
+        // Given
+        val owner = "testOwner"
+        val repo = "testRepo"
+        val mockWorkflowRuns = listOf(
+            WorkflowRun(
+                id = 1L,
+                name = "CI",
+                status = "completed",
+                conclusion = "success",
+                headSha = "abc123",
+                htmlUrl = "https://github.com/owner/repo/actions/runs/1"
+            ),
+            WorkflowRun(
+                id = 2L,
+                name = "Deploy",
+                status = "waiting",
+                conclusion = null,
+                headSha = "abc123",
+                htmlUrl = "https://github.com/owner/repo/actions/runs/2"
+            ),
+            WorkflowRun(
+                id = 3L,
+                name = "Build",
+                status = "action_required",
+                conclusion = null,
+                headSha = "abc123",
+                htmlUrl = "https://github.com/owner/repo/actions/runs/3"
+            )
+        )
+        
+        coEvery { 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
+        } returns Result.success(mockWorkflowRuns)
+        
+        // When
+        viewModel.loadWorkflowRuns(owner, repo)
+        advanceUntilIdle()
+        
+        // Then - all runs should be stored
+        val state = viewModel.uiState.value
+        assertEquals(3, state.workflowRuns.size)
     }
     
     @Test
@@ -109,7 +163,7 @@ class WorkflowApprovalTest {
         val repo = "testRepo"
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(emptyList())
         
         // When
@@ -128,7 +182,7 @@ class WorkflowApprovalTest {
         val repo = "testRepo"
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.failure(Exception("Network error"))
         
         // When
@@ -142,7 +196,7 @@ class WorkflowApprovalTest {
     }
     
     @Test
-    fun `approveWorkflowRun approves first waiting run`() = runTest {
+    fun `approveWorkflowRun approves waiting run with highest priority`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
@@ -154,15 +208,18 @@ class WorkflowApprovalTest {
             headSha = "abc123",
             htmlUrl = "https://github.com/owner/repo/actions/runs/123456"
         )
-        
-        // Set initial state with workflow runs
-        viewModel.uiState.value.let { state ->
-            viewModel.loadWorkflowRuns(owner, repo)
-        }
+        val actionRequiredRun = WorkflowRun(
+            id = 789012L,
+            name = "Deploy",
+            status = "action_required",
+            conclusion = null,
+            headSha = "abc123",
+            htmlUrl = "https://github.com/owner/repo/actions/runs/789012"
+        )
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
-        } returns Result.success(listOf(waitingRun))
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
+        } returns Result.success(listOf(actionRequiredRun, waitingRun))
         
         coEvery { 
             approveWorkflowRunUseCase(owner, repo, 123456L) 
@@ -172,40 +229,76 @@ class WorkflowApprovalTest {
         viewModel.loadWorkflowRuns(owner, repo)
         advanceUntilIdle()
         
-        // When
+        // When - should approve the "waiting" run (highest priority)
         viewModel.approveWorkflowRun(owner, repo)
         advanceUntilIdle()
         
         // Then
         val state = viewModel.uiState.value
-        assertEquals("Workflow run approved successfully", state.actionMessage)
+        assertEquals("Workflow run 'CI' approved successfully", state.actionMessage)
         coVerify { approveWorkflowRunUseCase(owner, repo, 123456L) }
     }
     
     @Test
-    fun `approveWorkflowRun shows message when no waiting runs`() = runTest {
+    fun `approveWorkflowRun falls back to any run when no priority status`() = runTest {
+        // Given
+        val owner = "testOwner"
+        val repo = "testRepo"
+        val completedRun = WorkflowRun(
+            id = 789012L,
+            name = "Tests",
+            status = "completed",
+            conclusion = "success",
+            headSha = "abc123",
+            htmlUrl = "https://github.com/owner/repo/actions/runs/789012"
+        )
+        
+        coEvery { 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
+        } returns Result.success(listOf(completedRun))
+        
+        coEvery { 
+            approveWorkflowRunUseCase(owner, repo, 789012L) 
+        } returns Result.success(Unit)
+        
+        // Load workflow runs first
+        viewModel.loadWorkflowRuns(owner, repo)
+        advanceUntilIdle()
+        
+        // When - no priority status, falls back to first run
+        viewModel.approveWorkflowRun(owner, repo)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertEquals("Workflow run 'Tests' approved successfully", state.actionMessage)
+        coVerify { approveWorkflowRunUseCase(owner, repo, 789012L) }
+    }
+    
+    @Test
+    fun `approveWorkflowRun shows message when no runs exist`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(emptyList())
         
         viewModel.loadWorkflowRuns(owner, repo)
         advanceUntilIdle()
         
-        // When
+        // When - no workflow runs at all
         viewModel.approveWorkflowRun(owner, repo)
         advanceUntilIdle()
         
         // Then
         val state = viewModel.uiState.value
-        assertEquals("No workflow runs require approval", state.actionMessage)
+        assertEquals("No workflow runs found", state.actionMessage)
     }
     
     @Test
-    fun `approveWorkflowRun handles approval failure`() = runTest {
+    fun `approveWorkflowRun handles approval failure with run name`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
@@ -220,7 +313,7 @@ class WorkflowApprovalTest {
         val errorMessage = "Permission denied"
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(listOf(waitingRun))
         
         coEvery { 
@@ -255,7 +348,7 @@ class WorkflowApprovalTest {
         )
         
         coEvery { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(listOf(waitingRun)) andThen Result.success(emptyList())
         
         coEvery { 
@@ -269,9 +362,9 @@ class WorkflowApprovalTest {
         viewModel.approveWorkflowRun(owner, repo)
         advanceUntilIdle()
         
-        // Then
+        // Then - verify workflow runs were loaded twice (initial + after approval)
         coVerify(exactly = 2) { 
-            getWorkflowRunsUseCase(owner, repo, "pull_request", "waiting") 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         }
     }
 }

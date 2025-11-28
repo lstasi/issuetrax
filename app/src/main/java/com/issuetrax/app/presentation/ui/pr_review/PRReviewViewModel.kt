@@ -34,7 +34,8 @@ class PRReviewViewModel @Inject constructor(
     private val createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase,
     private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase,
     private val getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase,
-    private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
+    private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase,
+    private val rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -288,13 +289,16 @@ class PRReviewViewModel @Inject constructor(
     
     /**
      * Loads workflow runs for the repository.
+     * Stores all workflow runs to allow re-run or approval actions.
      */
     fun loadWorkflowRuns(owner: String, repo: String) {
         viewModelScope.launch {
-            val result = getWorkflowRunsUseCase(owner, repo, event = "pull_request", status = "waiting")
+            // Fetch recent workflow runs for pull requests
+            val result = getWorkflowRunsUseCase(owner, repo, event = "pull_request", status = null)
             if (result.isSuccess) {
+                val allRuns = result.getOrNull() ?: emptyList()
                 _uiState.value = _uiState.value.copy(
-                    workflowRuns = result.getOrNull() ?: emptyList()
+                    workflowRuns = allRuns
                 )
             }
             // Silently fail - workflow runs are optional information
@@ -302,17 +306,77 @@ class PRReviewViewModel @Inject constructor(
     }
     
     /**
-     * Approves a workflow run that requires manual approval.
+     * Re-runs a workflow. This is the primary action for workflows since
+     * "approve" only works for fork PRs from first-time contributors.
+     * 
+     * Priority for selecting which run to re-run:
+     * 1. "failure" status - re-run failed workflows first
+     * 2. "cancelled" status
+     * 3. "action_required" status
+     * 4. Any other run (most recent first)
+     * 
+     * @param failedOnly If true, only re-run failed jobs; if false, re-run all jobs
+     */
+    fun rerunWorkflow(owner: String, repo: String, failedOnly: Boolean = false) {
+        viewModelScope.launch {
+            val workflowRuns = _uiState.value.workflowRuns
+            
+            if (workflowRuns.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    actionMessage = "No workflow runs found"
+                )
+                return@launch
+            }
+            
+            // Find a workflow run to re-run with priority
+            // Priority: failure > cancelled > action_required > any other
+            val runToRerun = workflowRuns.firstOrNull { it.conclusion == "failure" }
+                ?: workflowRuns.firstOrNull { it.conclusion == "cancelled" }
+                ?: workflowRuns.firstOrNull { it.status == "action_required" }
+                ?: workflowRuns.first() // Fall back to most recent run
+            
+            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+            
+            val result = rerunWorkflowUseCase(owner, repo, runToRerun.id, failedOnly)
+            if (result.isSuccess) {
+                val action = if (failedOnly) "Failed jobs re-run" else "Re-run"
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    actionMessage = "$action started for '${runToRerun.name}'"
+                )
+                // Reload workflow runs to update status
+                loadWorkflowRuns(owner, repo)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingReview = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to re-run workflow '${runToRerun.name}'"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Attempts to approve a workflow run (only works for fork PRs).
+     * For non-fork PRs, use rerunWorkflow() instead.
      */
     fun approveWorkflowRun(owner: String, repo: String) {
         viewModelScope.launch {
-            // Find the first waiting workflow run
             val workflowRuns = _uiState.value.workflowRuns
+            
+            if (workflowRuns.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    actionMessage = "No workflow runs found"
+                )
+                return@launch
+            }
+            
+            // Only "waiting" status workflows can be approved (fork PRs)
             val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
             
             if (waitingRun == null) {
+                // No waiting runs - suggest re-run instead
                 _uiState.value = _uiState.value.copy(
-                    actionMessage = "No workflow runs require approval"
+                    actionMessage = "No workflows need approval. Use re-run for non-fork PRs."
                 )
                 return@launch
             }
@@ -323,14 +387,13 @@ class PRReviewViewModel @Inject constructor(
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     isSubmittingReview = false,
-                    actionMessage = "Workflow run approved successfully"
+                    actionMessage = "Workflow '${waitingRun.name}' approved successfully"
                 )
-                // Reload workflow runs to update status
                 loadWorkflowRuns(owner, repo)
             } else {
                 _uiState.value = _uiState.value.copy(
                     isSubmittingReview = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to approve workflow run"
+                    error = result.exceptionOrNull()?.message ?: "Failed to approve workflow"
                 )
             }
         }

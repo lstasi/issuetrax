@@ -89,7 +89,29 @@ interface GitHubRepository {
         status: String? = null
     ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
     
+    /**
+     * Approves a workflow run from a fork PR by a first-time contributor.
+     * Note: This only works for fork pull requests, not same-repo PRs.
+     */
     suspend fun approveWorkflowRun(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit>
+    
+    /**
+     * Re-runs a workflow run. Works for any workflow run.
+     */
+    suspend fun rerunWorkflowRun(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit>
+    
+    /**
+     * Re-runs only the failed jobs in a workflow run.
+     */
+    suspend fun rerunFailedJobs(
         owner: String,
         repo: String,
         runId: Long

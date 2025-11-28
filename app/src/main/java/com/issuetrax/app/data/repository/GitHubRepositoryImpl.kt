@@ -277,19 +277,27 @@ class GitHubRepositoryImpl @Inject constructor(
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
             
+            // Create issue without assignees first
             val request = CreateIssueRequest(
                 title = title,
                 body = body,
-                assignees = assignees
+                assignees = emptyList()
             )
             
-            Log.d(TAG, "Creating issue in $owner/$repo with title: '$title', assignees: $assignees")
+            Log.d(TAG, "Creating issue in $owner/$repo with title: '$title'")
             
             val response = apiService.createIssue("Bearer $token", owner, repo, request)
             if (response.isSuccessful) {
                 val issueDto = response.body()
                 if (issueDto != null) {
                     Log.d(TAG, "Issue created successfully: #${issueDto.number}")
+                    
+                    // If Copilot is in assignees, use GraphQL API to assign
+                    if (assignees.any { it.equals("Copilot", ignoreCase = true) }) {
+                        Log.d(TAG, "Attempting to assign Copilot to issue #${issueDto.number} via GraphQL")
+                        assignCopilotToIssue(token, owner, repo, issueDto.number)
+                    }
+                    
                     Result.success(issueDto.toDomain())
                 } else {
                     val error = "Failed to create issue: response body is null"
@@ -304,6 +312,114 @@ class GitHubRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Exception while creating issue", e)
             Result.failure(e)
+        }
+    }
+    
+    /**
+     * Assigns Copilot coding agent to an issue using GitHub GraphQL API.
+     * This is required because Copilot cannot be assigned via the REST API.
+     */
+    private suspend fun assignCopilotToIssue(
+        token: String,
+        owner: String,
+        repo: String,
+        issueNumber: Int
+    ) {
+        try {
+            // Step 1: Get the Copilot bot ID from suggested actors
+            val suggestedActorsQuery = """
+                query {
+                    repository(owner: "$owner", name: "$repo") {
+                        suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
+                            nodes {
+                                login
+                                __typename
+                                ... on Bot { id }
+                                ... on User { id }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+            
+            val actorsRequest = com.issuetrax.app.data.api.GraphQLRequest(query = suggestedActorsQuery)
+            val actorsResponse = apiService.markPrReadyForReview("Bearer $token", actorsRequest)
+            
+            if (!actorsResponse.isSuccessful) {
+                Log.w(TAG, "Failed to get suggested actors: ${actorsResponse.code()}")
+                return
+            }
+            
+            val actorsData = actorsResponse.body()
+            val copilotBot = actorsData?.data?.repository?.suggestedActors?.nodes
+                ?.find { it.login == "copilot-swe-agent" }
+            
+            if (copilotBot == null) {
+                Log.w(TAG, "Copilot coding agent not available for this repository")
+                return
+            }
+            
+            val botId = copilotBot.id
+            Log.d(TAG, "Found Copilot bot ID: $botId")
+            
+            // Step 2: Get the issue's GraphQL ID
+            val issueQuery = """
+                query {
+                    repository(owner: "$owner", name: "$repo") {
+                        issue(number: $issueNumber) {
+                            id
+                            title
+                        }
+                    }
+                }
+            """.trimIndent()
+            
+            val issueRequest = com.issuetrax.app.data.api.GraphQLRequest(query = issueQuery)
+            val issueResponse = apiService.markPrReadyForReview("Bearer $token", issueRequest)
+            
+            if (!issueResponse.isSuccessful) {
+                Log.w(TAG, "Failed to get issue ID: ${issueResponse.code()}")
+                return
+            }
+            
+            val issueData = issueResponse.body()
+            val issueId = issueData?.data?.repository?.issue?.id
+            
+            if (issueId == null) {
+                Log.w(TAG, "Could not get issue GraphQL ID")
+                return
+            }
+            
+            Log.d(TAG, "Found issue GraphQL ID: $issueId")
+            
+            // Step 3: Assign Copilot to the issue
+            val assignMutation = """
+                mutation {
+                    replaceActorsForAssignable(input: {assignableId: "$issueId", actorIds: ["$botId"]}) {
+                        assignable {
+                            ... on Issue {
+                                id
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+            
+            val assignRequest = com.issuetrax.app.data.api.GraphQLRequest(query = assignMutation)
+            val assignResponse = apiService.markPrReadyForReview("Bearer $token", assignRequest)
+            
+            if (assignResponse.isSuccessful) {
+                val assignData = assignResponse.body()
+                if (assignData?.errors.isNullOrEmpty()) {
+                    Log.d(TAG, "Successfully assigned Copilot to issue #$issueNumber")
+                } else {
+                    Log.w(TAG, "GraphQL errors assigning Copilot: ${assignData?.errors?.map { it.message }}")
+                }
+            } else {
+                Log.w(TAG, "Failed to assign Copilot: ${assignResponse.code()}")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Exception while assigning Copilot to issue", e)
         }
     }
     
@@ -415,6 +531,66 @@ class GitHubRepositoryImpl @Inject constructor(
                 val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to approve workflow run"
+                )
+                Result.failure(Exception(errorMessage))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun rerunWorkflowRun(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.rerunWorkflowRun(
+                authorization = "Bearer $token",
+                owner = owner,
+                repo = repo,
+                runId = runId
+            )
+            
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to re-run workflow"
+                )
+                Result.failure(Exception(errorMessage))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun rerunFailedJobs(
+        owner: String,
+        repo: String,
+        runId: Long
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.rerunFailedJobs(
+                authorization = "Bearer $token",
+                owner = owner,
+                repo = repo,
+                runId = runId
+            )
+            
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to re-run failed jobs"
                 )
                 Result.failure(Exception(errorMessage))
             }

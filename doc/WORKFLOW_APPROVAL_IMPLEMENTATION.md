@@ -73,34 +73,42 @@ data class WorkflowRun(
 ## User Flow
 
 1. User navigates to a PR review screen
-2. App automatically loads workflow runs that require approval
-3. User sees the "Play" icon button in the toolbar (for open PRs only)
-4. User taps the button to approve the first waiting workflow run
-5. App displays success message via snackbar
-6. Workflow runs are automatically reloaded to reflect the new state
+2. App automatically loads workflow runs for the repository
+3. App filters runs to show only those needing approval (status: `waiting`, `action_required`, or `pending`)
+4. User sees the "Play" icon button in the toolbar (for open PRs only)
+5. User taps the button to approve the first workflow run needing approval
+6. App displays success message via snackbar
+7. Workflow runs are automatically reloaded to reflect the new state
 
 ## API Usage
 
 ### Get Workflow Runs
 ```
-GET /repos/{owner}/{repo}/actions/runs?event=pull_request&status=waiting
+GET /repos/{owner}/{repo}/actions/runs?event=pull_request
 ```
 
 Response includes:
 - List of workflow runs
 - Each run has: id, name, status, conclusion, head_sha, html_url
 
+The app locally filters for runs with these statuses that need approval:
+- `waiting` - Waiting for first-time contributor approval (highest priority)
+- `action_required` - Requires manual intervention
+- `pending` - Pending approval
+
 ### Approve Workflow Run
 ```
 POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
 ```
+
+Note: This endpoint specifically approves workflow runs from **fork pull requests by first-time contributors**.
 
 Returns:
 - Status and required approval count
 
 ## Error Handling
 
-- **No waiting runs**: Shows message "No workflow runs require approval"
+- **No runs need approval**: Shows message "No workflow runs require approval"
 - **API failure**: Shows error message with details
 - **Network error**: Displays appropriate error in UI
 - **Silent failures**: Loading workflow runs fails silently (optional data)
@@ -113,10 +121,11 @@ Returns:
 - `ApproveWorkflowRunUseCaseTest` (3 tests)
 - `GetWorkflowRunsUseCaseTest` (4 tests)
 
-**ViewModel Tests** (8 tests)
-- `WorkflowApprovalTest` (8 scenarios)
-  - Loading workflow runs
-  - Approving workflow runs
+**ViewModel Tests** (9 tests)
+- `WorkflowApprovalTest` (9 scenarios)
+  - Loading workflow runs with filtering
+  - Filtering for multiple approval statuses
+  - Approving workflow runs with priority
   - Handling errors
   - Edge cases (empty lists, no waiting runs)
 
