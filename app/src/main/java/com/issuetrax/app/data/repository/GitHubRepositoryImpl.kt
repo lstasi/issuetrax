@@ -423,6 +423,76 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
+    override suspend fun markPrReadyForReview(
+        owner: String,
+        repo: String,
+        prNumber: Int
+    ): Result<Unit> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            // First, get the PR to obtain its node_id (required for GraphQL)
+            val prResponse = apiService.getPullRequest("Bearer $token", owner, repo, prNumber)
+            if (!prResponse.isSuccessful) {
+                return Result.failure(Exception("Failed to get PR details: ${prResponse.code()}"))
+            }
+            
+            val prDto = prResponse.body()
+                ?: return Result.failure(Exception("PR response body is null"))
+            
+            if (prDto.draft != true) {
+                // PR is not a draft, no action needed
+                return Result.success(Unit)
+            }
+            
+            val nodeId = prDto.nodeId
+            
+            // Use GraphQL mutation to mark as ready for review
+            val mutation = """
+                mutation MarkReadyForReview(${'$'}pullRequestId: ID!) {
+                    markPullRequestReadyForReview(input: {pullRequestId: ${'$'}pullRequestId}) {
+                        pullRequest {
+                            id
+                            isDraft
+                        }
+                    }
+                }
+            """.trimIndent()
+            
+            val request = com.issuetrax.app.data.api.GraphQLRequest(
+                query = mutation,
+                variables = mapOf("pullRequestId" to nodeId)
+            )
+            
+            val response = apiService.markPrReadyForReview("Bearer $token", request)
+            
+            if (response.isSuccessful) {
+                val graphqlResponse = response.body()
+                val errors = graphqlResponse?.errors
+                if (!errors.isNullOrEmpty()) {
+                    val errorMessages = errors.joinToString(", ") { it.message }
+                    return Result.failure(Exception("GraphQL error: $errorMessages"))
+                }
+                
+                val payload = graphqlResponse?.data?.markPullRequestReadyForReview
+                if (payload?.pullRequest?.isDraft == false) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("Failed to mark PR as ready for review"))
+                }
+            } else {
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to mark PR as ready for review"
+                )
+                Result.failure(Exception(errorMessage))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     private fun String.toCommitState(): com.issuetrax.app.domain.entity.CommitState {
         return when (this.lowercase()) {
             "pending" -> com.issuetrax.app.domain.entity.CommitState.PENDING

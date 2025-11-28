@@ -94,6 +94,21 @@ interface GitHubRepository {
         repo: String,
         runId: Long
     ): Result<Unit>
+    
+    /**
+     * Marks a draft pull request as ready for review.
+     * This is required before merging a draft PR.
+     * 
+     * @param owner Repository owner
+     * @param repo Repository name
+     * @param prNumber Pull request number
+     * @return Result with Unit on success or error
+     */
+    suspend fun markPrReadyForReview(
+        owner: String,
+        repo: String,
+        prNumber: Int
+    ): Result<Unit>
 }
 
 data class ReviewComment(

@@ -121,6 +121,16 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("run_id") runId: Long
     ): Response<WorkflowRunApprovalResponseDto>
+    
+    /**
+     * Mark a draft pull request as ready for review using GitHub GraphQL API.
+     * This is required because GitHub REST API doesn't support this operation directly.
+     */
+    @POST("graphql")
+    suspend fun markPrReadyForReview(
+        @Header("Authorization") authorization: String,
+        @Body request: GraphQLRequest
+    ): Response<GraphQLResponse>
 }
 
 @Serializable
@@ -192,4 +202,38 @@ data class StatusDto(
     val context: String,
     val description: String?,
     val target_url: String?
+)
+
+@Serializable
+data class GraphQLRequest(
+    val query: String,
+    val variables: Map<String, String> = emptyMap()
+)
+
+@Serializable
+data class GraphQLResponse(
+    val data: GraphQLData? = null,
+    val errors: List<GraphQLError>? = null
+)
+
+@Serializable
+data class GraphQLData(
+    val markPullRequestReadyForReview: MarkPullRequestReadyForReviewPayload? = null
+)
+
+@Serializable
+data class MarkPullRequestReadyForReviewPayload(
+    val pullRequest: GraphQLPullRequest? = null
+)
+
+@Serializable
+data class GraphQLPullRequest(
+    val id: String,
+    val isDraft: Boolean
+)
+
+@Serializable
+data class GraphQLError(
+    val message: String,
+    val type: String? = null
 )

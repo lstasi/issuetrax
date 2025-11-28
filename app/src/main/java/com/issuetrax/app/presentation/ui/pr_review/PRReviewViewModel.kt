@@ -206,6 +206,7 @@ class PRReviewViewModel @Inject constructor(
     
     /**
      * Merges the pull request.
+     * If the PR is a draft, it will first be marked as ready for review.
      */
     fun mergePullRequest(
         owner: String,
@@ -218,7 +219,18 @@ class PRReviewViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
             
-            val result = mergePullRequestUseCase(owner, repo, prNumber, commitTitle, commitMessage, mergeMethod)
+            // Check if PR is a draft
+            val isDraft = _uiState.value.pullRequest?.draft == true
+            
+            val result = mergePullRequestUseCase(
+                owner = owner,
+                repo = repo,
+                prNumber = prNumber,
+                commitTitle = commitTitle,
+                commitMessage = commitMessage,
+                mergeMethod = mergeMethod,
+                isDraft = isDraft
+            )
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     isSubmittingReview = false,

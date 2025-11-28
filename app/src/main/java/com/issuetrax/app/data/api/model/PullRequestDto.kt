@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PullRequestDto(
     val id: Long,
+    @SerialName("node_id") val nodeId: String,
     val number: Int,
     val title: String,
     val body: String?,
