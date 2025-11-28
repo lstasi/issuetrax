@@ -40,6 +40,7 @@ class WorkflowApprovalTest {
     private lateinit var getCommitStatusUseCase: GetCommitStatusUseCase
     private lateinit var getWorkflowRunsUseCase: GetWorkflowRunsUseCase
     private lateinit var approveWorkflowRunUseCase: ApproveWorkflowRunUseCase
+    private lateinit var rerunWorkflowUseCase: RerunWorkflowUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -54,6 +55,7 @@ class WorkflowApprovalTest {
         getCommitStatusUseCase = mockk()
         getWorkflowRunsUseCase = mockk()
         approveWorkflowRunUseCase = mockk()
+        rerunWorkflowUseCase = mockk()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -63,7 +65,8 @@ class WorkflowApprovalTest {
             createCommentUseCase,
             getCommitStatusUseCase,
             getWorkflowRunsUseCase,
-            approveWorkflowRunUseCase
+            approveWorkflowRunUseCase,
+            rerunWorkflowUseCase
         )
     }
     
@@ -235,12 +238,12 @@ class WorkflowApprovalTest {
         
         // Then
         val state = viewModel.uiState.value
-        assertEquals("Workflow run 'CI' approved successfully", state.actionMessage)
+        assertEquals("Workflow 'CI' approved successfully", state.actionMessage)
         coVerify { approveWorkflowRunUseCase(owner, repo, 123456L) }
     }
     
     @Test
-    fun `approveWorkflowRun falls back to any run when no priority status`() = runTest {
+    fun `approveWorkflowRun suggests rerun when no waiting runs exist`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
@@ -257,22 +260,17 @@ class WorkflowApprovalTest {
             getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         } returns Result.success(listOf(completedRun))
         
-        coEvery { 
-            approveWorkflowRunUseCase(owner, repo, 789012L) 
-        } returns Result.success(Unit)
-        
         // Load workflow runs first
         viewModel.loadWorkflowRuns(owner, repo)
         advanceUntilIdle()
         
-        // When - no priority status, falls back to first run
+        // When - no waiting runs, suggests rerun instead
         viewModel.approveWorkflowRun(owner, repo)
         advanceUntilIdle()
         
-        // Then
+        // Then - should suggest using re-run for non-fork PRs
         val state = viewModel.uiState.value
-        assertEquals("Workflow run 'Tests' approved successfully", state.actionMessage)
-        coVerify { approveWorkflowRunUseCase(owner, repo, 789012L) }
+        assertEquals("No workflows need approval. Use re-run for non-fork PRs.", state.actionMessage)
     }
     
     @Test
