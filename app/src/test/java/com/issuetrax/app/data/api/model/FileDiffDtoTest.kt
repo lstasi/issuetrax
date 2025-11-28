@@ -174,4 +174,73 @@ class FileDiffDtoTest {
         assertEquals("file2.kt", fileDiffs[1].filename)
         assertEquals("old_file2.kt", fileDiffs[1].previousFilename)
     }
+
+    @Test
+    fun `deserialize file without patch field should default to null`() {
+        // Given - JSON without patch field (binary file or large file)
+        val jsonString = """
+            {
+                "filename": "image.png",
+                "status": "added",
+                "additions": 0,
+                "deletions": 0,
+                "changes": 0,
+                "blob_url": "https://github.com/test/test/blob/abc123/image.png",
+                "raw_url": "https://github.com/test/test/raw/abc123/image.png"
+            }
+        """.trimIndent()
+
+        // When
+        val fileDiff = json.decodeFromString<FileDiffDto>(jsonString)
+
+        // Then
+        assertEquals("image.png", fileDiff.filename)
+        assertEquals("added", fileDiff.status)
+        assertEquals(0, fileDiff.additions)
+        assertEquals(0, fileDiff.deletions)
+        assertEquals(0, fileDiff.changes)
+        assertNull("patch should be null when not present in JSON (e.g., for binary files)", fileDiff.patch)
+    }
+
+    @Test
+    fun `deserialize file array with missing patch field should handle gracefully`() {
+        // Given - Array with mixed files (some with patch, some without)
+        val jsonString = """
+            [
+                {
+                    "filename": "src/main.kt",
+                    "status": "modified",
+                    "additions": 10,
+                    "deletions": 5,
+                    "changes": 15,
+                    "patch": "@@ -1,3 +1,3 @@\n",
+                    "blob_url": "https://github.com/test/test/blob/abc/src/main.kt",
+                    "raw_url": "https://github.com/test/test/raw/abc/src/main.kt"
+                },
+                {
+                    "filename": "assets/logo.png",
+                    "status": "added",
+                    "additions": 0,
+                    "deletions": 0,
+                    "changes": 0,
+                    "blob_url": "https://github.com/test/test/blob/abc/assets/logo.png",
+                    "raw_url": "https://github.com/test/test/raw/abc/assets/logo.png"
+                }
+            ]
+        """.trimIndent()
+
+        // When
+        val fileDiffs = json.decodeFromString<List<FileDiffDto>>(jsonString)
+
+        // Then
+        assertEquals(2, fileDiffs.size)
+        
+        // First file with patch
+        assertEquals("src/main.kt", fileDiffs[0].filename)
+        assertEquals("@@ -1,3 +1,3 @@\n", fileDiffs[0].patch)
+        
+        // Second file without patch
+        assertEquals("assets/logo.png", fileDiffs[1].filename)
+        assertNull("Binary file should have null patch", fileDiffs[1].patch)
+    }
 }

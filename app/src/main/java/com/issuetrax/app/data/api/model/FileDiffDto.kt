@@ -10,8 +10,8 @@ data class FileDiffDto(
     val additions: Int,
     val deletions: Int,
     val changes: Int,
-    val patch: String?,
-    @SerialName("blob_url") val blobUrl: String?,
-    @SerialName("raw_url") val rawUrl: String?,
+    val patch: String? = null,
+    @SerialName("blob_url") val blobUrl: String? = null,
+    @SerialName("raw_url") val rawUrl: String? = null,
     @SerialName("previous_filename") val previousFilename: String? = null
 )
