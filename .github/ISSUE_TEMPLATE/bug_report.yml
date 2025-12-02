@@ -36,9 +36,9 @@ body:
       label: Version
       description: What version of the app are you running?
       options:
-        - Latest (default branch)
-        - v0.1.19
-        - Other
+        - Latest (main branch)
+        - v0.1.x (latest release)
+        - Older version
     validations:
       required: true
   - type: textarea
