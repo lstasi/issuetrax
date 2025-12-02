@@ -1,2 +1,5 @@
+# GitHub Issue Template Configuration
+# Enables blank issues in addition to template-based issues
 blank_issues_enabled: true
+# No external contact links for issue creation
 contact_links: []
