@@ -19,6 +19,21 @@ jobs:
         with:
           script: |
             try {
+              // Get the issue to check current assignees
+              const issue = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+              });
+              
+              // Check if copilot is already assigned
+              const assignees = issue.data.assignees.map(a => a.login);
+              if (assignees.includes('copilot')) {
+                console.log(`Issue #${context.issue.number} is already assigned to Copilot agent`);
+                return;
+              }
+              
+              // Assign to copilot
               await github.rest.issues.addAssignees({
                 owner: context.repo.owner,
                 repo: context.repo.repo,

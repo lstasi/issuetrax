@@ -1,0 +1,46 @@
+name: TODO / Task
+description: Create a TODO item or task for tracking
+title: "[TODO]: "
+labels: ["todo"]
+assignees:
+  - copilot
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create a TODO item or task to track work.
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Describe the task or TODO item
+      placeholder: What needs to be done?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be done for this task to be considered complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: What is the priority of this task?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any additional context or information
+      placeholder: Additional information...
