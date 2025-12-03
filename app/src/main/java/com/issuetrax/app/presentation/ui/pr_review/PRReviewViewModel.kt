@@ -289,7 +289,7 @@ class PRReviewViewModel @Inject constructor(
     
     /**
      * Loads workflow runs for the repository.
-     * Stores all workflow runs to allow re-run or approval actions.
+     * Stores all workflow runs to allow approval or re-run actions.
      */
     fun loadWorkflowRuns(owner: String, repo: String) {
         viewModelScope.launch {
@@ -306,18 +306,18 @@ class PRReviewViewModel @Inject constructor(
     }
     
     /**
-     * Re-runs a workflow. This is the primary action for workflows since
-     * "approve" only works for fork PRs from first-time contributors.
+     * Smart workflow action that handles both approval and re-run.
      * 
-     * Priority for selecting which run to re-run:
-     * 1. "failure" status - re-run failed workflows first
-     * 2. "cancelled" status
-     * 3. "action_required" status
-     * 4. Any other run (most recent first)
+     * For PRs from forks, first-time contributors, or bots (like Copilot),
+     * workflows enter a "waiting" state and need approval via the /approve endpoint.
      * 
-     * @param failedOnly If true, only re-run failed jobs; if false, re-run all jobs
+     * For other workflows (already completed, failed, etc.), this will re-run them.
+     * 
+     * Priority:
+     * 1. If any workflow has status="waiting" -> Approve it (this is the "Approve and run" case)
+     * 2. Otherwise, re-run the most relevant workflow (failed > cancelled > most recent)
      */
-    fun rerunWorkflow(owner: String, repo: String, failedOnly: Boolean = false) {
+    fun triggerWorkflowAction(owner: String, repo: String) {
         viewModelScope.launch {
             val workflowRuns = _uiState.value.workflowRuns
             
@@ -328,74 +328,73 @@ class PRReviewViewModel @Inject constructor(
                 return@launch
             }
             
-            // Find a workflow run to re-run with priority
-            // Priority: failure > cancelled > action_required > any other
-            val runToRerun = workflowRuns.firstOrNull { it.conclusion == "failure" }
-                ?: workflowRuns.firstOrNull { it.conclusion == "cancelled" }
-                ?: workflowRuns.firstOrNull { it.status == "action_required" }
-                ?: workflowRuns.first() // Fall back to most recent run
+            // First, check for workflows that need approval (status = "waiting")
+            val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
             
-            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
-            
-            val result = rerunWorkflowUseCase(owner, repo, runToRerun.id, failedOnly)
-            if (result.isSuccess) {
-                val action = if (failedOnly) "Failed jobs re-run" else "Re-run"
-                _uiState.value = _uiState.value.copy(
-                    isSubmittingReview = false,
-                    actionMessage = "$action started for '${runToRerun.name}'"
-                )
-                // Reload workflow runs to update status
-                loadWorkflowRuns(owner, repo)
+            if (waitingRun != null) {
+                // Approve the waiting workflow
+                approveWorkflowRun(owner, repo, waitingRun)
             } else {
-                _uiState.value = _uiState.value.copy(
-                    isSubmittingReview = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to re-run workflow '${runToRerun.name}'"
-                )
+                // No waiting runs - re-run the most relevant workflow
+                rerunWorkflow(owner, repo)
             }
         }
     }
     
     /**
-     * Attempts to approve a workflow run (only works for fork PRs).
-     * For non-fork PRs, use rerunWorkflow() instead.
+     * Approves a workflow run that is waiting for approval.
+     * This is used for PRs from forks, first-time contributors, or bots like Copilot.
+     * 
+     * API: POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
      */
-    fun approveWorkflowRun(owner: String, repo: String) {
-        viewModelScope.launch {
-            val workflowRuns = _uiState.value.workflowRuns
-            
-            if (workflowRuns.isEmpty()) {
-                _uiState.value = _uiState.value.copy(
-                    actionMessage = "No workflow runs found"
-                )
-                return@launch
-            }
-            
-            // Only "waiting" status workflows can be approved (fork PRs)
-            val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
-            
-            if (waitingRun == null) {
-                // No waiting runs - suggest re-run instead
-                _uiState.value = _uiState.value.copy(
-                    actionMessage = "No workflows need approval. Use re-run for non-fork PRs."
-                )
-                return@launch
-            }
-            
-            _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
-            
-            val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
-            if (result.isSuccess) {
-                _uiState.value = _uiState.value.copy(
-                    isSubmittingReview = false,
-                    actionMessage = "Workflow '${waitingRun.name}' approved successfully"
-                )
-                loadWorkflowRuns(owner, repo)
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isSubmittingReview = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to approve workflow"
-                )
-            }
+    private suspend fun approveWorkflowRun(owner: String, repo: String, waitingRun: com.issuetrax.app.domain.entity.WorkflowRun) {
+        _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+        
+        val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
+        if (result.isSuccess) {
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                actionMessage = "Workflow '${waitingRun.name}' approved and started"
+            )
+            loadWorkflowRuns(owner, repo)
+        } else {
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                error = result.exceptionOrNull()?.message ?: "Failed to approve workflow '${waitingRun.name}'"
+            )
+        }
+    }
+    
+    /**
+     * Re-runs a workflow. Used when no workflows are waiting for approval.
+     * 
+     * Priority for selecting which run to re-run:
+     * 1. "failure" conclusion - re-run failed workflows first
+     * 2. "cancelled" conclusion
+     * 3. Most recent run
+     */
+    private suspend fun rerunWorkflow(owner: String, repo: String) {
+        val workflowRuns = _uiState.value.workflowRuns
+        
+        // Find a workflow run to re-run with priority
+        val runToRerun = workflowRuns.firstOrNull { it.conclusion == "failure" }
+            ?: workflowRuns.firstOrNull { it.conclusion == "cancelled" }
+            ?: workflowRuns.first()
+        
+        _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+        
+        val result = rerunWorkflowUseCase(owner, repo, runToRerun.id, false)
+        if (result.isSuccess) {
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                actionMessage = "Re-run started for '${runToRerun.name}'"
+            )
+            loadWorkflowRuns(owner, repo)
+        } else {
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                error = result.exceptionOrNull()?.message ?: "Failed to re-run workflow '${runToRerun.name}'"
+            )
         }
     }
 }

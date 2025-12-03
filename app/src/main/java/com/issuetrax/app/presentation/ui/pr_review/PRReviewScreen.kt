@@ -103,8 +103,8 @@ fun PRReviewScreen(
                             onComment = { body ->
                                 viewModel.createComment(owner, repo, prNumber, body)
                             },
-                            onRerunWorkflow = {
-                                viewModel.rerunWorkflow(owner, repo)
+                            onWorkflowAction = {
+                                viewModel.triggerWorkflowAction(owner, repo)
                             }
                         )
                     }
