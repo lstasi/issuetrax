@@ -301,31 +301,25 @@ fun BuildJobStatistics(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Pending jobs (yellow/tertiary dot)
-        if (pendingJobs > 0) {
-            JobStatusItem(
-                count = pendingJobs,
-                color = MaterialTheme.colorScheme.tertiary,
-                contentDescription = "Pending jobs"
-            )
-        }
+        JobStatusItem(
+            count = pendingJobs,
+            color = MaterialTheme.colorScheme.tertiary,
+            contentDescription = "Pending jobs"
+        )
         
         // Success jobs (green/primary dot)
-        if (successJobs > 0) {
-            JobStatusItem(
-                count = successJobs,
-                color = MaterialTheme.colorScheme.primary,
-                contentDescription = "Success jobs"
-            )
-        }
+        JobStatusItem(
+            count = successJobs,
+            color = MaterialTheme.colorScheme.primary,
+            contentDescription = "Success jobs"
+        )
         
         // Failed jobs (red/error dot)
-        if (failedJobs > 0) {
-            JobStatusItem(
-                count = failedJobs,
-                color = MaterialTheme.colorScheme.error,
-                contentDescription = "Failed jobs"
-            )
-        }
+        JobStatusItem(
+            count = failedJobs,
+            color = MaterialTheme.colorScheme.error,
+            contentDescription = "Failed jobs"
+        )
     }
 }
 
