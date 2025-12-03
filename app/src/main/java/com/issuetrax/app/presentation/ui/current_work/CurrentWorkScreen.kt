@@ -283,28 +283,24 @@ fun PRStateIndicator(
 fun BuildJobStatistics(
     commitStatus: CommitStatus
 ) {
-    // Count jobs by state
-    val totalJobs = commitStatus.totalCount
-    val pendingJobs = commitStatus.statuses.count { it.state == CommitState.PENDING }
-    val successJobs = commitStatus.statuses.count { it.state == CommitState.SUCCESS }
-    val failedJobs = commitStatus.statuses.count { 
-        it.state == CommitState.FAILURE || it.state == CommitState.ERROR 
+    // Count jobs by state in a single pass for efficiency
+    var pendingJobs = 0
+    var successJobs = 0
+    var failedJobs = 0
+    
+    commitStatus.statuses.forEach { status ->
+        when (status.state) {
+            CommitState.PENDING -> pendingJobs++
+            CommitState.SUCCESS -> successJobs++
+            CommitState.FAILURE, CommitState.ERROR -> failedJobs++
+        }
     }
     
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Total jobs (black dot)
-        if (totalJobs > 0) {
-            JobStatusItem(
-                count = totalJobs,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                contentDescription = "Total jobs"
-            )
-        }
-        
-        // Pending jobs (yellow dot)
+        // Pending jobs (yellow/tertiary dot)
         if (pendingJobs > 0) {
             JobStatusItem(
                 count = pendingJobs,
@@ -313,7 +309,7 @@ fun BuildJobStatistics(
             )
         }
         
-        // Success jobs (green dot)
+        // Success jobs (green/primary dot)
         if (successJobs > 0) {
             JobStatusItem(
                 count = successJobs,
@@ -322,7 +318,7 @@ fun BuildJobStatistics(
             )
         }
         
-        // Failed jobs (red dot)
+        // Failed jobs (red/error dot)
         if (failedJobs > 0) {
             JobStatusItem(
                 count = failedJobs,
