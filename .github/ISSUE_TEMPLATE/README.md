@@ -43,7 +43,9 @@ Use this template to create TODO items or tasks for tracking.
 **Label:** `todo`
 
 ### 4. Blank Issue
-You can also create a blank/custom issue without using a template. These issues will be automatically assigned to `@copilot` via the GitHub Actions workflow.
+You can also create a blank/custom issue without using a template.
+
+**Note:** Blank issues will not be automatically assigned to `@copilot`. To ensure proper assignment, please use one of the templates above.
 
 ## Configuration
 
@@ -53,18 +55,11 @@ You can also create a blank/custom issue without using a template. These issues 
 
 ## Automatic Assignment
 
-All issues (template-based and blank) are automatically assigned to `@copilot` through two mechanisms:
+Template-based issues are automatically assigned to `@copilot` through GitHub's native issue template API:
 
-1. **Template-based issues**: Each template includes `assignees: - copilot` which automatically assigns the issue when created
-2. **Blank/custom issues**: The `.github/workflows/assign-issue-to-copilot.yml` workflow automatically assigns new issues to `@copilot`
-
-### Workflow Details
-
-The `assign-issue-to-copilot.yml` workflow:
-- Triggers on all new issues (`issues: types: [opened]`)
-- Checks if `@copilot` is already assigned
-- Adds `@copilot` as an assignee if not already assigned
-- Provides detailed logging for debugging
+- Each template includes `assignees: - copilot` in its YAML configuration
+- When you create an issue using a template, GitHub's API automatically assigns the specified users
+- This happens instantly when the issue is created, without requiring any additional workflows or actions
 
 ## How to Use
 
@@ -76,7 +71,7 @@ The `assign-issue-to-copilot.yml` workflow:
 4. Fill out the required fields
 5. Submit the issue
 
-The issue will be automatically assigned to `@copilot` for tracking and management.
+If you use a template, the issue will be automatically assigned to `@copilot` for tracking and management.
 
 ## Modifying Templates
 
@@ -89,14 +84,14 @@ To modify a template:
 
 ## Troubleshooting
 
-If issues are not being assigned to `@copilot`:
+If template-based issues are not being assigned to `@copilot`:
 
-1. Check the Actions tab for workflow runs
-2. Review the `assign-issue-to-copilot.yml` workflow logs
-3. Verify the `copilot` user exists and is a valid collaborator
-4. Ensure the workflow has `issues: write` permissions
+1. Verify the template YAML file includes `assignees: - copilot` 
+2. Ensure the `copilot` user exists and is a valid collaborator in the repository
+3. Check that you selected a template (not a blank issue) when creating the issue
+4. Verify the template YAML syntax is correct
 
 ## References
 
 - [GitHub Issue Forms Documentation](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms)
-- [GitHub Actions Issue Assignment](https://docs.github.com/en/rest/issues/assignees)
+- [GitHub Issue Template Assignees](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax)
