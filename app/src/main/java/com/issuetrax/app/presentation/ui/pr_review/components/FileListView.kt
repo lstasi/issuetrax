@@ -18,10 +18,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -190,7 +190,7 @@ private fun FileStatusIcon(
             MaterialTheme.colorScheme.onError
         )
         FileStatus.RENAMED -> Triple(
-            Icons.Filled.DriveFileRenameOutline,
+            Icons.Outlined.DriveFileRenameOutline,
             MaterialTheme.colorScheme.secondary,
             MaterialTheme.colorScheme.onSecondary
         )
