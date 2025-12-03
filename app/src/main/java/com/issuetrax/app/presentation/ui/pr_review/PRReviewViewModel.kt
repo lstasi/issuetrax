@@ -333,7 +333,7 @@ class PRReviewViewModel @Inject constructor(
             
             if (waitingRun != null) {
                 // Approve the waiting workflow
-                approveWorkflowRun(owner, repo, waitingRun)
+                approveWorkflowRunInternal(owner, repo, waitingRun)
             } else {
                 // No waiting runs - re-run the most relevant workflow
                 rerunWorkflow(owner, repo)
@@ -342,19 +342,50 @@ class PRReviewViewModel @Inject constructor(
     }
     
     /**
-     * Approves a workflow run that is waiting for approval.
+     * Public method to approve a workflow run that is waiting for approval.
+     * Finds the first waiting run and approves it.
+     * 
+     * This is used for PRs from forks, first-time contributors, or bots like Copilot.
+     */
+    fun approveWorkflowRun(owner: String, repo: String) {
+        viewModelScope.launch {
+            val workflowRuns = _uiState.value.workflowRuns
+            
+            if (workflowRuns.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    actionMessage = "No workflow runs found"
+                )
+                return@launch
+            }
+            
+            // Find a waiting run (status = "waiting" has priority over "action_required")
+            val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
+                ?: workflowRuns.firstOrNull { it.status == "action_required" }
+            
+            if (waitingRun != null) {
+                approveWorkflowRunInternal(owner, repo, waitingRun)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    actionMessage = "No workflows need approval. Use re-run for non-fork PRs."
+                )
+            }
+        }
+    }
+    
+    /**
+     * Internal method to approve a specific workflow run.
      * This is used for PRs from forks, first-time contributors, or bots like Copilot.
      * 
      * API: POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
      */
-    private suspend fun approveWorkflowRun(owner: String, repo: String, waitingRun: com.issuetrax.app.domain.entity.WorkflowRun) {
+    private suspend fun approveWorkflowRunInternal(owner: String, repo: String, waitingRun: com.issuetrax.app.domain.entity.WorkflowRun) {
         _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
         
         val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
         if (result.isSuccess) {
             _uiState.value = _uiState.value.copy(
                 isSubmittingReview = false,
-                actionMessage = "Workflow '${waitingRun.name}' approved and started"
+                actionMessage = "Workflow '${waitingRun.name}' approved successfully"
             )
             loadWorkflowRuns(owner, repo)
         } else {
