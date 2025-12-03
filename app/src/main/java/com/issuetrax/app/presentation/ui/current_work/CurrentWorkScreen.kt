@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -48,12 +46,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.domain.entity.CommitState
+import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.PRState
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import java.time.Duration
 import java.time.LocalDateTime
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -240,9 +241,9 @@ fun PullRequestItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Show build status if available
+                    // Show build job statistics if available
                     pullRequest.commitStatus?.let { status ->
-                        BuildStatusIndicator(state = status.state)
+                        BuildJobStatistics(commitStatus = status)
                     }
                     
                     // Only show stats if we have data (changedFiles is null from list endpoint)
@@ -279,33 +280,81 @@ fun PRStateIndicator(
 }
 
 @Composable
-fun BuildStatusIndicator(
-    state: CommitState
+fun BuildJobStatistics(
+    commitStatus: CommitStatus
 ) {
-    val (icon, color, contentDescription) = when (state) {
-        CommitState.SUCCESS -> Triple(
-            Icons.Default.CheckCircle,
-            MaterialTheme.colorScheme.primary,
-            "Build succeeded"
-        )
-        CommitState.FAILURE, CommitState.ERROR -> Triple(
-            Icons.Default.Close,
-            MaterialTheme.colorScheme.error,
-            "Build failed"
-        )
-        CommitState.PENDING -> Triple(
-            Icons.Default.Refresh,
-            MaterialTheme.colorScheme.onSurfaceVariant,
-            "Build pending"
-        )
+    // Count jobs by state
+    val totalJobs = commitStatus.totalCount
+    val pendingJobs = commitStatus.statuses.count { it.state == CommitState.PENDING }
+    val successJobs = commitStatus.statuses.count { it.state == CommitState.SUCCESS }
+    val failedJobs = commitStatus.statuses.count { 
+        it.state == CommitState.FAILURE || it.state == CommitState.ERROR 
     }
     
-    Icon(
-        imageVector = icon,
-        contentDescription = contentDescription,
-        tint = color,
-        modifier = Modifier.size(16.dp)
-    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Total jobs (black dot)
+        if (totalJobs > 0) {
+            JobStatusItem(
+                count = totalJobs,
+                color = Color.Black,
+                contentDescription = "Total jobs"
+            )
+        }
+        
+        // Pending jobs (yellow dot)
+        if (pendingJobs > 0) {
+            JobStatusItem(
+                count = pendingJobs,
+                color = Color(0xFFFFC107), // Yellow
+                contentDescription = "Pending jobs"
+            )
+        }
+        
+        // Success jobs (green dot)
+        if (successJobs > 0) {
+            JobStatusItem(
+                count = successJobs,
+                color = Color(0xFF4CAF50), // Green
+                contentDescription = "Success jobs"
+            )
+        }
+        
+        // Failed jobs (red dot)
+        if (failedJobs > 0) {
+            JobStatusItem(
+                count = failedJobs,
+                color = Color(0xFFF44336), // Red
+                contentDescription = "Failed jobs"
+            )
+        }
+    }
+}
+
+@Composable
+fun JobStatusItem(
+    count: Int,
+    color: Color,
+    contentDescription: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Dot
+        Canvas(modifier = Modifier.size(8.dp)) {
+            drawCircle(color = color)
+        }
+        
+        // Number
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Composable
