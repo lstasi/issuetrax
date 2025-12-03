@@ -45,8 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
-import com.issuetrax.app.domain.entity.CommitState
-import com.issuetrax.app.domain.entity.CommitStatus
+import com.issuetrax.app.domain.entity.CheckRunSummary
 import com.issuetrax.app.domain.entity.PRState
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
@@ -241,9 +240,9 @@ fun PullRequestItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Show build job statistics if available
-                    pullRequest.commitStatus?.let { status ->
-                        BuildJobStatistics(commitStatus = status)
+                    // Show GitHub Actions check run statistics if available
+                    pullRequest.checkRunSummary?.let { summary ->
+                        CheckRunStatistics(checkRunSummary = summary)
                     }
                     
                     // Only show stats if we have data (changedFiles is null from list endpoint)
@@ -279,47 +278,56 @@ fun PRStateIndicator(
     )
 }
 
+/**
+ * Display GitHub Actions check run statistics.
+ * Shows pending (yellow), success (green), failed (red), and skipped (gray) job counts.
+ */
 @Composable
-fun BuildJobStatistics(
-    commitStatus: CommitStatus
+fun CheckRunStatistics(
+    checkRunSummary: CheckRunSummary
 ) {
-    // Count jobs by state in a single pass for efficiency
-    var pendingJobs = 0
-    var successJobs = 0
-    var failedJobs = 0
-    
-    commitStatus.statuses.forEach { status ->
-        when (status.state) {
-            CommitState.PENDING -> pendingJobs++
-            CommitState.SUCCESS -> successJobs++
-            CommitState.FAILURE, CommitState.ERROR -> failedJobs++
-        }
-    }
+    // Only show if there are any check runs
+    if (checkRunSummary.total == 0) return
     
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Pending jobs (yellow/tertiary dot)
-        JobStatusItem(
-            count = pendingJobs,
-            color = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Pending jobs"
-        )
+        // Pending/In-progress jobs (yellow dot)
+        if (checkRunSummary.pending > 0) {
+            JobStatusItem(
+                count = checkRunSummary.pending,
+                color = Color(0xFFDBB300), // Yellow/amber for in-progress
+                contentDescription = "Pending jobs"
+            )
+        }
         
-        // Success jobs (green/primary dot)
-        JobStatusItem(
-            count = successJobs,
-            color = MaterialTheme.colorScheme.primary,
-            contentDescription = "Success jobs"
-        )
+        // Success jobs (green dot)
+        if (checkRunSummary.success > 0) {
+            JobStatusItem(
+                count = checkRunSummary.success,
+                color = Color(0xFF22863A), // GitHub green
+                contentDescription = "Success jobs"
+            )
+        }
         
-        // Failed jobs (red/error dot)
-        JobStatusItem(
-            count = failedJobs,
-            color = MaterialTheme.colorScheme.error,
-            contentDescription = "Failed jobs"
-        )
+        // Failed jobs (red dot)
+        if (checkRunSummary.failed > 0) {
+            JobStatusItem(
+                count = checkRunSummary.failed,
+                color = MaterialTheme.colorScheme.error,
+                contentDescription = "Failed jobs"
+            )
+        }
+        
+        // Skipped jobs (gray dot)
+        if (checkRunSummary.skipped > 0) {
+            JobStatusItem(
+                count = checkRunSummary.skipped,
+                color = Color(0xFF8B949E), // Gray for skipped
+                contentDescription = "Skipped jobs"
+            )
+        }
     }
 }
 
