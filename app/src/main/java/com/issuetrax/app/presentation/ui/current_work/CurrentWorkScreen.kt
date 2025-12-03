@@ -299,7 +299,7 @@ fun BuildJobStatistics(
         if (totalJobs > 0) {
             JobStatusItem(
                 count = totalJobs,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = "Total jobs"
             )
         }
@@ -308,7 +308,7 @@ fun BuildJobStatistics(
         if (pendingJobs > 0) {
             JobStatusItem(
                 count = pendingJobs,
-                color = Color(0xFFFFC107), // Yellow
+                color = MaterialTheme.colorScheme.tertiary,
                 contentDescription = "Pending jobs"
             )
         }
@@ -317,7 +317,7 @@ fun BuildJobStatistics(
         if (successJobs > 0) {
             JobStatusItem(
                 count = successJobs,
-                color = Color(0xFF4CAF50), // Green
+                color = MaterialTheme.colorScheme.primary,
                 contentDescription = "Success jobs"
             )
         }
@@ -326,7 +326,7 @@ fun BuildJobStatistics(
         if (failedJobs > 0) {
             JobStatusItem(
                 count = failedJobs,
-                color = Color(0xFFF44336), // Red
+                color = MaterialTheme.colorScheme.error,
                 contentDescription = "Failed jobs"
             )
         }
