@@ -16,7 +16,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -181,12 +185,17 @@ private fun FileStatusIcon(
             MaterialTheme.colorScheme.onTertiary
         )
         FileStatus.REMOVED -> Triple(
-            Icons.Default.Close,
+            Icons.Filled.Delete,
             MaterialTheme.colorScheme.error,
             MaterialTheme.colorScheme.onError
         )
-        FileStatus.RENAMED, FileStatus.COPIED -> Triple(
-            Icons.Default.Edit,
+        FileStatus.RENAMED -> Triple(
+            Icons.Filled.DriveFileRenameOutline,
+            MaterialTheme.colorScheme.secondary,
+            MaterialTheme.colorScheme.onSecondary
+        )
+        FileStatus.COPIED -> Triple(
+            Icons.Filled.ContentCopy,
             MaterialTheme.colorScheme.secondary,
             MaterialTheme.colorScheme.onSecondary
         )
@@ -257,7 +266,7 @@ private fun BuildStatusIndicator(
             text = "Checks passed"
         )
         com.issuetrax.app.domain.entity.CommitState.FAILURE -> StatusDisplay(
-            icon = Icons.Default.Close,
+            icon = Icons.Filled.Error,
             backgroundColor = MaterialTheme.colorScheme.error,
             iconColor = MaterialTheme.colorScheme.onError,
             text = "Checks failed"
@@ -269,7 +278,7 @@ private fun BuildStatusIndicator(
             text = "Checks pending"
         )
         com.issuetrax.app.domain.entity.CommitState.ERROR -> StatusDisplay(
-            icon = Icons.Default.Close,
+            icon = Icons.Filled.Error,
             backgroundColor = MaterialTheme.colorScheme.error,
             iconColor = MaterialTheme.colorScheme.onError,
             text = "Checks error"

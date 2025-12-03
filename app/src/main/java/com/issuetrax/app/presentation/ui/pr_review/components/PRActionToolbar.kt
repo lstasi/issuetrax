@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CallMerge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
@@ -81,7 +83,7 @@ fun PRActionToolbar(
         if (pullRequest.state == PRState.OPEN) {
             IconButton(onClick = { showMergeDialog = true }) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = Icons.Filled.CallMerge,
                     contentDescription = "Merge PR",
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -113,7 +115,7 @@ fun PRActionToolbar(
         // Comment button - for all PRs
         IconButton(onClick = { showCommentDialog = true }) {
             Icon(
-                imageVector = Icons.Default.Edit,
+                imageVector = Icons.Filled.Comment,
                 contentDescription = "Add comment",
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -351,7 +353,7 @@ fun PRActionToolbar(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = Icons.Filled.CallMerge,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -408,7 +410,7 @@ fun PRActionToolbar(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Edit,
+                    imageVector = Icons.Filled.Comment,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )
