@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -120,7 +121,7 @@ fun CurrentWorkScreen(
                                     showFilterMenu = false
                                 }
                             )
-                            androidx.compose.material3.HorizontalDivider()
+                            Divider()
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.current_work_download_release)) },
                                 onClick = {
