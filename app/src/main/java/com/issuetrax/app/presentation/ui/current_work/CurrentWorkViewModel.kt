@@ -194,15 +194,37 @@ class CurrentWorkViewModel @Inject constructor(
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
+    
+    fun loadLatestRelease(owner: String, repo: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingRelease = true)
+            
+            val result = gitHubRepository.getLatestRelease(owner, repo)
+            if (result.isSuccess) {
+                val release = result.getOrNull()
+                _uiState.value = _uiState.value.copy(
+                    isLoadingRelease = false,
+                    latestRelease = release
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingRelease = false,
+                    latestRelease = null
+                )
+            }
+        }
+    }
 }
 
 data class CurrentWorkUiState(
     val isLoading: Boolean = false,
     val isLoadingPRs: Boolean = false,
+    val isLoadingRelease: Boolean = false,
     val repositories: List<Repository> = emptyList(),
     val pullRequests: List<PullRequest> = emptyList(),
     val selectedRepository: String? = null,
     val filter: PRFilter = PRFilter.OPEN,
     val sortBy: PRSortOrder = PRSortOrder.UPDATED,
-    val error: String? = null
+    val error: String? = null,
+    val latestRelease: com.issuetrax.app.domain.entity.Release? = null
 )

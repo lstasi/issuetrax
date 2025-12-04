@@ -29,6 +29,9 @@
     <string name="current_work_state_open">Open</string>
     <string name="current_work_state_closed">Closed</string>
     <string name="current_work_state_merged">Merged</string>
+    <string name="current_work_download_release">Download Latest Release</string>
+    <string name="current_work_no_release">No release available</string>
+    <string name="current_work_no_apk">No APK found in release</string>
     
     <!-- PR Review -->
     <string name="pr_review_title">Pull Request Review</string>

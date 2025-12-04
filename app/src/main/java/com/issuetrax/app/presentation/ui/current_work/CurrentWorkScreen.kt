@@ -67,10 +67,12 @@ fun CurrentWorkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showFilterMenu by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
-    // Load pull requests on initial composition
+    // Load pull requests and latest release on initial composition
     LaunchedEffect(owner, repo) {
         viewModel.loadPullRequests(owner, repo)
+        viewModel.loadLatestRelease(owner, repo)
     }
 
     Scaffold(
@@ -117,6 +119,15 @@ fun CurrentWorkScreen(
                                     viewModel.filterPullRequests(PRFilter.CLOSED)
                                     showFilterMenu = false
                                 }
+                            )
+                            androidx.compose.material3.HorizontalDivider()
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.current_work_download_release)) },
+                                onClick = {
+                                    showFilterMenu = false
+                                    handleDownloadRelease(context, uiState.latestRelease)
+                                },
+                                enabled = uiState.latestRelease != null && !uiState.isLoadingRelease
                             )
                         }
                     }
@@ -393,5 +404,53 @@ fun timeAgo(dateTime: LocalDateTime): String {
         duration.toHours() > 0 -> "${duration.toHours()} ${if (duration.toHours() == 1L) "hour" else "hours"} ago"
         duration.toMinutes() > 0 -> "${duration.toMinutes()} ${if (duration.toMinutes() == 1L) "minute" else "minutes"} ago"
         else -> "just now"
+    }
+}
+
+/**
+ * Handles downloading the latest release. If an APK is available, downloads that preferentially.
+ */
+private fun handleDownloadRelease(
+    context: android.content.Context,
+    release: com.issuetrax.app.domain.entity.Release?
+) {
+    if (release == null) {
+        android.widget.Toast.makeText(
+            context,
+            context.getString(R.string.current_work_no_release),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+        return
+    }
+
+    // Find an APK asset, or use the first asset if no APK is found
+    val apkAsset = release.assets.firstOrNull { asset ->
+        asset.name.endsWith(".apk", ignoreCase = true)
+    }
+
+    val assetToDownload = apkAsset ?: release.assets.firstOrNull()
+
+    if (assetToDownload == null) {
+        android.widget.Toast.makeText(
+            context,
+            context.getString(R.string.current_work_no_apk),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+        return
+    }
+
+    // Open the download URL in the browser
+    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+        data = android.net.Uri.parse(assetToDownload.browserDownloadUrl)
+    }
+
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        android.widget.Toast.makeText(
+            context,
+            "Failed to open download link",
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 }

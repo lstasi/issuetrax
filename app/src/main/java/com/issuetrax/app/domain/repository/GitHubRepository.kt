@@ -141,6 +141,18 @@ interface GitHubRepository {
         repo: String,
         prNumber: Int
     ): Result<Unit>
+    
+    /**
+     * Gets the latest release for a repository.
+     * 
+     * @param owner Repository owner
+     * @param repo Repository name
+     * @return Result with Release on success or error
+     */
+    suspend fun getLatestRelease(
+        owner: String,
+        repo: String
+    ): Result<com.issuetrax.app.domain.entity.Release>
 }
 
 data class ReviewComment(

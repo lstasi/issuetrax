@@ -691,6 +691,31 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
+    override suspend fun getLatestRelease(
+        owner: String,
+        repo: String
+    ): Result<com.issuetrax.app.domain.entity.Release> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.getLatestRelease("Bearer $token", owner, repo)
+            if (response.isSuccessful) {
+                val releaseDto = response.body()
+                    ?: return Result.failure(Exception("No release found"))
+                Result.success(releaseDto.toDomain())
+            } else {
+                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                    response,
+                    "Failed to get latest release"
+                )
+                Result.failure(Exception(errorMessage))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     private fun String.toCommitState(): com.issuetrax.app.domain.entity.CommitState {
         return when (this.lowercase()) {
             "pending" -> com.issuetrax.app.domain.entity.CommitState.PENDING
