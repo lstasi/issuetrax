@@ -434,7 +434,7 @@ private fun handleDownloadRelease(
     if (assetToDownload == null) {
         android.widget.Toast.makeText(
             context,
-            context.getString(R.string.current_work_no_apk),
+            context.getString(R.string.current_work_no_assets),
             android.widget.Toast.LENGTH_SHORT
         ).show()
         return
