@@ -450,7 +450,7 @@ private fun handleDownloadRelease(
     } catch (e: Exception) {
         android.widget.Toast.makeText(
             context,
-            "Failed to open download link",
+            context.getString(R.string.current_work_download_failed),
             android.widget.Toast.LENGTH_SHORT
         ).show()
     }
