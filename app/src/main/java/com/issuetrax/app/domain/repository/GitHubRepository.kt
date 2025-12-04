@@ -82,6 +82,16 @@ interface GitHubRepository {
         ref: String
     ): Result<CommitStatus>
     
+    /**
+     * Gets check runs for a specific commit.
+     * This is the proper way to get GitHub Actions job statuses.
+     */
+    suspend fun getCheckRuns(
+        owner: String,
+        repo: String,
+        ref: String
+    ): Result<List<com.issuetrax.app.domain.entity.CheckRun>>
+    
     suspend fun getWorkflowRuns(
         owner: String,
         repo: String,

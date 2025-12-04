@@ -7,6 +7,7 @@ import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.IssueDto
 import com.issuetrax.app.data.api.model.WorkflowRunDto
+import com.issuetrax.app.data.api.model.CheckRunDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -147,6 +148,32 @@ fun WorkflowRunDto.toDomain(): WorkflowRun {
         status = status,
         conclusion = conclusion,
         headSha = head_sha,
+        htmlUrl = html_url
+    )
+}
+
+fun CheckRunDto.toDomain(): CheckRun {
+    return CheckRun(
+        id = id,
+        name = name,
+        status = when (status.lowercase()) {
+            "queued" -> CheckRunStatus.QUEUED
+            "in_progress" -> CheckRunStatus.IN_PROGRESS
+            "completed" -> CheckRunStatus.COMPLETED
+            else -> CheckRunStatus.QUEUED
+        },
+        conclusion = conclusion?.let { conclusionString ->
+            when (conclusionString.lowercase()) {
+                "success" -> CheckRunConclusion.SUCCESS
+                "failure" -> CheckRunConclusion.FAILURE
+                "neutral" -> CheckRunConclusion.NEUTRAL
+                "cancelled" -> CheckRunConclusion.CANCELLED
+                "skipped" -> CheckRunConclusion.SKIPPED
+                "timed_out" -> CheckRunConclusion.TIMED_OUT
+                "action_required" -> CheckRunConclusion.ACTION_REQUIRED
+                else -> null
+            }
+        },
         htmlUrl = html_url
     )
 }

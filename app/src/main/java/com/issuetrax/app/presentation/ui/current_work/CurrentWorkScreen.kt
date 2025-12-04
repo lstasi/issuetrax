@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -47,13 +45,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
-import com.issuetrax.app.domain.entity.CommitState
+import com.issuetrax.app.domain.entity.CheckRunSummary
 import com.issuetrax.app.domain.entity.PRState
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import java.time.Duration
 import java.time.LocalDateTime
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -240,9 +240,9 @@ fun PullRequestItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Show build status if available
-                    pullRequest.commitStatus?.let { status ->
-                        BuildStatusIndicator(state = status.state)
+                    // Show GitHub Actions check run statistics if available
+                    pullRequest.checkRunSummary?.let { summary ->
+                        CheckRunStatistics(checkRunSummary = summary)
                     }
                     
                     // Only show stats if we have data (changedFiles is null from list endpoint)
@@ -278,34 +278,81 @@ fun PRStateIndicator(
     )
 }
 
+/**
+ * Display GitHub Actions check run statistics.
+ * Shows pending (yellow), success (green), failed (red), and skipped (gray) job counts.
+ */
 @Composable
-fun BuildStatusIndicator(
-    state: CommitState
+fun CheckRunStatistics(
+    checkRunSummary: CheckRunSummary
 ) {
-    val (icon, color, contentDescription) = when (state) {
-        CommitState.SUCCESS -> Triple(
-            Icons.Default.CheckCircle,
-            MaterialTheme.colorScheme.primary,
-            "Build succeeded"
-        )
-        CommitState.FAILURE, CommitState.ERROR -> Triple(
-            Icons.Default.Close,
-            MaterialTheme.colorScheme.error,
-            "Build failed"
-        )
-        CommitState.PENDING -> Triple(
-            Icons.Default.Refresh,
-            MaterialTheme.colorScheme.onSurfaceVariant,
-            "Build pending"
+    // Only show if there are any check runs
+    if (checkRunSummary.total == 0) return
+    
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Pending/In-progress jobs (yellow dot)
+        if (checkRunSummary.pending > 0) {
+            JobStatusItem(
+                count = checkRunSummary.pending,
+                color = Color(0xFFDBB300), // Yellow/amber for in-progress
+                contentDescription = "Pending jobs"
+            )
+        }
+        
+        // Success jobs (green dot)
+        if (checkRunSummary.success > 0) {
+            JobStatusItem(
+                count = checkRunSummary.success,
+                color = Color(0xFF22863A), // GitHub green
+                contentDescription = "Success jobs"
+            )
+        }
+        
+        // Failed jobs (red dot)
+        if (checkRunSummary.failed > 0) {
+            JobStatusItem(
+                count = checkRunSummary.failed,
+                color = MaterialTheme.colorScheme.error,
+                contentDescription = "Failed jobs"
+            )
+        }
+        
+        // Skipped jobs (gray dot)
+        if (checkRunSummary.skipped > 0) {
+            JobStatusItem(
+                count = checkRunSummary.skipped,
+                color = Color(0xFF8B949E), // Gray for skipped
+                contentDescription = "Skipped jobs"
+            )
+        }
+    }
+}
+
+@Composable
+fun JobStatusItem(
+    count: Int,
+    color: Color,
+    contentDescription: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Dot
+        Canvas(modifier = Modifier.size(8.dp)) {
+            drawCircle(color = color)
+        }
+        
+        // Number
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-    
-    Icon(
-        imageVector = icon,
-        contentDescription = contentDescription,
-        tint = color,
-        modifier = Modifier.size(16.dp)
-    )
 }
 
 @Composable

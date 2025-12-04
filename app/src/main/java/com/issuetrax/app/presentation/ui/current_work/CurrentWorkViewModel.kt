@@ -2,10 +2,13 @@ package com.issuetrax.app.presentation.ui.current_work
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.issuetrax.app.domain.entity.CheckRun
+import com.issuetrax.app.domain.entity.CheckRunConclusion
+import com.issuetrax.app.domain.entity.CheckRunStatus
+import com.issuetrax.app.domain.entity.CheckRunSummary
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.entity.Repository
 import com.issuetrax.app.domain.repository.GitHubRepository
-import com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
 import com.issuetrax.app.domain.usecase.GetPullRequestsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +28,7 @@ enum class PRSortOrder {
 @HiltViewModel
 class CurrentWorkViewModel @Inject constructor(
     private val getPullRequestsUseCase: GetPullRequestsUseCase,
-    private val gitHubRepository: GitHubRepository,
-    private val getCommitStatusUseCase: GetCommitStatusUseCase
+    private val gitHubRepository: GitHubRepository
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(CurrentWorkUiState())
@@ -65,8 +67,8 @@ class CurrentWorkViewModel @Inject constructor(
                     val pullRequests = result.getOrNull() ?: emptyList()
                     allPullRequests = pullRequests
                     
-                    // Fetch commit status for each PR in the background
-                    loadCommitStatuses(owner, repo, pullRequests)
+                    // Fetch check runs (GitHub Actions) for each PR in the background
+                    loadCheckRuns(owner, repo, pullRequests)
                     
                     val filtered = applyFilterAndSort(pullRequests)
                     _uiState.value = _uiState.value.copy(
@@ -84,21 +86,26 @@ class CurrentWorkViewModel @Inject constructor(
         }
     }
     
-    private fun loadCommitStatuses(owner: String, repo: String, pullRequests: List<PullRequest>) {
+    /**
+     * Load GitHub Actions check runs for each PR and compute summary statistics.
+     */
+    private fun loadCheckRuns(owner: String, repo: String, pullRequests: List<PullRequest>) {
         viewModelScope.launch {
             // Create a map for efficient lookup by PR number
             val prMap = pullRequests.associateBy { it.number }.toMutableMap()
             
-            // Fetch commit statuses for all PRs concurrently
+            // Fetch check runs for all PRs concurrently
             pullRequests.forEach { pr ->
                 launch {
-                    val statusResult = getCommitStatusUseCase(owner, repo, pr.headRef)
-                    if (statusResult.isSuccess) {
-                        val commitStatus = statusResult.getOrNull()
-                        // Update the PR in the map
-                        prMap[pr.number] = pr.copy(commitStatus = commitStatus)
+                    val checkRunsResult = gitHubRepository.getCheckRuns(owner, repo, pr.headRef)
+                    if (checkRunsResult.isSuccess) {
+                        val checkRuns = checkRunsResult.getOrNull() ?: emptyList()
+                        val summary = computeCheckRunSummary(checkRuns)
                         
-                        // Update allPullRequests and UI state once per status
+                        // Update the PR in the map with check run summary
+                        prMap[pr.number] = pr.copy(checkRunSummary = summary)
+                        
+                        // Update allPullRequests and UI state
                         allPullRequests = prMap.values.toList()
                         val filtered = applyFilterAndSort(allPullRequests)
                         _uiState.value = _uiState.value.copy(pullRequests = filtered)
@@ -106,6 +113,38 @@ class CurrentWorkViewModel @Inject constructor(
                 }
             }
         }
+    }
+    
+    /**
+     * Compute summary statistics from check runs.
+     */
+    private fun computeCheckRunSummary(checkRuns: List<CheckRun>): CheckRunSummary {
+        var pending = 0
+        var success = 0
+        var failed = 0
+        var skipped = 0
+        
+        checkRuns.forEach { run ->
+            when (run.status) {
+                CheckRunStatus.QUEUED, CheckRunStatus.IN_PROGRESS -> pending++
+                CheckRunStatus.COMPLETED -> {
+                    when (run.conclusion) {
+                        CheckRunConclusion.SUCCESS -> success++
+                        CheckRunConclusion.FAILURE, CheckRunConclusion.TIMED_OUT, CheckRunConclusion.ACTION_REQUIRED -> failed++
+                        CheckRunConclusion.SKIPPED, CheckRunConclusion.NEUTRAL, CheckRunConclusion.CANCELLED -> skipped++
+                        null -> pending++ // No conclusion yet
+                    }
+                }
+            }
+        }
+        
+        return CheckRunSummary(
+            total = checkRuns.size,
+            pending = pending,
+            success = success,
+            failed = failed,
+            skipped = skipped
+        )
     }
     
     fun refreshPullRequests() {

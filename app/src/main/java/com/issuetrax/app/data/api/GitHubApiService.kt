@@ -8,6 +8,7 @@ import com.issuetrax.app.data.api.model.FileDiffDto
 import com.issuetrax.app.data.api.model.IssueDto
 import com.issuetrax.app.data.api.model.WorkflowRunsResponseDto
 import com.issuetrax.app.data.api.model.WorkflowRunApprovalResponseDto
+import com.issuetrax.app.data.api.model.CheckRunsResponseDto
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
@@ -112,6 +113,21 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("ref") ref: String
     ): Response<CommitStatusDto>
+    
+    /**
+     * Get check runs for a specific commit.
+     * This is the proper way to get GitHub Actions job statuses.
+     * 
+     * API: GET /repos/{owner}/{repo}/commits/{ref}/check-runs
+     */
+    @GET("repos/{owner}/{repo}/commits/{ref}/check-runs")
+    suspend fun getCheckRuns(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("ref") ref: String,
+        @Query("per_page") perPage: Int = 100
+    ): Response<CheckRunsResponseDto>
     
     @GET("repos/{owner}/{repo}/actions/runs")
     suspend fun getWorkflowRuns(

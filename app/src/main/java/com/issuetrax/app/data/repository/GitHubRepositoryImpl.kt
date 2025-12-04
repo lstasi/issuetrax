@@ -479,6 +479,28 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
+    override suspend fun getCheckRuns(
+        owner: String,
+        repo: String,
+        ref: String
+    ): Result<List<com.issuetrax.app.domain.entity.CheckRun>> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.getCheckRuns("Bearer $token", owner, repo, ref)
+            if (response.isSuccessful) {
+                val checkRunsDto = response.body()!!
+                val checkRuns = checkRunsDto.check_runs.map { it.toDomain() }
+                Result.success(checkRuns)
+            } else {
+                Result.failure(Exception("Failed to get check runs: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     override suspend fun getWorkflowRuns(
         owner: String,
         repo: String,
