@@ -38,7 +38,7 @@ class CreateIssueViewModel @Inject constructor(
                 repo = repo,
                 title = title,
                 body = body,
-                assignees = listOf("Copilot") // Auto-assign to Copilot after issue creation
+                assignees = emptyList() // No auto-assignment
             )
 
             result.fold(

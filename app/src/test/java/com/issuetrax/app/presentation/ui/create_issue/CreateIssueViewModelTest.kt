@@ -67,7 +67,7 @@ class CreateIssueViewModelTest {
     fun `createIssue should complete successfully`() = runTest {
         // Given
         coEvery {
-            createIssueUseCase("owner", "repo", "Test", "Body", listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test", "Body", emptyList())
         } returns Result.success(mockIssue)
 
         // When
@@ -84,7 +84,7 @@ class CreateIssueViewModelTest {
     fun `createIssue should update state on success`() = runTest {
         // Given
         coEvery {
-            createIssueUseCase("owner", "repo", "Test Issue", "Test body", listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test Issue", "Test body", emptyList())
         } returns Result.success(mockIssue)
 
         // When
@@ -103,7 +103,7 @@ class CreateIssueViewModelTest {
         // Given
         val errorMessage = "Network error"
         coEvery {
-            createIssueUseCase("owner", "repo", "Test Issue", "Test body", listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test Issue", "Test body", emptyList())
         } returns Result.failure(Exception(errorMessage))
 
         // When
@@ -118,27 +118,10 @@ class CreateIssueViewModelTest {
     }
 
     @Test
-    fun `createIssue should auto-assign to copilot`() = runTest {
-        // Given
-        coEvery {
-            createIssueUseCase("owner", "repo", "Test Issue", "Test body", listOf("Copilot"))
-        } returns Result.success(mockIssue)
-
-        // When
-        viewModel.createIssue("owner", "repo", "Test Issue", "Test body")
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // Then - verify copilot is automatically assigned
-        coVerify {
-            createIssueUseCase("owner", "repo", "Test Issue", "Test body", listOf("Copilot"))
-        }
-    }
-
-    @Test
     fun `createIssue should handle null body`() = runTest {
         // Given
         coEvery {
-            createIssueUseCase("owner", "repo", "Test Issue", null, listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test Issue", null, emptyList())
         } returns Result.success(mockIssue)
 
         // When
@@ -147,7 +130,7 @@ class CreateIssueViewModelTest {
 
         // Then
         coVerify {
-            createIssueUseCase("owner", "repo", "Test Issue", null, listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test Issue", null, emptyList())
         }
     }
 
@@ -175,7 +158,7 @@ class CreateIssueViewModelTest {
     fun `createIssue should handle generic exception with default message`() = runTest {
         // Given
         coEvery {
-            createIssueUseCase("owner", "repo", "Test Issue", "Test body", listOf("Copilot"))
+            createIssueUseCase("owner", "repo", "Test Issue", "Test body", emptyList())
         } returns Result.failure(Exception())
 
         // When
