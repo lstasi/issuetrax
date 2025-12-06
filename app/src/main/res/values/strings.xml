@@ -29,6 +29,10 @@
     <string name="current_work_state_open">Open</string>
     <string name="current_work_state_closed">Closed</string>
     <string name="current_work_state_merged">Merged</string>
+    <string name="current_work_download_release">Download Latest Release</string>
+    <string name="current_work_no_release">No release available</string>
+    <string name="current_work_no_assets">No assets found in release</string>
+    <string name="current_work_download_failed">Failed to open download link</string>
     
     <!-- PR Review -->
     <string name="pr_review_title">Pull Request Review</string>

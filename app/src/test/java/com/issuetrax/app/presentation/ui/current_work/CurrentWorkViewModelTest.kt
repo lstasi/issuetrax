@@ -70,12 +70,14 @@ class CurrentWorkViewModelTest {
         val state = viewModel.uiState.value
         assertFalse("Should not be loading", state.isLoading)
         assertFalse("Should not be loading PRs", state.isLoadingPRs)
+        assertFalse("Should not be loading release", state.isLoadingRelease)
         assertTrue("Repositories should be empty", state.repositories.isEmpty())
         assertTrue("Pull requests should be empty", state.pullRequests.isEmpty())
         assertNull("Selected repository should be null", state.selectedRepository)
         assertEquals("Filter should be OPEN", PRFilter.OPEN, state.filter)
         assertEquals("Sort order should be UPDATED", PRSortOrder.UPDATED, state.sortBy)
         assertNull("Error should be null", state.error)
+        assertNull("Latest release should be null", state.latestRelease)
     }
     
     @Test
@@ -372,5 +374,81 @@ class CurrentWorkViewModelTest {
             baseRef = "main",
             htmlUrl = "https://github.com/testuser/test-repo/pull/$number"
         )
+    }
+    
+    @Test
+    fun `loadLatestRelease should update state with release on success`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val mockRelease = com.issuetrax.app.domain.entity.Release(
+            id = 1,
+            tagName = "v1.0.0",
+            name = "Release 1.0.0",
+            body = "First release",
+            htmlUrl = "https://github.com/testuser/test-repo/releases/tag/v1.0.0",
+            draft = false,
+            prerelease = false,
+            createdAt = LocalDateTime.now().minusDays(1),
+            publishedAt = LocalDateTime.now().minusDays(1),
+            assets = listOf(
+                com.issuetrax.app.domain.entity.ReleaseAsset(
+                    id = 1,
+                    name = "app-debug.apk",
+                    label = "Debug APK",
+                    contentType = "application/vnd.android.package-archive",
+                    size = 1024000,
+                    downloadCount = 10,
+                    browserDownloadUrl = "https://github.com/testuser/test-repo/releases/download/v1.0.0/app-debug.apk",
+                    createdAt = LocalDateTime.now().minusDays(1),
+                    updatedAt = LocalDateTime.now().minusDays(1)
+                )
+            ),
+            author = User(
+                id = 1,
+                login = "testuser",
+                name = "Test User",
+                email = null,
+                avatarUrl = "https://example.com/avatar.png",
+                htmlUrl = "https://github.com/testuser",
+                type = UserType.USER
+            )
+        )
+        
+        coEvery { 
+            gitHubRepository.getLatestRelease(owner, repo) 
+        } returns Result.success(mockRelease)
+        
+        // When
+        viewModel.loadLatestRelease(owner, repo)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertFalse("Should not be loading release", state.isLoadingRelease)
+        assertEquals("Latest release should be set", mockRelease, state.latestRelease)
+        
+        coVerify { gitHubRepository.getLatestRelease(owner, repo) }
+    }
+    
+    @Test
+    fun `loadLatestRelease should update state with null release on failure`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        coEvery { 
+            gitHubRepository.getLatestRelease(owner, repo) 
+        } returns Result.failure(RuntimeException("Not found"))
+        
+        // When
+        viewModel.loadLatestRelease(owner, repo)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertFalse("Should not be loading release", state.isLoadingRelease)
+        assertNull("Latest release should be null", state.latestRelease)
+        
+        coVerify { gitHubRepository.getLatestRelease(owner, repo) }
     }
 }

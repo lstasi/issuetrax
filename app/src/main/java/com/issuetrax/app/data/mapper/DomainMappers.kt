@@ -8,6 +8,8 @@ import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.IssueDto
 import com.issuetrax.app.data.api.model.WorkflowRunDto
 import com.issuetrax.app.data.api.model.CheckRunDto
+import com.issuetrax.app.data.api.model.ReleaseDto
+import com.issuetrax.app.data.api.model.ReleaseAssetDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -175,6 +177,36 @@ fun CheckRunDto.toDomain(): CheckRun {
             }
         },
         htmlUrl = html_url
+    )
+}
+
+fun ReleaseDto.toDomain(): Release {
+    return Release(
+        id = id,
+        tagName = tagName,
+        name = name,
+        body = body,
+        htmlUrl = htmlUrl,
+        draft = draft,
+        prerelease = prerelease,
+        createdAt = parseDateTime(createdAt),
+        publishedAt = publishedAt?.let { parseDateTime(it) },
+        assets = assets.map { it.toDomain() },
+        author = author.toDomain()
+    )
+}
+
+fun ReleaseAssetDto.toDomain(): ReleaseAsset {
+    return ReleaseAsset(
+        id = id,
+        name = name,
+        label = label,
+        contentType = contentType,
+        size = size,
+        downloadCount = downloadCount,
+        browserDownloadUrl = browserDownloadUrl,
+        createdAt = parseDateTime(createdAt),
+        updatedAt = parseDateTime(updatedAt)
     )
 }
 

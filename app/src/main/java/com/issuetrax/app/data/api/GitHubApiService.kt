@@ -179,6 +179,16 @@ interface GitHubApiService {
         @Header("Authorization") authorization: String,
         @Body request: GraphQLRequest
     ): Response<GraphQLResponse>
+    
+    /**
+     * Get the latest release for a repository.
+     */
+    @GET("repos/{owner}/{repo}/releases/latest")
+    suspend fun getLatestRelease(
+        @Header("Authorization") authorization: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String
+    ): Response<com.issuetrax.app.data.api.model.ReleaseDto>
 }
 
 @Serializable
