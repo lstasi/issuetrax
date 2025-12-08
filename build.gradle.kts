@@ -6,12 +6,12 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:8.13.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.21")
         classpath("com.google.dagger:hilt-android-gradle-plugin:2.48")
     }
 }
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21" apply false
     id("com.github.ben-manes.versions") version "0.49.0"
 }
