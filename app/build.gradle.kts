@@ -148,13 +148,13 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     // Activity & Lifecycle
-    implementation("androidx.activity:activity-compose:1.8.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.activity:activity-compose:1.12.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
     // Hilt Dependency Injection
     implementation("com.google.dagger:hilt-android:2.48")
@@ -172,13 +172,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // DataStore (for preferences)
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
 
     // Security (for encrypted preferences)
     implementation("androidx.security:security-crypto:1.1.0")
 
     // Custom Tabs (for OAuth)
-    implementation("androidx.browser:browser:1.6.0")
+    implementation("androidx.browser:browser:1.9.0")
 
     // Material Components (needed for Theme.MaterialComponents parent and material attributes)
     implementation("com.google.android.material:material:1.13.0")
