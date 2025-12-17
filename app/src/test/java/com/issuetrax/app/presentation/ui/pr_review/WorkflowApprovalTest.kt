@@ -199,7 +199,7 @@ class WorkflowApprovalTest {
     }
     
     @Test
-    fun `approveWorkflowRun approves waiting run with highest priority`() = runTest {
+    fun `approveWorkflowRun approves all waiting and action_required runs`() = runTest {
         // Given
         val owner = "testOwner"
         val repo = "testRepo"
@@ -228,11 +228,52 @@ class WorkflowApprovalTest {
             approveWorkflowRunUseCase(owner, repo, 123456L) 
         } returns Result.success(Unit)
         
+        coEvery { 
+            approveWorkflowRunUseCase(owner, repo, 789012L) 
+        } returns Result.success(Unit)
+        
         // Load workflow runs first
         viewModel.loadWorkflowRuns(owner, repo)
         advanceUntilIdle()
         
-        // When - should approve the "waiting" run (highest priority)
+        // When - should approve ALL waiting and action_required runs
+        viewModel.approveWorkflowRun(owner, repo)
+        advanceUntilIdle()
+        
+        // Then - both workflows should be approved
+        val state = viewModel.uiState.value
+        assertEquals("All 2 workflows approved successfully", state.actionMessage)
+        coVerify { approveWorkflowRunUseCase(owner, repo, 123456L) }
+        coVerify { approveWorkflowRunUseCase(owner, repo, 789012L) }
+    }
+    
+    @Test
+    fun `approveWorkflowRun approves single workflow when only one is pending`() = runTest {
+        // Given
+        val owner = "testOwner"
+        val repo = "testRepo"
+        val waitingRun = WorkflowRun(
+            id = 123456L,
+            name = "CI",
+            status = "waiting",
+            conclusion = null,
+            headSha = "abc123",
+            htmlUrl = "https://github.com/owner/repo/actions/runs/123456"
+        )
+        
+        coEvery { 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
+        } returns Result.success(listOf(waitingRun))
+        
+        coEvery { 
+            approveWorkflowRunUseCase(owner, repo, 123456L) 
+        } returns Result.success(Unit)
+        
+        // Load workflow runs first
+        viewModel.loadWorkflowRuns(owner, repo)
+        advanceUntilIdle()
+        
+        // When - should approve the single workflow
         viewModel.approveWorkflowRun(owner, repo)
         advanceUntilIdle()
         
@@ -327,7 +368,7 @@ class WorkflowApprovalTest {
         
         // Then
         val state = viewModel.uiState.value
-        assertEquals(errorMessage, state.error)
+        assertEquals("Failed to approve workflows: CI: $errorMessage", state.error)
         assertFalse(state.isSubmittingReview)
     }
     
@@ -364,5 +405,53 @@ class WorkflowApprovalTest {
         coVerify(exactly = 2) { 
             getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
         }
+    }
+    
+    @Test
+    fun `approveWorkflowRun handles partial failure when approving multiple workflows`() = runTest {
+        // Given
+        val owner = "testOwner"
+        val repo = "testRepo"
+        val waitingRun1 = WorkflowRun(
+            id = 123456L,
+            name = "CI",
+            status = "waiting",
+            conclusion = null,
+            headSha = "abc123",
+            htmlUrl = "https://github.com/owner/repo/actions/runs/123456"
+        )
+        val waitingRun2 = WorkflowRun(
+            id = 789012L,
+            name = "Deploy",
+            status = "waiting",
+            conclusion = null,
+            headSha = "abc123",
+            htmlUrl = "https://github.com/owner/repo/actions/runs/789012"
+        )
+        
+        coEvery { 
+            getWorkflowRunsUseCase(owner, repo, "pull_request", null) 
+        } returns Result.success(listOf(waitingRun1, waitingRun2))
+        
+        coEvery { 
+            approveWorkflowRunUseCase(owner, repo, 123456L) 
+        } returns Result.success(Unit)
+        
+        coEvery { 
+            approveWorkflowRunUseCase(owner, repo, 789012L) 
+        } returns Result.failure(Exception("Permission denied"))
+        
+        viewModel.loadWorkflowRuns(owner, repo)
+        advanceUntilIdle()
+        
+        // When
+        viewModel.approveWorkflowRun(owner, repo)
+        advanceUntilIdle()
+        
+        // Then - partial success message
+        val state = viewModel.uiState.value
+        assertEquals("Approved 1 workflows, 1 failed", state.actionMessage)
+        coVerify { approveWorkflowRunUseCase(owner, repo, 123456L) }
+        coVerify { approveWorkflowRunUseCase(owner, repo, 789012L) }
     }
 }

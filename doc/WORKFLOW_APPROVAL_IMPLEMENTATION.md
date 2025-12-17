@@ -74,10 +74,10 @@ data class WorkflowRun(
 
 1. User navigates to a PR review screen
 2. App automatically loads workflow runs for the repository
-3. App filters runs to show only those needing approval (status: `waiting`, `action_required`, or `pending`)
+3. App filters runs to show only those needing approval (status: `waiting` or `action_required`)
 4. User sees the "Play" icon button in the toolbar (for open PRs only)
-5. User taps the button to approve the first workflow run needing approval
-6. App displays success message via snackbar
+5. User taps the button to approve **ALL** workflow runs needing approval at once
+6. App displays success message via snackbar showing how many workflows were approved
 7. Workflow runs are automatically reloaded to reflect the new state
 
 ## API Usage
@@ -92,24 +92,26 @@ Response includes:
 - Each run has: id, name, status, conclusion, head_sha, html_url
 
 The app locally filters for runs with these statuses that need approval:
-- `waiting` - Waiting for first-time contributor approval (highest priority)
+- `waiting` - Waiting for first-time contributor approval
 - `action_required` - Requires manual intervention
-- `pending` - Pending approval
 
-### Approve Workflow Run
+### Approve Workflow Runs (Batch Operation)
 ```
 POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
 ```
 
 Note: This endpoint specifically approves workflow runs from **fork pull requests by first-time contributors**.
 
+The app calls this endpoint for **each** pending workflow run, effectively approving all pending runs at once, similar to GitHub's web UI behavior when approving workflows.
+
 Returns:
 - Status and required approval count
 
 ## Error Handling
 
-- **No runs need approval**: Shows message "No workflow runs require approval"
-- **API failure**: Shows error message with details
+- **No runs need approval**: Shows message "No workflows need approval. Use re-run for non-fork PRs."
+- **API failure**: Shows error message with details for all failures
+- **Partial success**: Shows message indicating how many workflows were approved and how many failed
 - **Network error**: Displays appropriate error in UI
 - **Silent failures**: Loading workflow runs fails silently (optional data)
 
@@ -140,7 +142,7 @@ All tests pass successfully (100% pass rate).
 
 ## Future Enhancements
 
-1. **Bulk Approval**: Allow approving multiple workflow runs at once
+1. ~~**Bulk Approval**: Allow approving multiple workflow runs at once~~ ✅ **IMPLEMENTED**
 2. **Workflow Details**: Show detailed information about each workflow run
 3. **Status Indicators**: Display visual indicators for workflow run status
 4. **Notifications**: Notify users when workflows require approval
