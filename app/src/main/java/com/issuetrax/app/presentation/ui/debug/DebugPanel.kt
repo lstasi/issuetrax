@@ -216,7 +216,7 @@ private fun ExpandedDebugPanel(
                     }
                     IconButton(onClick = onCollapse) {
                         Icon(
-                            imageVector = Icons.Default.ExpandMore,
+                            imageVector = Icons.Default.ExpandLess,
                             contentDescription = "Collapse"
                         )
                     }

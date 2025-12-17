@@ -5,7 +5,6 @@ import com.issuetrax.app.domain.debug.HttpRequestTracker
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import okio.Buffer
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
