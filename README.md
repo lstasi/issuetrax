@@ -40,6 +40,26 @@ Built with modern Android development practices and **minimal essential dependen
 - **Target**: Android 14+ (API 34) - No backward compatibility
 - **Philosophy**: Simple UI, minimal dependencies, no unnecessary animations
 
+## 🔧 Development Features
+
+### Debug Mode HTTP Request Panel
+
+When running debug builds, Issuetrax includes a powerful HTTP request tracking panel at the bottom of the screen that helps developers:
+
+- 📊 **Monitor all API requests** in real-time
+- 🔍 **Inspect request/response details** including headers, bodies, and timing
+- 🐛 **Debug API issues** with detailed error information
+- ⚡ **Analyze performance** with request duration metrics
+
+**Key Features:**
+- Collapsible bar showing the latest request
+- Expandable list of recent requests (up to 50)
+- Detailed view with full headers and body content
+- Color-coded status indicators (green=success, orange=failed, red=error)
+- Zero impact on release builds (debug-only)
+
+See **[DEBUG_PANEL.md](doc/DEBUG_PANEL.md)** for complete documentation.
+
 ## 📚 Documentation
 
 This repository contains comprehensive definition documents for the Issuetrax project:
@@ -51,6 +71,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 - **[ARCHITECTURE.md](doc/ARCHITECTURE.md)**: Technical architecture, patterns, and implementation details
 - **[UI_UX_DESIGN.md](doc/UI_UX_DESIGN.md)**: Detailed UI/UX specifications with gesture system design
 - **[PROJECT_SETUP.md](doc/PROJECT_SETUP.md)**: Step-by-step development environment and project setup guide
+- **[DEBUG_PANEL.md](doc/DEBUG_PANEL.md)**: Debug mode HTTP request tracking panel documentation ⭐ **NEW**
 - **[copilot-instructions.md](.github/copilot-instructions.md)**: GitHub Copilot configuration and development guidelines
 
 ### 🎯 Quick Navigation
@@ -62,6 +83,7 @@ This repository contains comprehensive definition documents for the Issuetrax pr
 | [Architecture](doc/ARCHITECTURE.md) | Technical implementation details | Developers, Architects |
 | [UI/UX Design](doc/UI_UX_DESIGN.md) | Design specifications and user experience | Designers, Frontend Developers |
 | [Project Setup](doc/PROJECT_SETUP.md) | Development environment setup | Developers, DevOps |
+| [Debug Panel](doc/DEBUG_PANEL.md) | Debug mode HTTP request tracking | Developers |
 | [Copilot Instructions](.github/copilot-instructions.md) | AI coding assistant configuration | Developers using GitHub Copilot |
 
 ## 🎨 Design Highlights
