@@ -51,14 +51,10 @@ class DebugLoggingInterceptor @Inject constructor(
     
     private fun captureRequest(request: Request, requestId: String, timestamp: Long): HttpRequestInfo {
         val headers = request.headers.toMultimap().mapValues { it.value.joinToString(", ") }
-        val body = try {
-            request.body?.let { requestBody ->
-                val buffer = Buffer()
-                requestBody.writeTo(buffer)
-                buffer.readUtf8().take(1000) // Limit body size
-            }
-        } catch (e: Exception) {
-            "[Error reading body: ${e.message}]"
+        // Note: We don't capture the request body to avoid consuming it.
+        // The body is only available once and reading it here would prevent the actual request.
+        val body = request.body?.contentLength()?.let { length ->
+            if (length > 0) "[Request body: $length bytes]" else null
         }
         
         return HttpRequestInfo(

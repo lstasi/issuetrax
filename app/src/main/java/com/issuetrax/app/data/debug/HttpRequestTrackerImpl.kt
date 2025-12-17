@@ -5,6 +5,7 @@ import com.issuetrax.app.domain.debug.HttpRequestTracker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,16 +22,9 @@ class HttpRequestTrackerImpl @Inject constructor() : HttpRequestTracker {
     override val requests: StateFlow<List<HttpRequestInfo>> = _requests.asStateFlow()
     
     override fun trackRequest(request: HttpRequestInfo) {
-        synchronized(this) {
-            val currentRequests = _requests.value.toMutableList()
-            currentRequests.add(0, request) // Add to beginning (most recent first)
-            
-            // Keep only the last maxRequests
-            if (currentRequests.size > maxRequests) {
-                currentRequests.subList(maxRequests, currentRequests.size).clear()
-            }
-            
-            _requests.value = currentRequests
+        _requests.update { currentRequests ->
+            val updatedList = listOf(request) + currentRequests
+            updatedList.take(maxRequests)
         }
     }
     
