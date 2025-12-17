@@ -93,21 +93,9 @@ The repository maintainers will handle merging PRs that modify workflows.
 
 If you need to update your PAT:
 
-**Using Git Credential Manager (recommended)**:
+**Method 1: Using Git Credential Manager (recommended)**:
 ```bash
-# Clear cached credentials (enter the following lines interactively)
-git credential reject
-# Then type these lines followed by a blank line:
-protocol=https
-host=github.com
-
-# Next git operation will prompt for credentials
-git pull
-# Enter your username and the new PAT as the password
-```
-
-**Alternative: Using heredoc**:
-```bash
+# Use heredoc to clear cached credentials
 git credential reject <<EOF
 protocol=https
 host=github.com
@@ -116,16 +104,33 @@ EOF
 
 # Next git operation will prompt for credentials
 git pull
+# Enter your username and the new PAT as the password
+```
+
+**Method 2: Interactive input**:
+```bash
+# Start the credential reject command
+git credential reject
+# The command will wait for input. Type the following lines:
+protocol=https
+host=github.com
+# Then press Enter on a blank line to submit
+# Press Ctrl+D to end input
+
+# Next git operation will prompt for credentials
+git pull
 ```
 
 **⚠️ NOT RECOMMENDED: Embedding token in URL**:
 ```bash
 # WARNING: This exposes the token in git config and shell history
-# Only use for testing/temporary setups
+# Only use for testing/temporary setups - NEVER for production
 git remote set-url origin https://NEW_TOKEN@github.com/lstasi/issuetrax.git
 
-# If you use this method, clear your shell history afterwards:
-history -d $(history 1)
+# If you use this method, clear your shell history afterwards (bash):
+history -d $((HISTCMD-1))
+# Or for zsh:
+# fc -R
 ```
 
 ## Security Best Practices
