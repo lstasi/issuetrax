@@ -95,8 +95,9 @@ If you need to update your PAT:
 
 **Using Git Credential Manager (recommended)**:
 ```bash
-# Clear cached credentials
+# Clear cached credentials (enter the following lines interactively)
 git credential reject
+# Then type these lines followed by a blank line:
 protocol=https
 host=github.com
 
@@ -105,10 +106,26 @@ git pull
 # Enter your username and the new PAT as the password
 ```
 
-**Using command line**:
+**Alternative: Using heredoc**:
 ```bash
-# For HTTPS remotes, update the remote URL with the new token
+git credential reject <<EOF
+protocol=https
+host=github.com
+
+EOF
+
+# Next git operation will prompt for credentials
+git pull
+```
+
+**⚠️ NOT RECOMMENDED: Embedding token in URL**:
+```bash
+# WARNING: This exposes the token in git config and shell history
+# Only use for testing/temporary setups
 git remote set-url origin https://NEW_TOKEN@github.com/lstasi/issuetrax.git
+
+# If you use this method, clear your shell history afterwards:
+history -d $(history 1)
 ```
 
 ## Security Best Practices
