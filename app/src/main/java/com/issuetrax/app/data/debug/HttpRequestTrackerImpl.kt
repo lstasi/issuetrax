@@ -29,6 +29,6 @@ class HttpRequestTrackerImpl @Inject constructor() : HttpRequestTracker {
     }
     
     override fun clearRequests() {
-        _requests.value = emptyList()
+        _requests.update { emptyList() }
     }
 }

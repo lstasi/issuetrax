@@ -18,6 +18,10 @@ class DebugLoggingInterceptor @Inject constructor(
     private val requestTracker: HttpRequestTracker
 ) : Interceptor {
     
+    companion object {
+        private const val MAX_RESPONSE_BODY_SIZE = 1000L
+    }
+    
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val requestId = UUID.randomUUID().toString()
@@ -51,9 +55,9 @@ class DebugLoggingInterceptor @Inject constructor(
     
     private fun captureRequest(request: Request, requestId: String, timestamp: Long): HttpRequestInfo {
         val headers = request.headers.toMultimap().mapValues { it.value.joinToString(", ") }
-        // Note: We don't capture the request body to avoid consuming it.
+        // Note: We don't capture the request body content to avoid consuming it.
         // The body is only available once and reading it here would prevent the actual request.
-        val body = request.body?.contentLength()?.let { length ->
+        val bodyInfo = request.body?.contentLength()?.let { length ->
             if (length > 0) "[Request body: $length bytes]" else null
         }
         
@@ -63,7 +67,7 @@ class DebugLoggingInterceptor @Inject constructor(
             method = request.method,
             url = request.url.toString(),
             requestHeaders = headers,
-            requestBody = body,
+            requestBody = bodyInfo,
             responseCode = null,
             responseMessage = null,
             responseHeaders = null,
@@ -80,7 +84,7 @@ class DebugLoggingInterceptor @Inject constructor(
     ): HttpRequestInfo {
         val headers = response.headers.toMultimap().mapValues { it.value.joinToString(", ") }
         val body = try {
-            response.peekBody(1000).string() // Peek at response body without consuming it
+            response.peekBody(MAX_RESPONSE_BODY_SIZE).string() // Peek at response body without consuming it
         } catch (e: Exception) {
             "[Error reading body: ${e.message}]"
         }
