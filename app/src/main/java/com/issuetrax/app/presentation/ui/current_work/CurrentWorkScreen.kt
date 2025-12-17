@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -193,11 +194,23 @@ fun CurrentWorkScreen(
                         items(uiState.pullRequests) { pullRequest ->
                             PullRequestItem(
                                 pullRequest = pullRequest,
-                                onClick = { onNavigateToPR(pullRequest.number) }
+                                onClick = { onNavigateToPR(pullRequest.number) },
+                                onShowBuildActions = {
+                                    viewModel.showBuildActionsSheet(owner, repo, pullRequest)
+                                }
                             )
                         }
                     }
                 }
+            }
+            
+            // Show Build Actions Sheet when requested
+            if (uiState.showBuildActionsSheet) {
+                BuildActionsSheet(
+                    workflowRuns = uiState.workflowRuns,
+                    isLoading = uiState.isLoadingWorkflowRuns,
+                    onDismiss = { viewModel.hideBuildActionsSheet() }
+                )
             }
         }
     }
@@ -206,7 +219,8 @@ fun CurrentWorkScreen(
 @Composable
 fun PullRequestItem(
     pullRequest: PullRequest,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onShowBuildActions: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -254,7 +268,10 @@ fun PullRequestItem(
                 ) {
                     // Show GitHub Actions check run statistics if available
                     pullRequest.checkRunSummary?.let { summary ->
-                        CheckRunStatistics(checkRunSummary = summary)
+                        CheckRunStatisticsWithButton(
+                            checkRunSummary = summary,
+                            onShowBuildActions = onShowBuildActions
+                        )
                     }
                     
                     // Only show stats if we have data (changedFiles is null from list endpoint)
@@ -288,6 +305,40 @@ fun PRStateIndicator(
         color = color,
         modifier = modifier
     )
+}
+
+/**
+ * Display GitHub Actions check run statistics with a button to show details.
+ * Shows pending (yellow), success (green), failed (red), and skipped (gray) job counts.
+ * Includes an info button to show detailed workflow runs.
+ */
+@Composable
+fun CheckRunStatisticsWithButton(
+    checkRunSummary: CheckRunSummary,
+    onShowBuildActions: () -> Unit
+) {
+    // Only show if there are any check runs
+    if (checkRunSummary.total == 0) return
+    
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CheckRunStatistics(checkRunSummary = checkRunSummary)
+        
+        // Info button to show build actions sheet
+        IconButton(
+            onClick = onShowBuildActions,
+            modifier = Modifier.size(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = "Show build details",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
 }
 
 /**

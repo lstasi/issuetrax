@@ -531,6 +531,38 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
+    override suspend fun getWorkflowRunsForPR(
+        owner: String,
+        repo: String,
+        headSha: String
+    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>> {
+        return try {
+            val token = authRepository.getAccessToken()
+                ?: return Result.failure(Exception("No access token"))
+            
+            val response = apiService.getWorkflowRuns(
+                authorization = "Bearer $token",
+                owner = owner,
+                repo = repo,
+                event = null,
+                status = null
+            )
+            
+            if (response.isSuccessful) {
+                val workflowRunsResponse = response.body()!!
+                // Filter workflow runs by head SHA to get only those for this PR
+                val workflowRuns = workflowRunsResponse.workflow_runs
+                    .filter { it.head_sha == headSha }
+                    .map { it.toDomain() }
+                Result.success(workflowRuns)
+            } else {
+                Result.failure(Exception("Failed to get workflow runs for PR: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     override suspend fun approveWorkflowRun(
         owner: String,
         repo: String,
