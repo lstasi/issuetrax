@@ -90,7 +90,7 @@ The GitHub authentication enables users to securely access GitHub APIs using Per
 
 ## User Setup Instructions
 
-### Creating a Personal Access Token
+### Creating a Personal Access Token for App Usage
 
 Users need to create a Personal Access Token from their GitHub account:
 
@@ -105,6 +105,15 @@ Users need to create a Personal Access Token from their GitHub account:
 7. Paste the token into the Issuetrax app
 
 **Note**: The app provides a convenient button that opens the token creation page with pre-configured scopes.
+
+### For Repository Maintainers
+
+If you're a repository maintainer who needs to merge Pull Requests that modify GitHub Actions workflow files, you'll need additional scopes. See [REPOSITORY_MAINTENANCE.md](REPOSITORY_MAINTENANCE.md) for detailed information about:
+- Required PAT scopes for workflow modifications
+- Troubleshooting merge errors
+- Security best practices
+
+**Quick summary**: Add the `workflow` scope to your PAT if you need to merge PRs that create or modify files in `.github/workflows/`.
 
 ## Security Considerations
 
