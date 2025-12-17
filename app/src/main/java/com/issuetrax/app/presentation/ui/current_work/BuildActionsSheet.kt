@@ -170,13 +170,13 @@ fun WorkflowStatusBadge(
     conclusion: String?
 ) {
     val (text, color) = when {
-        status == "completed" && conclusion == "success" -> "Success" to Color(0xFF22863A)
+        status == "completed" && conclusion == "success" -> "Success" to Color(0xFF22863A) // GitHub green
         status == "completed" && conclusion == "failure" -> "Failed" to MaterialTheme.colorScheme.error
-        status == "completed" && conclusion == "cancelled" -> "Cancelled" to Color(0xFF8B949E)
-        status == "completed" && conclusion == "skipped" -> "Skipped" to Color(0xFF8B949E)
-        status == "in_progress" -> "In Progress" to Color(0xFFDBB300)
-        status == "queued" -> "Queued" to Color(0xFFDBB300)
-        status == "waiting" -> "Waiting" to Color(0xFFDBB300)
+        status == "completed" && conclusion == "cancelled" -> "Cancelled" to Color(0xFF8B949E) // Gray
+        status == "completed" && conclusion == "skipped" -> "Skipped" to Color(0xFF8B949E) // Gray
+        status == "in_progress" -> "In Progress" to Color(0xFFDBB300) // Yellow/amber
+        status == "queued" -> "Queued" to Color(0xFFDBB300) // Yellow/amber
+        status == "waiting" -> "Waiting" to Color(0xFFDBB300) // Yellow/amber
         else -> status.replaceFirstChar { it.uppercase() } to MaterialTheme.colorScheme.onSurfaceVariant
     }
     
