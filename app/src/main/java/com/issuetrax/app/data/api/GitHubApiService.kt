@@ -6,6 +6,7 @@ import com.issuetrax.app.data.api.model.ReviewDto
 import com.issuetrax.app.data.api.model.UserDto
 import com.issuetrax.app.data.api.model.FileDiffDto
 import com.issuetrax.app.data.api.model.IssueDto
+import com.issuetrax.app.data.api.model.IssueCommentDto
 import com.issuetrax.app.data.api.model.WorkflowRunsResponseDto
 import com.issuetrax.app.data.api.model.WorkflowRunApprovalResponseDto
 import com.issuetrax.app.data.api.model.CheckRunsResponseDto
@@ -241,15 +242,6 @@ data class AddAssigneesRequest(
 @Serializable
 data class CreateIssueCommentRequest(
     val body: String
-)
-
-@Serializable
-data class IssueCommentDto(
-    val id: Long,
-    val body: String,
-    val user: UserDto,
-    val created_at: String,
-    val updated_at: String
 )
 
 @Serializable
