@@ -342,10 +342,11 @@ class PRReviewViewModel @Inject constructor(
     }
     
     /**
-     * Public method to approve a workflow run that is waiting for approval.
-     * Finds the first waiting run and approves it.
+     * Public method to approve all workflow runs that are waiting for approval.
+     * Approves all runs with status "waiting" or "action_required".
      * 
      * This is used for PRs from forks, first-time contributors, or bots like Copilot.
+     * Similar to GitHub's behavior when approving workflows from the UI.
      */
     fun approveWorkflowRun(owner: String, repo: String) {
         viewModelScope.launch {
@@ -358,18 +359,81 @@ class PRReviewViewModel @Inject constructor(
                 return@launch
             }
             
-            // Find a waiting run (status = "waiting" has priority over "action_required")
-            val waitingRun = workflowRuns.firstOrNull { it.status == "waiting" }
-                ?: workflowRuns.firstOrNull { it.status == "action_required" }
+            // Find all waiting runs (status = "waiting" or "action_required")
+            val waitingRuns = workflowRuns.filter { 
+                it.status == "waiting" || it.status == "action_required" 
+            }
             
-            if (waitingRun != null) {
-                approveWorkflowRunInternal(owner, repo, waitingRun)
-            } else {
+            if (waitingRuns.isEmpty()) {
                 _uiState.value = _uiState.value.copy(
                     actionMessage = "No workflows need approval. Use re-run for non-fork PRs."
                 )
+                return@launch
+            }
+            
+            // Approve all waiting runs
+            approveAllWorkflowRuns(owner, repo, waitingRuns)
+        }
+    }
+    
+    /**
+     * Approves all workflow runs in the provided list.
+     * This matches GitHub's behavior where all pending workflows are approved at once.
+     * 
+     * @param owner Repository owner
+     * @param repo Repository name
+     * @param waitingRuns List of workflow runs to approve
+     */
+    private suspend fun approveAllWorkflowRuns(
+        owner: String, 
+        repo: String, 
+        waitingRuns: List<com.issuetrax.app.domain.entity.WorkflowRun>
+    ) {
+        _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
+        
+        var successCount = 0
+        var failureCount = 0
+        val errors = mutableListOf<String>()
+        
+        // Approve each workflow run
+        for (run in waitingRuns) {
+            val result = approveWorkflowRunUseCase(owner, repo, run.id)
+            if (result.isSuccess) {
+                successCount++
+            } else {
+                failureCount++
+                errors.add("${run.name}: ${result.exceptionOrNull()?.message ?: "Unknown error"}")
             }
         }
+        
+        // Update UI state based on results
+        if (failureCount == 0) {
+            // All approvals succeeded
+            val message = if (successCount == 1) {
+                "Workflow '${waitingRuns[0].name}' approved successfully"
+            } else {
+                "All $successCount workflows approved successfully"
+            }
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                actionMessage = message
+            )
+        } else if (successCount == 0) {
+            // All approvals failed
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                error = "Failed to approve workflows: ${errors.joinToString("; ")}"
+            )
+        } else {
+            // Partial success
+            _uiState.value = _uiState.value.copy(
+                isSubmittingReview = false,
+                actionMessage = "Approved $successCount workflows, $failureCount failed"
+            )
+        }
+        
+        // Reload workflow runs to reflect the new state
+        loadWorkflowRuns(owner, repo)
     }
     
     /**
