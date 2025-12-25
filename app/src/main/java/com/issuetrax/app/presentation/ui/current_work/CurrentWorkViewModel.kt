@@ -214,6 +214,49 @@ class CurrentWorkViewModel @Inject constructor(
             }
         }
     }
+    
+    /**
+     * Shows the build actions sheet for a specific PR and loads its workflow runs.
+     */
+    fun showBuildActionsSheet(owner: String, repo: String, pullRequest: PullRequest) {
+        _uiState.value = _uiState.value.copy(
+            showBuildActionsSheet = true,
+            selectedPrForBuildActions = pullRequest,
+            isLoadingWorkflowRuns = true
+        )
+        
+        viewModelScope.launch {
+            val result = gitHubRepository.getWorkflowRunsForPR(
+                owner = owner,
+                repo = repo,
+                headSha = pullRequest.headRef
+            )
+            
+            if (result.isSuccess) {
+                val workflowRuns = result.getOrNull() ?: emptyList()
+                _uiState.value = _uiState.value.copy(
+                    isLoadingWorkflowRuns = false,
+                    workflowRuns = workflowRuns
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingWorkflowRuns = false,
+                    workflowRuns = emptyList()
+                )
+            }
+        }
+    }
+    
+    /**
+     * Hides the build actions sheet.
+     */
+    fun hideBuildActionsSheet() {
+        _uiState.value = _uiState.value.copy(
+            showBuildActionsSheet = false,
+            selectedPrForBuildActions = null,
+            workflowRuns = emptyList()
+        )
+    }
 }
 
 data class CurrentWorkUiState(
@@ -226,5 +269,9 @@ data class CurrentWorkUiState(
     val filter: PRFilter = PRFilter.OPEN,
     val sortBy: PRSortOrder = PRSortOrder.UPDATED,
     val error: String? = null,
-    val latestRelease: com.issuetrax.app.domain.entity.Release? = null
+    val latestRelease: com.issuetrax.app.domain.entity.Release? = null,
+    val showBuildActionsSheet: Boolean = false,
+    val selectedPrForBuildActions: PullRequest? = null,
+    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList(),
+    val isLoadingWorkflowRuns: Boolean = false
 )

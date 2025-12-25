@@ -100,6 +100,20 @@ interface GitHubRepository {
     ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
     
     /**
+     * Gets workflow runs for a specific pull request by filtering by head SHA.
+     * 
+     * @param owner Repository owner
+     * @param repo Repository name
+     * @param headSha The commit SHA of the PR head
+     * @return Result with list of WorkflowRun for the specific PR
+     */
+    suspend fun getWorkflowRunsForPR(
+        owner: String,
+        repo: String,
+        headSha: String
+    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
+    
+    /**
      * Approves a workflow run from a fork PR by a first-time contributor.
      * Note: This only works for fork pull requests, not same-repo PRs.
      */

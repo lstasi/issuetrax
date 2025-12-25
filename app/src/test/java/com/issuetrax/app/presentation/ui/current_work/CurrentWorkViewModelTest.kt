@@ -56,6 +56,8 @@ class CurrentWorkViewModelTest {
         gitHubRepository = mockk()
         // Mock getCheckRuns to return failure by default (no checks available)
         coEvery { gitHubRepository.getCheckRuns(any(), any(), any()) } returns Result.failure(Exception("No checks"))
+        // Mock getWorkflowRunsForPR to return empty list by default
+        coEvery { gitHubRepository.getWorkflowRunsForPR(any(), any(), any()) } returns Result.success(emptyList())
         viewModel = CurrentWorkViewModel(getPullRequestsUseCase, gitHubRepository)
     }
     
@@ -78,6 +80,10 @@ class CurrentWorkViewModelTest {
         assertEquals("Sort order should be UPDATED", PRSortOrder.UPDATED, state.sortBy)
         assertNull("Error should be null", state.error)
         assertNull("Latest release should be null", state.latestRelease)
+        assertFalse("Build actions sheet should not be shown", state.showBuildActionsSheet)
+        assertNull("Selected PR for build actions should be null", state.selectedPrForBuildActions)
+        assertTrue("Workflow runs should be empty", state.workflowRuns.isEmpty())
+        assertFalse("Should not be loading workflow runs", state.isLoadingWorkflowRuns)
     }
     
     @Test
@@ -450,5 +456,134 @@ class CurrentWorkViewModelTest {
         assertNull("Latest release should be null", state.latestRelease)
         
         coVerify { gitHubRepository.getLatestRelease(owner, repo) }
+    }
+    
+    @Test
+    fun `showBuildActionsSheet should set state and load workflow runs on success`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val headSha = "abc123"
+        val pullRequest = createTestPullRequest(1, "Test PR", LocalDateTime.now())
+            .copy(headRef = headSha)
+        val mockWorkflowRuns = listOf(
+            com.issuetrax.app.domain.entity.WorkflowRun(
+                id = 1,
+                name = "Build",
+                status = "completed",
+                conclusion = "success",
+                headSha = headSha,
+                htmlUrl = "https://github.com/testuser/test-repo/actions/runs/1"
+            )
+        )
+        
+        coEvery { 
+            gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) 
+        } returns Result.success(mockWorkflowRuns)
+        
+        // When
+        viewModel.showBuildActionsSheet(owner, repo, pullRequest)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue("Build actions sheet should be shown", state.showBuildActionsSheet)
+        assertEquals("Selected PR should be set", pullRequest, state.selectedPrForBuildActions)
+        assertFalse("Should not be loading workflow runs", state.isLoadingWorkflowRuns)
+        assertEquals("Should have 1 workflow run", 1, state.workflowRuns.size)
+        assertEquals("Workflow run should match", mockWorkflowRuns[0], state.workflowRuns[0])
+        
+        coVerify { gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) }
+    }
+    
+    @Test
+    fun `showBuildActionsSheet should set state and handle empty workflow runs`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val headSha = "abc123"
+        val pullRequest = createTestPullRequest(1, "Test PR", LocalDateTime.now())
+            .copy(headRef = headSha)
+        
+        coEvery { 
+            gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) 
+        } returns Result.success(emptyList())
+        
+        // When
+        viewModel.showBuildActionsSheet(owner, repo, pullRequest)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue("Build actions sheet should be shown", state.showBuildActionsSheet)
+        assertTrue("Workflow runs should be empty", state.workflowRuns.isEmpty())
+        assertFalse("Should not be loading workflow runs", state.isLoadingWorkflowRuns)
+        
+        coVerify { gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) }
+    }
+    
+    @Test
+    fun `showBuildActionsSheet should set state and handle failure`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val headSha = "abc123"
+        val pullRequest = createTestPullRequest(1, "Test PR", LocalDateTime.now())
+            .copy(headRef = headSha)
+        
+        coEvery { 
+            gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) 
+        } returns Result.failure(RuntimeException("API Error"))
+        
+        // When
+        viewModel.showBuildActionsSheet(owner, repo, pullRequest)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue("Build actions sheet should be shown", state.showBuildActionsSheet)
+        assertTrue("Workflow runs should be empty on failure", state.workflowRuns.isEmpty())
+        assertFalse("Should not be loading workflow runs", state.isLoadingWorkflowRuns)
+        
+        coVerify { gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) }
+    }
+    
+    @Test
+    fun `hideBuildActionsSheet should reset build actions state`() = runTest {
+        // Given - First show the sheet
+        val owner = "testuser"
+        val repo = "test-repo"
+        val headSha = "abc123"
+        val pullRequest = createTestPullRequest(1, "Test PR", LocalDateTime.now())
+            .copy(headRef = headSha)
+        val mockWorkflowRuns = listOf(
+            com.issuetrax.app.domain.entity.WorkflowRun(
+                id = 1,
+                name = "Build",
+                status = "completed",
+                conclusion = "success",
+                headSha = headSha,
+                htmlUrl = "https://github.com/testuser/test-repo/actions/runs/1"
+            )
+        )
+        
+        coEvery { 
+            gitHubRepository.getWorkflowRunsForPR(owner, repo, headSha) 
+        } returns Result.success(mockWorkflowRuns)
+        
+        viewModel.showBuildActionsSheet(owner, repo, pullRequest)
+        advanceUntilIdle()
+        
+        // Verify sheet is shown
+        assertTrue("Build actions sheet should be shown", viewModel.uiState.value.showBuildActionsSheet)
+        
+        // When
+        viewModel.hideBuildActionsSheet()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertFalse("Build actions sheet should be hidden", state.showBuildActionsSheet)
+        assertNull("Selected PR should be null", state.selectedPrForBuildActions)
+        assertTrue("Workflow runs should be cleared", state.workflowRuns.isEmpty())
     }
 }
