@@ -2,6 +2,7 @@ package com.issuetrax.app.di
 
 import com.issuetrax.app.BuildConfig
 import com.issuetrax.app.data.api.AuthInterceptor
+import com.issuetrax.app.data.api.DebugLoggingInterceptor
 import com.issuetrax.app.data.api.GitHubApiService
 import com.issuetrax.app.data.api.RateLimitInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -46,16 +47,23 @@ object NetworkModule {
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: AuthInterceptor,
-        rateLimitInterceptor: RateLimitInterceptor
+        rateLimitInterceptor: RateLimitInterceptor,
+        debugLoggingInterceptor: DebugLoggingInterceptor
     ): OkHttpClient {
-        return OkHttpClient.Builder()
+        val builder = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(rateLimitInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
+        
+        // Add debug interceptor only in debug builds
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(debugLoggingInterceptor)
+        }
+        
+        return builder.build()
     }
     
     @Provides
