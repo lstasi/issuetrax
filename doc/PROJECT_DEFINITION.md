@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Issuetrax is a native Android application built with Kotlin that provides a focused, single-project workflow for GitHub issue management and Pull Request (PR) reviews. The app operates on a simplified model: one repository, one issue/PR at a time, with primary focus on delivering an intuitive, gesture-based PR review experience optimized for mobile devices.
+Issuetrax is a native Android application built with Kotlin that provides a focused, single-project workflow for GitHub issue management and Pull Request (PR) merge management. The app operates on a simplified model: one repository, one issue/PR at a time, with primary focus on repository-level merge-readiness review.
 
 ## Related Documentation
 
@@ -16,16 +16,16 @@ Issuetrax is a native Android application built with Kotlin that provides a focu
 ### Primary Features
 - Focused single-repository workflow
 - Single issue/PR management at a time
-- Advanced Pull Request review interface (primary focus)
+- Advanced Pull Request merge management interface (primary focus)
 - Gesture-based navigation (swipe up/down/left/right)
 - GitHub authentication integration
 - No backend dependency (direct GitHub API integration)
-- Inline diff view optimized for mobile screens
+- PR description rendering and high-level merge review guidance
 
 ### Simplified Workflow
 1. **Login & Repository Selection**: OAuth authentication with single repository selection
 2. **Current Work Focus**: Display current issue/PR or provide simple creation interface
-3. **PR Review Experience**: Advanced gesture-driven review with inline diff, source code browser, validations, comments, and file navigation
+3. **Repository Review Experience**: PR description rendering, high-level impact/intent/security review, and merge decision support
 4. **Single Context**: Work within one repository and one issue/PR at a time to reduce complexity
 
 ### Target Output
@@ -120,8 +120,8 @@ app/
 - Active PR → PR Review Screen
 - Create Issue → Issue creation flow
 
-### 3. PR Review Screen (Primary Focus)
-**Purpose**: Provide comprehensive Pull Request review experience with mobile-optimized interface
+### 3. Repository Review Screen (Primary Focus)
+**Purpose**: Provide merge-first Pull Request review with repository-level context and high-level decision support
 
 #### Core Features
 **PR Overview**:
@@ -131,8 +131,10 @@ app/
 - Review progress tracking
 
 **Advanced Review Interface**:
-- **Inline Diff Viewer** (mobile-optimized, no side-by-side)
-- File navigation with gesture support
+- **PR Description Rendering** (markdown, mobile-optimized)
+- High-level review request/comment workflow (impact, intent, security)
+- File diff access from top action bar when detailed code review is needed
+- File navigation with gesture support (secondary flow)
 - Line-by-line commenting system
 - Review submission workflow
 - Source code browser for context
