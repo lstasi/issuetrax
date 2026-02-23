@@ -81,6 +81,12 @@ fun PRReviewScreen(
             }
         }
     }
+
+    LaunchedEffect(showFileReview) {
+        if (showFileReview) {
+            viewModel.navigateToFileList()
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -108,9 +114,6 @@ fun PRReviewScreen(
                     IconButton(
                         onClick = {
                             showFileReview = !showFileReview
-                            if (showFileReview) {
-                                viewModel.navigateToFileList()
-                            }
                         }
                     ) {
                         Icon(
@@ -171,65 +174,66 @@ fun PRReviewScreen(
                     }
                 }
                 uiState.pullRequest != null -> {
-                    val pullRequest = uiState.pullRequest ?: return@Box
-                    if (!showFileReview) {
-                        RepoReviewContent(
-                            pullRequest = pullRequest,
-                            onRequestHighLevelReview = {
-                                viewModel.requestHighLevelReview(owner, repo, prNumber)
-                            },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                        )
-                    } else {
-                        when (uiState.viewMode) {
-                            PRViewMode.FILE_LIST -> {
-                                // Show file list view
-                                FileListView(
-                                    files = uiState.files,
-                                    currentFileIndex = uiState.currentFileIndex,
-                                    onFileClick = { index -> viewModel.navigateToFile(index) },
-                                    commitStatus = uiState.commitStatus,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp)
-                                )
-                            }
-                            PRViewMode.FILE_DIFF -> {
-                                // Show file diff with swipe to return
-                                uiState.currentFile?.let { currentFile ->
-                                    GestureDetectionBox(
-                                        callbacks = GestureCallbacks(
-                                            onSwipeRight = { viewModel.navigateToFileList() }
-                                        ),
-                                        enabled = true,
-                                        showVisualFeedback = false,
-                                        enableHapticFeedback = true,
-                                        modifier = Modifier.fillMaxSize()
-                                    ) {
-                                        InlineDiffView(
-                                            fileDiff = currentFile,
-                                            onHunkClick = { hunk, index ->
-                                                viewModel.selectHunk(hunk, index)
-                                            },
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(16.dp)
-                                        )
+                    uiState.pullRequest?.let { pullRequest ->
+                        if (!showFileReview) {
+                            RepoReviewContent(
+                                pullRequest = pullRequest,
+                                onRequestHighLevelReview = {
+                                    viewModel.requestHighLevelReview(owner, repo, prNumber)
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                            )
+                        } else {
+                            when (uiState.viewMode) {
+                                PRViewMode.FILE_LIST -> {
+                                    // Show file list view
+                                    FileListView(
+                                        files = uiState.files,
+                                        currentFileIndex = uiState.currentFileIndex,
+                                        onFileClick = { index -> viewModel.navigateToFile(index) },
+                                        commitStatus = uiState.commitStatus,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp)
+                                    )
+                                }
+                                PRViewMode.FILE_DIFF -> {
+                                    // Show file diff with swipe to return
+                                    uiState.currentFile?.let { currentFile ->
+                                        GestureDetectionBox(
+                                            callbacks = GestureCallbacks(
+                                                onSwipeRight = { viewModel.navigateToFileList() }
+                                            ),
+                                            enabled = true,
+                                            showVisualFeedback = false,
+                                            enableHapticFeedback = true,
+                                            modifier = Modifier.fillMaxSize()
+                                        ) {
+                                            InlineDiffView(
+                                                fileDiff = currentFile,
+                                                onHunkClick = { hunk, index ->
+                                                    viewModel.selectHunk(hunk, index)
+                                                },
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(16.dp)
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                            PRViewMode.HUNK_DETAIL -> {
-                                // Show full-screen hunk detail with close button
-                                uiState.selectedHunk?.let { hunk ->
-                                    HunkDetailView(
-                                        hunk = hunk,
-                                        hunkIndex = uiState.selectedHunkIndex,
-                                        fileName = uiState.currentFile?.filename ?: "",
-                                        onClose = { viewModel.closeHunkDetail() },
-                                        modifier = Modifier.fillMaxSize()
-                                    )
+                                PRViewMode.HUNK_DETAIL -> {
+                                    // Show full-screen hunk detail with close button
+                                    uiState.selectedHunk?.let { hunk ->
+                                        HunkDetailView(
+                                            hunk = hunk,
+                                            hunkIndex = uiState.selectedHunkIndex,
+                                            fileName = uiState.currentFile?.filename ?: "",
+                                            onClose = { viewModel.closeHunkDetail() },
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
                                 }
                             }
                         }
