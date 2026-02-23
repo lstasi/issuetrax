@@ -269,6 +269,46 @@ class PRReviewViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Posts a structured comment asking for a high-level merge readiness review.
+     */
+    fun requestHighLevelReview(owner: String, repo: String, prNumber: Int) {
+        val pullRequest = _uiState.value.pullRequest
+        if (pullRequest == null) {
+            _uiState.value = _uiState.value.copy(
+                actionMessage = "Pull request details are still loading"
+            )
+            return
+        }
+        val body = buildHighLevelReviewRequest(owner, repo, prNumber, pullRequest)
+        createComment(owner, repo, prNumber, body)
+    }
+
+    private fun buildHighLevelReviewRequest(
+        owner: String,
+        repo: String,
+        prNumber: Int,
+        pullRequest: PullRequest
+    ): String {
+        val prTitle = pullRequest.title
+        val prUrl = pullRequest.htmlUrl.ifBlank { "https://github.com/$owner/$repo/pull/$prNumber" }
+        return """
+            ## @copilot High-Level Merge Review Request
+            
+            Please provide a high-level review focused on merge readiness for this pull request.
+            
+            **Repository:** `$owner/$repo`  
+            **PR:** #$prNumber - $prTitle  
+            **Link:** $prUrl
+            
+            ### Review Checklist
+            - Intent match: Does the implementation align with the requested changes?
+            - Impact: What are the main product and technical impacts?
+            - Security: Are there notable security concerns or regressions?
+            - Merge recommendation: Should this PR be merged now, and why?
+        """.trimIndent()
+    }
     
     /**
      * Loads commit status for the PR's head reference.

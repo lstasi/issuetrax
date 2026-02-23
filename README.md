@@ -4,7 +4,7 @@ A Kotlin mobile application for focused GitHub issue management and Pull Request
 
 ## 🚀 Overview
 
-Issuetrax is designed to revolutionize mobile code reviews by providing a clean, gesture-driven interface that makes reviewing Pull Requests on mobile devices intuitive and efficient. The app operates on a **simplified workflow model**: one repository, one issue/PR at a time, with primary focus on creating the best possible PR review experience using **inline diff views optimized for mobile screens**.
+Issuetrax is designed to streamline mobile Pull Request merge management with a clean, focused interface for repository-level PR understanding. The app operates on a **simplified workflow model**: one repository, one issue/PR at a time, with primary focus on **merge-readiness review**. File diffs remain available on demand when deeper inspection is needed.
 
 ## ✨ Key Features
 
@@ -15,7 +15,7 @@ Issuetrax is designed to revolutionize mobile code reviews by providing a clean,
   - Double tap: Expand/collapse code sections
   - Long press: Quick comment mode
 
-- **Mobile-Optimized PR Reviews**: Inline diff views designed for mobile screens
+- **Merge-First PR Reviews**: Repository-level PR understanding with high-level merge readiness checks
 - **GitHub Integration**: Seamless OAuth authentication and full API integration
 - **Source Code Browser**: Navigate repository files beyond the current PR
 - **Clean Architecture**: MVVM with Clean Architecture principles
@@ -24,7 +24,7 @@ Issuetrax is designed to revolutionize mobile code reviews by providing a clean,
 
 1. **Login & Repository Selection**: Combined GitHub OAuth authentication and single repository selection
 2. **Current Work**: Display active issue/PR or provide simple creation interface
-3. **PR Reviews**: Advanced gesture-based review interface with inline diff viewing (primary focus)
+3. **Repository Review**: PR description rendering and high-level merge assessment (primary focus), with file diff review available from the top action bar
 
 ## 🏗️ Architecture
 

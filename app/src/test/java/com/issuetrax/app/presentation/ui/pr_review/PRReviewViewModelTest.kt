@@ -12,6 +12,7 @@ import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -634,6 +635,58 @@ class PRReviewViewModelTest {
         
         // Then
         assertNull("Error should be null", viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `requestHighLevelReview should post structured merge review request comment`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 456
+        val pullRequest = createTestPullRequest(prNumber, "Refactor merge flow")
+        val bodySlot = slot<String>()
+
+        coEvery {
+            gitHubRepository.getPullRequest(owner, repo, prNumber)
+        } returns Result.success(pullRequest)
+        coEvery {
+            gitHubRepository.getPullRequestFiles(owner, repo, prNumber)
+        } returns Result.success(emptyList())
+        coEvery {
+            createCommentUseCase(owner, repo, prNumber, capture(bodySlot))
+        } returns Result.success(Unit)
+
+        viewModel.loadPullRequest(owner, repo, prNumber)
+        advanceUntilIdle()
+
+        // When
+        viewModel.requestHighLevelReview(owner, repo, prNumber)
+        advanceUntilIdle()
+
+        // Then
+        assertTrue(bodySlot.captured.contains("@copilot High-Level Merge Review Request"))
+        assertTrue(bodySlot.captured.contains("Review Checklist"))
+        assertTrue(bodySlot.captured.contains("#$prNumber - ${pullRequest.title}"))
+        coVerify { createCommentUseCase(owner, repo, prNumber, any()) }
+    }
+
+    @Test
+    fun `requestHighLevelReview should not post comment when pull request is not loaded`() = runTest {
+        // Given
+        val owner = "testuser"
+        val repo = "test-repo"
+        val prNumber = 789
+
+        // When
+        viewModel.requestHighLevelReview(owner, repo, prNumber)
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(
+            "Pull request details are still loading",
+            viewModel.uiState.value.actionMessage
+        )
+        coVerify(exactly = 0) { createCommentUseCase(any(), any(), any(), any()) }
     }
     
     @Test
