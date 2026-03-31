@@ -214,7 +214,12 @@ private fun parseDateTime(dateTimeString: String): LocalDateTime {
     return try {
         LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
     } catch (e: Exception) {
-        // Fallback for GitHub's date format
-        LocalDateTime.parse(dateTimeString.replace("Z", ""), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        try {
+            // Fallback for GitHub's date format
+            LocalDateTime.parse(dateTimeString.replace("Z", ""), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        } catch (e2: Exception) {
+            // Final fallback: return epoch start to avoid crashing the entire mapping
+            LocalDateTime.of(1970, 1, 1, 0, 0, 0)
+        }
     }
 }

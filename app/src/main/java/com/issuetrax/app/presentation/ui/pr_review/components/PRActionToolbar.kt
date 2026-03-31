@@ -189,7 +189,7 @@ fun PRActionToolbar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
+                    contentDescription = "Approve pull request",
                     tint = MaterialTheme.colorScheme.tertiary
                 )
             }
@@ -225,7 +225,7 @@ fun PRActionToolbar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = null,
+                    contentDescription = "Close pull request",
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -352,7 +352,7 @@ fun PRActionToolbar(
             icon = {
                 Icon(
                     imageVector = Icons.Filled.CallMerge,
-                    contentDescription = null,
+                    contentDescription = "Merge pull request",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -409,7 +409,7 @@ fun PRActionToolbar(
             icon = {
                 Icon(
                     imageVector = Icons.Filled.Comment,
-                    contentDescription = null,
+                    contentDescription = "Add comment",
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }

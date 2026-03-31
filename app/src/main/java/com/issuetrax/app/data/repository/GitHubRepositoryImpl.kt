@@ -46,7 +46,8 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getCurrentUser("Bearer $token")
             if (response.isSuccessful) {
-                val userDto = response.body()!!
+                val userDto = response.body()
+                    ?: return Result.failure(Exception("Failed to get current user: response body is null"))
                 Result.success(userDto.toDomain())
             } else {
                 Result.failure(Exception("Failed to get current user: ${response.code()}"))
@@ -66,7 +67,12 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getUserRepositories("Bearer $token")
             if (response.isSuccessful) {
-                val repositories = response.body()!!
+                val body = response.body()
+                if (body == null) {
+                    emit(Result.failure(Exception("Failed to get repositories: response body is null")))
+                    return@flow
+                }
+                val repositories = body
                     .filter { !it.archived }  // Filter out archived repositories
                     .map { it.toDomain() }
                 emit(Result.success(repositories))
@@ -92,7 +98,12 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getPullRequests("Bearer $token", owner, repo, state)
             if (response.isSuccessful) {
-                val pullRequests = response.body()!!.map { it.toDomain() }
+                val body = response.body()
+                if (body == null) {
+                    emit(Result.failure(Exception("Failed to get pull requests: response body is null")))
+                    return@flow
+                }
+                val pullRequests = body.map { it.toDomain() }
                 emit(Result.success(pullRequests))
             } else {
                 emit(Result.failure(Exception("Failed to get pull requests: ${response.code()}")))
@@ -113,7 +124,9 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getPullRequest("Bearer $token", owner, repo, number)
             if (response.isSuccessful) {
-                val pullRequest = response.body()!!.toDomain()
+                val pullRequest = (response.body()
+                    ?: return Result.failure(Exception("Failed to get pull request: response body is null")))
+                    .toDomain()
                 Result.success(pullRequest)
             } else {
                 Result.failure(Exception("Failed to get pull request: ${response.code()}"))
@@ -134,7 +147,9 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getPullRequestFiles("Bearer $token", owner, repo, number)
             if (response.isSuccessful) {
-                val files = response.body()!!.map { it.toDomain() }
+                val files = (response.body()
+                    ?: return Result.failure(Exception("Failed to get pull request files: response body is null")))
+                    .map { it.toDomain() }
                 Result.success(files)
             } else {
                 Result.failure(Exception("Failed to get pull request files: ${response.code()}"))
@@ -467,7 +482,8 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getCommitStatus("Bearer $token", owner, repo, ref)
             if (response.isSuccessful) {
-                val statusDto = response.body()!!
+                val statusDto = response.body()
+                    ?: return Result.failure(Exception("Failed to get commit status: response body is null"))
                 val commitStatus = CommitStatus(
                     state = statusDto.state.toCommitState(),
                     statuses = statusDto.statuses.map { status ->
@@ -500,7 +516,8 @@ class GitHubRepositoryImpl @Inject constructor(
             
             val response = apiService.getCheckRuns("Bearer $token", owner, repo, ref)
             if (response.isSuccessful) {
-                val checkRunsDto = response.body()!!
+                val checkRunsDto = response.body()
+                    ?: return Result.failure(Exception("Failed to get check runs: response body is null"))
                 val checkRuns = checkRunsDto.check_runs.map { it.toDomain() }
                 Result.success(checkRuns)
             } else {
@@ -530,7 +547,8 @@ class GitHubRepositoryImpl @Inject constructor(
             )
             
             if (response.isSuccessful) {
-                val workflowRunsResponse = response.body()!!
+                val workflowRunsResponse = response.body()
+                    ?: return Result.failure(Exception("Failed to get workflow runs: response body is null"))
                 val workflowRuns = workflowRunsResponse.workflow_runs.map { it.toDomain() }
                 Result.success(workflowRuns)
             } else {
@@ -559,7 +577,8 @@ class GitHubRepositoryImpl @Inject constructor(
             )
             
             if (response.isSuccessful) {
-                val workflowRunsResponse = response.body()!!
+                val workflowRunsResponse = response.body()
+                    ?: return Result.failure(Exception("Failed to get workflow runs for PR: response body is null"))
                 // Filter workflow runs by head SHA to get only those for this PR
                 val workflowRuns = workflowRunsResponse.workflow_runs
                     .filter { it.head_sha == headSha }
