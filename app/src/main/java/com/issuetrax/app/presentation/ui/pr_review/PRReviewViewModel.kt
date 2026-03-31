@@ -3,11 +3,21 @@ package com.issuetrax.app.presentation.ui.pr_review
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.issuetrax.app.domain.entity.CodeHunk
+import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.domain.entity.WorkflowRun
 import com.issuetrax.app.domain.repository.GitHubRepository
-import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
+import com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase
+import com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
+import com.issuetrax.app.domain.usecase.ClosePullRequestUseCase
+import com.issuetrax.app.domain.usecase.CreateCommentUseCase
+import com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
+import com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
+import com.issuetrax.app.domain.usecase.MergePullRequestUseCase
+import com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
 import com.issuetrax.app.domain.usecase.ReviewEvent
+import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,14 +38,14 @@ enum class PRViewMode {
 class PRReviewViewModel @Inject constructor(
     private val gitHubRepository: GitHubRepository,
     private val submitReviewUseCase: SubmitReviewUseCase,
-    private val approvePullRequestUseCase: com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase,
-    private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase,
-    private val mergePullRequestUseCase: com.issuetrax.app.domain.usecase.MergePullRequestUseCase,
-    private val createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase,
-    private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase,
-    private val getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase,
-    private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase,
-    private val rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
+    private val approvePullRequestUseCase: ApprovePullRequestUseCase,
+    private val closePullRequestUseCase: ClosePullRequestUseCase,
+    private val mergePullRequestUseCase: MergePullRequestUseCase,
+    private val createCommentUseCase: CreateCommentUseCase,
+    private val getCommitStatusUseCase: GetCommitStatusUseCase,
+    private val getWorkflowRunsUseCase: GetWorkflowRunsUseCase,
+    private val approveWorkflowRunUseCase: ApproveWorkflowRunUseCase,
+    private val rerunWorkflowUseCase: RerunWorkflowUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -427,7 +437,7 @@ class PRReviewViewModel @Inject constructor(
     private suspend fun approveAllWorkflowRuns(
         owner: String, 
         repo: String, 
-        waitingRuns: List<com.issuetrax.app.domain.entity.WorkflowRun>
+        waitingRuns: List<WorkflowRun>
     ) {
         _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
         
@@ -482,7 +492,7 @@ class PRReviewViewModel @Inject constructor(
      * 
      * API: POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
      */
-    private suspend fun approveWorkflowRunInternal(owner: String, repo: String, waitingRun: com.issuetrax.app.domain.entity.WorkflowRun) {
+    private suspend fun approveWorkflowRunInternal(owner: String, repo: String, waitingRun: WorkflowRun) {
         _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
         
         val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
@@ -546,8 +556,8 @@ data class PRReviewUiState(
     val viewMode: PRViewMode = PRViewMode.FILE_LIST,
     val selectedHunk: CodeHunk? = null,
     val selectedHunkIndex: Int = -1,
-    val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null,
-    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList()
+    val commitStatus: CommitStatus? = null,
+    val workflowRuns: List<WorkflowRun> = emptyList()
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {

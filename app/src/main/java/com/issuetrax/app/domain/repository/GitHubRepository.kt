@@ -1,14 +1,19 @@
 package com.issuetrax.app.domain.repository
 
+import com.issuetrax.app.domain.entity.CheckRun
 import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.FileDiff
+import com.issuetrax.app.domain.entity.Issue
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.domain.entity.Release
 import com.issuetrax.app.domain.entity.Repository
 import com.issuetrax.app.domain.entity.Review
+import com.issuetrax.app.domain.entity.User
+import com.issuetrax.app.domain.entity.WorkflowRun
 import kotlinx.coroutines.flow.Flow
 
 interface GitHubRepository {
-    suspend fun getCurrentUser(): Result<com.issuetrax.app.domain.entity.User>
+    suspend fun getCurrentUser(): Result<User>
     
     suspend fun getUserRepositories(): Flow<Result<List<Repository>>>
     
@@ -67,7 +72,7 @@ interface GitHubRepository {
         title: String,
         body: String?,
         assignees: List<String> = emptyList()
-    ): Result<com.issuetrax.app.domain.entity.Issue>
+    ): Result<Issue>
     
     suspend fun createIssueComment(
         owner: String,
@@ -90,14 +95,14 @@ interface GitHubRepository {
         owner: String,
         repo: String,
         ref: String
-    ): Result<List<com.issuetrax.app.domain.entity.CheckRun>>
+    ): Result<List<CheckRun>>
     
     suspend fun getWorkflowRuns(
         owner: String,
         repo: String,
         event: String? = null,
         status: String? = null
-    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
+    ): Result<List<WorkflowRun>>
     
     /**
      * Gets workflow runs for a specific pull request by filtering by head SHA.
@@ -111,7 +116,7 @@ interface GitHubRepository {
         owner: String,
         repo: String,
         headSha: String
-    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>>
+    ): Result<List<WorkflowRun>>
     
     /**
      * Approves a workflow run from a fork PR by a first-time contributor.
@@ -166,7 +171,7 @@ interface GitHubRepository {
     suspend fun getLatestRelease(
         owner: String,
         repo: String
-    ): Result<com.issuetrax.app.domain.entity.Release>
+    ): Result<Release>
 }
 
 data class ReviewComment(
