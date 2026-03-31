@@ -1,5 +1,7 @@
 package com.issuetrax.app.presentation.ui.pr_review.components
 
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +64,7 @@ fun AudioOverviewSheet(
 
     // Initialise TextToSpeech and tear it down when the sheet leaves composition.
     DisposableEffect(Unit) {
+        val mainHandler = Handler(Looper.getMainLooper())
         val tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 ttsRef.value?.language = Locale.getDefault()
@@ -72,16 +75,16 @@ fun AudioOverviewSheet(
 
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-                isPlaying = true
+                mainHandler.post { isPlaying = true }
             }
 
             override fun onDone(utteranceId: String?) {
-                isPlaying = false
+                mainHandler.post { isPlaying = false }
             }
 
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) {
-                isPlaying = false
+                mainHandler.post { isPlaying = false }
             }
         })
 
