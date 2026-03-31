@@ -1,18 +1,28 @@
 package com.issuetrax.app.data.repository
 
 import android.util.Log
-import com.issuetrax.app.data.api.ApiErrorParser
-import com.issuetrax.app.data.api.GitHubApiService
-import com.issuetrax.app.data.api.CreateReviewRequest
-import com.issuetrax.app.data.api.ReviewCommentRequest
+import com.issuetrax.app.data.api.CreateIssueCommentRequest
 import com.issuetrax.app.data.api.CreateIssueRequest
+import com.issuetrax.app.data.api.CreateReviewRequest
+import com.issuetrax.app.data.api.GitHubApiError
+import com.issuetrax.app.data.api.GitHubApiService
+import com.issuetrax.app.data.api.GraphQLRequest
+import com.issuetrax.app.data.api.MergePullRequestRequest
+import com.issuetrax.app.data.api.ReviewCommentRequest
+import com.issuetrax.app.data.api.UpdatePullRequestRequest
 import com.issuetrax.app.data.mapper.toDomain
+import com.issuetrax.app.domain.entity.CheckRun
+import com.issuetrax.app.domain.entity.CommitState
+import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.FileDiff
+import com.issuetrax.app.domain.entity.Issue
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.domain.entity.Release
 import com.issuetrax.app.domain.entity.Repository
 import com.issuetrax.app.domain.entity.Review
+import com.issuetrax.app.domain.entity.Status
 import com.issuetrax.app.domain.entity.User
-import com.issuetrax.app.domain.entity.Issue
+import com.issuetrax.app.domain.entity.WorkflowRun
 import com.issuetrax.app.domain.repository.AuthRepository
 import com.issuetrax.app.domain.repository.GitHubRepository
 import com.issuetrax.app.domain.repository.ReviewComment
@@ -189,7 +199,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to approve PR"
                 )
@@ -209,7 +219,7 @@ class GitHubRepositoryImpl @Inject constructor(
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
             
-            val request = com.issuetrax.app.data.api.UpdatePullRequestRequest(
+            val request = UpdatePullRequestRequest(
                 state = "closed"
             )
             
@@ -217,7 +227,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to close PR"
                 )
@@ -240,7 +250,7 @@ class GitHubRepositoryImpl @Inject constructor(
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
             
-            val request = com.issuetrax.app.data.api.MergePullRequestRequest(
+            val request = MergePullRequestRequest(
                 commit_title = commitTitle,
                 commit_message = commitMessage,
                 merge_method = mergeMethod
@@ -255,7 +265,7 @@ class GitHubRepositoryImpl @Inject constructor(
                     Result.failure(Exception("Failed to merge PR: ${result?.message ?: "Unknown error"}"))
                 }
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to merge PR"
                 )
@@ -305,9 +315,9 @@ class GitHubRepositoryImpl @Inject constructor(
                     Result.failure(Exception(error))
                 }
             } else {
-                val errorMessage = ApiErrorParser.parseErrorResponse(response)
-                Log.e(TAG, "Failed to create issue: $errorMessage")
-                Result.failure(Exception("Failed to create issue: $errorMessage"))
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(response, "Failed to create issue")
+                Log.e(TAG, errorMessage)
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception while creating issue", e)
@@ -342,8 +352,8 @@ class GitHubRepositoryImpl @Inject constructor(
                 }
             """.trimIndent()
             
-            val actorsRequest = com.issuetrax.app.data.api.GraphQLRequest(query = suggestedActorsQuery)
-            val actorsResponse = apiService.markPrReadyForReview("Bearer $token", actorsRequest)
+            val actorsRequest = GraphQLRequest(query = suggestedActorsQuery)
+            val actorsResponse = apiService.executeGraphQL("Bearer $token", actorsRequest)
             
             if (!actorsResponse.isSuccessful) {
                 Log.w(TAG, "Failed to get suggested actors: ${actorsResponse.code()}")
@@ -374,8 +384,8 @@ class GitHubRepositoryImpl @Inject constructor(
                 }
             """.trimIndent()
             
-            val issueRequest = com.issuetrax.app.data.api.GraphQLRequest(query = issueQuery)
-            val issueResponse = apiService.markPrReadyForReview("Bearer $token", issueRequest)
+            val issueRequest = GraphQLRequest(query = issueQuery)
+            val issueResponse = apiService.executeGraphQL("Bearer $token", issueRequest)
             
             if (!issueResponse.isSuccessful) {
                 Log.w(TAG, "Failed to get issue ID: ${issueResponse.code()}")
@@ -405,8 +415,8 @@ class GitHubRepositoryImpl @Inject constructor(
                 }
             """.trimIndent()
             
-            val assignRequest = com.issuetrax.app.data.api.GraphQLRequest(query = assignMutation)
-            val assignResponse = apiService.markPrReadyForReview("Bearer $token", assignRequest)
+            val assignRequest = GraphQLRequest(query = assignMutation)
+            val assignResponse = apiService.executeGraphQL("Bearer $token", assignRequest)
             
             if (assignResponse.isSuccessful) {
                 val assignData = assignResponse.body()
@@ -433,7 +443,7 @@ class GitHubRepositoryImpl @Inject constructor(
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
             
-            val request = com.issuetrax.app.data.api.CreateIssueCommentRequest(body = body)
+            val request = CreateIssueCommentRequest(body = body)
             
             val response = apiService.createIssueComment("Bearer $token", owner, repo, issueNumber, request)
             if (response.isSuccessful) {
@@ -450,7 +460,7 @@ class GitHubRepositoryImpl @Inject constructor(
         owner: String,
         repo: String,
         ref: String
-    ): Result<com.issuetrax.app.domain.entity.CommitStatus> {
+    ): Result<CommitStatus> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -458,10 +468,10 @@ class GitHubRepositoryImpl @Inject constructor(
             val response = apiService.getCommitStatus("Bearer $token", owner, repo, ref)
             if (response.isSuccessful) {
                 val statusDto = response.body()!!
-                val commitStatus = com.issuetrax.app.domain.entity.CommitStatus(
+                val commitStatus = CommitStatus(
                     state = statusDto.state.toCommitState(),
                     statuses = statusDto.statuses.map { status ->
-                        com.issuetrax.app.domain.entity.Status(
+                        Status(
                             state = status.state.toCommitState(),
                             context = status.context,
                             description = status.description,
@@ -483,7 +493,7 @@ class GitHubRepositoryImpl @Inject constructor(
         owner: String,
         repo: String,
         ref: String
-    ): Result<List<com.issuetrax.app.domain.entity.CheckRun>> {
+    ): Result<List<CheckRun>> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -506,7 +516,7 @@ class GitHubRepositoryImpl @Inject constructor(
         repo: String,
         event: String?,
         status: String?
-    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>> {
+    ): Result<List<WorkflowRun>> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -535,7 +545,7 @@ class GitHubRepositoryImpl @Inject constructor(
         owner: String,
         repo: String,
         headSha: String
-    ): Result<List<com.issuetrax.app.domain.entity.WorkflowRun>> {
+    ): Result<List<WorkflowRun>> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -582,7 +592,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to approve workflow run"
                 )
@@ -612,7 +622,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to re-run workflow"
                 )
@@ -642,7 +652,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to re-run failed jobs"
                 )
@@ -690,12 +700,12 @@ class GitHubRepositoryImpl @Inject constructor(
                 }
             """.trimIndent()
             
-            val request = com.issuetrax.app.data.api.GraphQLRequest(
+            val request = GraphQLRequest(
                 query = mutation,
                 variables = mapOf("pullRequestId" to nodeId)
             )
             
-            val response = apiService.markPrReadyForReview("Bearer $token", request)
+            val response = apiService.executeGraphQL("Bearer $token", request)
             
             if (response.isSuccessful) {
                 val graphqlResponse = response.body()
@@ -712,7 +722,7 @@ class GitHubRepositoryImpl @Inject constructor(
                     Result.failure(Exception("Failed to mark PR as ready for review"))
                 }
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to mark PR as ready for review"
                 )
@@ -726,7 +736,7 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun getLatestRelease(
         owner: String,
         repo: String
-    ): Result<com.issuetrax.app.domain.entity.Release> {
+    ): Result<Release> {
         return try {
             val token = authRepository.getAccessToken()
                 ?: return Result.failure(Exception("No access token"))
@@ -737,7 +747,7 @@ class GitHubRepositoryImpl @Inject constructor(
                     ?: return Result.failure(Exception("No release found"))
                 Result.success(releaseDto.toDomain())
             } else {
-                val errorMessage = com.issuetrax.app.data.api.GitHubApiError.getDetailedErrorMessage(
+                val errorMessage = GitHubApiError.getDetailedErrorMessage(
                     response,
                     "Failed to get latest release"
                 )
@@ -748,13 +758,13 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
     
-    private fun String.toCommitState(): com.issuetrax.app.domain.entity.CommitState {
+    private fun String.toCommitState(): CommitState {
         return when (this.lowercase()) {
-            "pending" -> com.issuetrax.app.domain.entity.CommitState.PENDING
-            "success" -> com.issuetrax.app.domain.entity.CommitState.SUCCESS
-            "failure" -> com.issuetrax.app.domain.entity.CommitState.FAILURE
-            "error" -> com.issuetrax.app.domain.entity.CommitState.ERROR
-            else -> com.issuetrax.app.domain.entity.CommitState.PENDING
+            "pending" -> CommitState.PENDING
+            "success" -> CommitState.SUCCESS
+            "failure" -> CommitState.FAILURE
+            "error" -> CommitState.ERROR
+            else -> CommitState.PENDING
         }
     }
 }
