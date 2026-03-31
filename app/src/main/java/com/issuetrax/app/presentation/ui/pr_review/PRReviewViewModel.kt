@@ -2,12 +2,14 @@ package com.issuetrax.app.presentation.ui.pr_review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.issuetrax.app.domain.entity.AudioOverviewScript
 import com.issuetrax.app.domain.entity.CodeHunk
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
 import com.issuetrax.app.domain.repository.GitHubRepository
-import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
+import com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase
 import com.issuetrax.app.domain.usecase.ReviewEvent
+import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +37,8 @@ class PRReviewViewModel @Inject constructor(
     private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase,
     private val getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase,
     private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase,
-    private val rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
+    private val rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase,
+    private val generateAudioOverviewUseCase: GenerateAudioOverviewUseCase,
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(PRReviewUiState())
@@ -532,6 +535,29 @@ class PRReviewViewModel @Inject constructor(
             )
         }
     }
+
+    /**
+     * Generates a podcast-style audio overview script for the current pull request
+     * and reveals the [AudioOverviewSheet].
+     *
+     * If no pull request is loaded yet, this is a no-op.
+     */
+    fun generateAudioOverview() {
+        val pullRequest = _uiState.value.pullRequest ?: return
+        val files = _uiState.value.files
+        val script = generateAudioOverviewUseCase(pullRequest, files)
+        _uiState.value = _uiState.value.copy(
+            audioOverviewScript = script,
+            showAudioOverview = true,
+        )
+    }
+
+    /**
+     * Hides the audio overview sheet.
+     */
+    fun dismissAudioOverview() {
+        _uiState.value = _uiState.value.copy(showAudioOverview = false)
+    }
 }
 
 data class PRReviewUiState(
@@ -547,7 +573,9 @@ data class PRReviewUiState(
     val selectedHunk: CodeHunk? = null,
     val selectedHunkIndex: Int = -1,
     val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null,
-    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList()
+    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList(),
+    val audioOverviewScript: AudioOverviewScript? = null,
+    val showAudioOverview: Boolean = false,
 ) {
     val currentFile: FileDiff?
         get() = if (currentFileIndex >= 0 && currentFileIndex < files.size) {

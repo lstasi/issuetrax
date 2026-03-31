@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -44,6 +45,7 @@ import com.issuetrax.app.presentation.ui.common.components.ErrorText
 import com.issuetrax.app.presentation.ui.common.gesture.GestureCallbacks
 import com.issuetrax.app.presentation.ui.common.gesture.GestureDetectionBox
 import com.issuetrax.app.presentation.ui.common.markdown.MarkdownText
+import com.issuetrax.app.presentation.ui.pr_review.components.AudioOverviewSheet
 import com.issuetrax.app.presentation.ui.pr_review.components.FileListView
 import com.issuetrax.app.presentation.ui.pr_review.components.HunkDetailView
 import com.issuetrax.app.presentation.ui.pr_review.components.InlineDiffView
@@ -120,6 +122,16 @@ fun PRReviewScreen(
                             imageVector = Icons.Default.Code,
                             contentDescription = if (showFileReview) "Back to repo review" else "Open file review"
                         )
+                    }
+
+                    // Audio overview button — only shown when a PR is loaded
+                    if (uiState.pullRequest != null) {
+                        IconButton(onClick = { viewModel.generateAudioOverview() }) {
+                            Icon(
+                                imageVector = Icons.Default.GraphicEq,
+                                contentDescription = "Audio overview",
+                            )
+                        }
                     }
 
                     // PR Action Toolbar
@@ -240,6 +252,16 @@ fun PRReviewScreen(
                     }
                 }
             }
+        }
+    }
+
+    // Audio overview bottom sheet
+    if (uiState.showAudioOverview) {
+        uiState.audioOverviewScript?.let { script ->
+            AudioOverviewSheet(
+                script = script,
+                onDismiss = { viewModel.dismissAudioOverview() },
+            )
         }
     }
 }
