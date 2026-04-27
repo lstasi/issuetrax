@@ -58,6 +58,7 @@ class PRReviewIntegrationTest {
     private lateinit var getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
     private lateinit var approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
     private lateinit var rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
+    private lateinit var generateAudioOverviewUseCase: com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -73,6 +74,7 @@ class PRReviewIntegrationTest {
         getWorkflowRunsUseCase = mockk()
         approveWorkflowRunUseCase = mockk()
         rerunWorkflowUseCase = mockk()
+        generateAudioOverviewUseCase = com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -83,7 +85,8 @@ class PRReviewIntegrationTest {
             getCommitStatusUseCase,
             getWorkflowRunsUseCase,
             approveWorkflowRunUseCase,
-            rerunWorkflowUseCase
+            rerunWorkflowUseCase,
+            generateAudioOverviewUseCase,
         )
     }
     

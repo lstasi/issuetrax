@@ -58,6 +58,7 @@ class PRReviewViewModelTest {
     private lateinit var getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
     private lateinit var approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
     private lateinit var rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
+    private lateinit var generateAudioOverviewUseCase: com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -73,6 +74,7 @@ class PRReviewViewModelTest {
         getWorkflowRunsUseCase = mockk()
         approveWorkflowRunUseCase = mockk()
         rerunWorkflowUseCase = mockk()
+        generateAudioOverviewUseCase = com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -83,7 +85,8 @@ class PRReviewViewModelTest {
             getCommitStatusUseCase,
             getWorkflowRunsUseCase,
             approveWorkflowRunUseCase,
-            rerunWorkflowUseCase
+            rerunWorkflowUseCase,
+            generateAudioOverviewUseCase,
         )
     }
     
@@ -107,6 +110,8 @@ class PRReviewViewModelTest {
         assertEquals("View mode should be FILE_LIST", PRViewMode.FILE_LIST, state.viewMode)
         assertNull("Selected hunk should be null", state.selectedHunk)
         assertEquals("Selected hunk index should be -1", -1, state.selectedHunkIndex)
+        assertNull("Audio overview script should be null", state.audioOverviewScript)
+        assertFalse("Show audio overview should be false", state.showAudioOverview)
     }
     
     @Test

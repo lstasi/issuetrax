@@ -41,6 +41,7 @@ class WorkflowApprovalTest {
     private lateinit var getWorkflowRunsUseCase: GetWorkflowRunsUseCase
     private lateinit var approveWorkflowRunUseCase: ApproveWorkflowRunUseCase
     private lateinit var rerunWorkflowUseCase: RerunWorkflowUseCase
+    private lateinit var generateAudioOverviewUseCase: com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase
     private lateinit var viewModel: PRReviewViewModel
     
     @Before
@@ -56,6 +57,7 @@ class WorkflowApprovalTest {
         getWorkflowRunsUseCase = mockk()
         approveWorkflowRunUseCase = mockk()
         rerunWorkflowUseCase = mockk()
+        generateAudioOverviewUseCase = com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase()
         viewModel = PRReviewViewModel(
             gitHubRepository,
             submitReviewUseCase,
@@ -66,7 +68,8 @@ class WorkflowApprovalTest {
             getCommitStatusUseCase,
             getWorkflowRunsUseCase,
             approveWorkflowRunUseCase,
-            rerunWorkflowUseCase
+            rerunWorkflowUseCase,
+            generateAudioOverviewUseCase,
         )
     }
     
