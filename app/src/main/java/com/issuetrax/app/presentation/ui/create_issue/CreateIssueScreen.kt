@@ -188,8 +188,8 @@ fun CreateIssueScreen(
             }
 
             // Error message
-            if (uiState.error != null) {
-                ErrorText(text = uiState.error!!)
+            uiState.error?.let { error ->
+                ErrorText(text = error)
             }
         }
     }
