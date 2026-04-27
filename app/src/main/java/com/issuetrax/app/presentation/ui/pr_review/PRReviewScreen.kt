@@ -51,6 +51,7 @@ import com.issuetrax.app.presentation.ui.pr_review.components.HunkDetailView
 import com.issuetrax.app.presentation.ui.pr_review.components.InlineDiffView
 import com.issuetrax.app.presentation.ui.pr_review.components.PRActionToolbar
 import com.issuetrax.app.presentation.ui.pr_review.components.PRMetadataCard
+import com.issuetrax.app.presentation.ui.pr_review.components.ReviewSubmissionDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +67,8 @@ fun PRReviewScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var showFileReview by rememberSaveable { mutableStateOf(false) }
-    
+    var showReviewDialog by rememberSaveable { mutableStateOf(false) }
+
     // Load pull request data when screen launches
     LaunchedEffect(owner, repo, prNumber) {
         viewModel.loadPullRequest(owner, repo, prNumber)
@@ -81,6 +83,13 @@ fun PRReviewScreen(
                 snackbarHostState.showSnackbar(message)
                 viewModel.clearActionMessage()
             }
+        }
+    }
+
+    // Navigate back when review is submitted successfully
+    LaunchedEffect(uiState.reviewSubmitted) {
+        if (uiState.reviewSubmitted) {
+            onNavigateBack()
         }
     }
 
@@ -130,6 +139,17 @@ fun PRReviewScreen(
                             Icon(
                                 imageVector = Icons.Default.GraphicEq,
                                 contentDescription = "Audio overview",
+                            )
+                        }
+                    }
+
+                    // Submit review button — only shown when a PR is loaded
+                    if (uiState.pullRequest != null) {
+                        IconButton(onClick = { showReviewDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.RateReview,
+                                contentDescription = "Submit review for PR #$prNumber",
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
@@ -263,6 +283,18 @@ fun PRReviewScreen(
                 onDismiss = { viewModel.dismissAudioOverview() },
             )
         }
+    }
+
+    // Review submission dialog
+    if (showReviewDialog) {
+        ReviewSubmissionDialog(
+            prNumber = prNumber,
+            isSubmitting = uiState.isSubmittingReview,
+            onDismiss = { showReviewDialog = false },
+            onSubmit = { event, body ->
+                viewModel.submitReview(owner, repo, prNumber, body, event)
+            },
+        )
     }
 }
 
