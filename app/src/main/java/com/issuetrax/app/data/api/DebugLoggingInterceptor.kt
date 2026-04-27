@@ -53,7 +53,13 @@ class DebugLoggingInterceptor @Inject constructor(
     }
     
     private fun captureRequest(request: Request, requestId: String, timestamp: Long): HttpRequestInfo {
-        val headers = request.headers.toMultimap().mapValues { it.value.joinToString(", ") }
+        val headers = request.headers.toMultimap().mapValues { (key, values) ->
+            if (key.equals("Authorization", ignoreCase = true)) {
+                "[REDACTED]"
+            } else {
+                values.joinToString(", ")
+            }
+        }
         // Note: We don't capture the request body content to avoid consuming it.
         // The body is only available once and reading it here would prevent the actual request.
         val bodyInfo = request.body?.contentLength()?.let { length ->

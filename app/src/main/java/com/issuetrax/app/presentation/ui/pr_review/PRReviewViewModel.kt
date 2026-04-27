@@ -58,13 +58,20 @@ class PRReviewViewModel @Inject constructor(
             // Load PR details
             val prResult = gitHubRepository.getPullRequest(owner, repo, number)
             if (prResult.isSuccess) {
-                val pullRequest = prResult.getOrThrow()
+                val pullRequest = prResult.getOrNull()
+                    ?: run {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Failed to load pull request: unexpected null result"
+                        )
+                        return@launch
+                    }
                 _uiState.value = _uiState.value.copy(pullRequest = pullRequest)
                 
                 // Load PR files
                 val filesResult = gitHubRepository.getPullRequestFiles(owner, repo, number)
                 if (filesResult.isSuccess) {
-                    val files = filesResult.getOrThrow()
+                    val files = filesResult.getOrNull() ?: emptyList()
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         files = files,
