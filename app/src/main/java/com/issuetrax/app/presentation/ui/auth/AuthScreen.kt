@@ -3,6 +3,7 @@ package com.issuetrax.app.presentation.ui.auth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +14,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -32,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.issuetrax.app.R
 import com.issuetrax.app.presentation.ui.common.components.ErrorText
+import android.content.Intent
+import android.net.Uri
 
 @Composable
 fun AuthScreen(
@@ -40,13 +46,14 @@ fun AuthScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var token by remember { mutableStateOf("") }
-    
+    val context = LocalContext.current
+
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
             onAuthSuccess()
         }
     }
-    
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -63,23 +70,34 @@ fun AuthScreen(
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center
             )
-            
+
             Text(
                 text = stringResource(R.string.auth_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
-                text = "Enter your GitHub Personal Access Token below. You can create one at github.com/settings/tokens",
+                text = "Enter your GitHub Personal Access Token below.",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
+            // Create Token button
+            TextButton(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/settings/tokens/new?description=Issuetrax%20Android%20App&scopes=repo,user"))
+                    context.startActivity(intent)
+                },
+                enabled = !uiState.isLoading
+            ) {
+                Text("Create Token on GitHub →")
+            }
+
             OutlinedTextField(
                 value = token,
                 onValueChange = { token = it },
@@ -101,14 +119,14 @@ fun AuthScreen(
                 enabled = !uiState.isLoading,
                 isError = uiState.error != null
             )
-            
+
             uiState.error?.let { error ->
                 ErrorText(
                     text = error,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            
+
             Button(
                 onClick = {
                     viewModel.authenticate(token)
