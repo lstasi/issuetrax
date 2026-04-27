@@ -58,6 +58,10 @@ class AuthRepositoryImpl @Inject constructor(
         return encryptedPrefs.getString(ACCESS_TOKEN_KEY, null)
     }
     
+    override fun getAccessTokenBlocking(): String? {
+        return encryptedPrefs.getString(ACCESS_TOKEN_KEY, null)
+    }
+
     override suspend fun clearAccessToken() {
         encryptedPrefs.edit().remove(ACCESS_TOKEN_KEY).apply()
         _isAuthenticatedFlow.value = false
@@ -65,16 +69,5 @@ class AuthRepositoryImpl @Inject constructor(
     
     override fun isAuthenticated(): Flow<Boolean> {
         return _isAuthenticatedFlow.asStateFlow()
-    }
-    
-    override suspend fun refreshToken(): Result<String> {
-        // GitHub Personal Access Tokens don't expire (unless configured to do so)
-        // Just return the current token
-        val currentToken = getAccessToken()
-        return if (currentToken != null) {
-            Result.success(currentToken)
-        } else {
-            Result.failure(Exception("No token to refresh"))
-        }
     }
 }

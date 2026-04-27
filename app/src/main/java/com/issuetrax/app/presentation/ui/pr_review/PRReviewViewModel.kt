@@ -4,10 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.issuetrax.app.domain.entity.AudioOverviewScript
 import com.issuetrax.app.domain.entity.CodeHunk
+import com.issuetrax.app.domain.entity.CommitStatus
 import com.issuetrax.app.domain.entity.FileDiff
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.domain.entity.WorkflowRun
 import com.issuetrax.app.domain.repository.GitHubRepository
+import com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase
+import com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase
+import com.issuetrax.app.domain.usecase.ClosePullRequestUseCase
+import com.issuetrax.app.domain.usecase.CreateCommentUseCase
 import com.issuetrax.app.domain.usecase.GenerateAudioOverviewUseCase
+import com.issuetrax.app.domain.usecase.GetCommitStatusUseCase
+import com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase
+import com.issuetrax.app.domain.usecase.MergePullRequestUseCase
+import com.issuetrax.app.domain.usecase.RerunWorkflowUseCase
 import com.issuetrax.app.domain.usecase.ReviewEvent
 import com.issuetrax.app.domain.usecase.SubmitReviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,14 +40,14 @@ enum class PRViewMode {
 class PRReviewViewModel @Inject constructor(
     private val gitHubRepository: GitHubRepository,
     private val submitReviewUseCase: SubmitReviewUseCase,
-    private val approvePullRequestUseCase: com.issuetrax.app.domain.usecase.ApprovePullRequestUseCase,
-    private val closePullRequestUseCase: com.issuetrax.app.domain.usecase.ClosePullRequestUseCase,
-    private val mergePullRequestUseCase: com.issuetrax.app.domain.usecase.MergePullRequestUseCase,
-    private val createCommentUseCase: com.issuetrax.app.domain.usecase.CreateCommentUseCase,
-    private val getCommitStatusUseCase: com.issuetrax.app.domain.usecase.GetCommitStatusUseCase,
-    private val getWorkflowRunsUseCase: com.issuetrax.app.domain.usecase.GetWorkflowRunsUseCase,
-    private val approveWorkflowRunUseCase: com.issuetrax.app.domain.usecase.ApproveWorkflowRunUseCase,
-    private val rerunWorkflowUseCase: com.issuetrax.app.domain.usecase.RerunWorkflowUseCase,
+    private val approvePullRequestUseCase: ApprovePullRequestUseCase,
+    private val closePullRequestUseCase: ClosePullRequestUseCase,
+    private val mergePullRequestUseCase: MergePullRequestUseCase,
+    private val createCommentUseCase: CreateCommentUseCase,
+    private val getCommitStatusUseCase: GetCommitStatusUseCase,
+    private val getWorkflowRunsUseCase: GetWorkflowRunsUseCase,
+    private val approveWorkflowRunUseCase: ApproveWorkflowRunUseCase,
+    private val rerunWorkflowUseCase: RerunWorkflowUseCase,
     private val generateAudioOverviewUseCase: GenerateAudioOverviewUseCase,
 ) : ViewModel() {
     
@@ -51,13 +61,20 @@ class PRReviewViewModel @Inject constructor(
             // Load PR details
             val prResult = gitHubRepository.getPullRequest(owner, repo, number)
             if (prResult.isSuccess) {
-                val pullRequest = prResult.getOrThrow()
+                val pullRequest = prResult.getOrNull()
+                    ?: run {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Failed to load pull request: unexpected null result"
+                        )
+                        return@launch
+                    }
                 _uiState.value = _uiState.value.copy(pullRequest = pullRequest)
                 
                 // Load PR files
                 val filesResult = gitHubRepository.getPullRequestFiles(owner, repo, number)
                 if (filesResult.isSuccess) {
-                    val files = filesResult.getOrThrow()
+                    val files = filesResult.getOrNull() ?: emptyList()
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         files = files,
@@ -430,7 +447,7 @@ class PRReviewViewModel @Inject constructor(
     private suspend fun approveAllWorkflowRuns(
         owner: String, 
         repo: String, 
-        waitingRuns: List<com.issuetrax.app.domain.entity.WorkflowRun>
+        waitingRuns: List<WorkflowRun>
     ) {
         _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
         
@@ -485,7 +502,7 @@ class PRReviewViewModel @Inject constructor(
      * 
      * API: POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve
      */
-    private suspend fun approveWorkflowRunInternal(owner: String, repo: String, waitingRun: com.issuetrax.app.domain.entity.WorkflowRun) {
+    private suspend fun approveWorkflowRunInternal(owner: String, repo: String, waitingRun: WorkflowRun) {
         _uiState.value = _uiState.value.copy(isSubmittingReview = true, error = null)
         
         val result = approveWorkflowRunUseCase(owner, repo, waitingRun.id)
@@ -572,8 +589,8 @@ data class PRReviewUiState(
     val viewMode: PRViewMode = PRViewMode.FILE_LIST,
     val selectedHunk: CodeHunk? = null,
     val selectedHunkIndex: Int = -1,
-    val commitStatus: com.issuetrax.app.domain.entity.CommitStatus? = null,
-    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList(),
+    val commitStatus: CommitStatus? = null,
+    val workflowRuns: List<WorkflowRun> = emptyList(),
     val audioOverviewScript: AudioOverviewScript? = null,
     val showAudioOverview: Boolean = false,
 ) {

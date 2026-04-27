@@ -13,6 +13,7 @@ import com.issuetrax.app.data.api.model.ReleaseAssetDto
 import com.issuetrax.app.domain.entity.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 fun UserDto.toDomain(): User {
     return User(
@@ -213,8 +214,13 @@ fun ReleaseAssetDto.toDomain(): ReleaseAsset {
 private fun parseDateTime(dateTimeString: String): LocalDateTime {
     return try {
         LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
-    } catch (e: Exception) {
-        // Fallback for GitHub's date format
-        LocalDateTime.parse(dateTimeString.replace("Z", ""), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    } catch (e: DateTimeParseException) {
+        try {
+            // Fallback for GitHub's date format
+            LocalDateTime.parse(dateTimeString.replace("Z", ""), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        } catch (e2: DateTimeParseException) {
+            // Final fallback: return epoch start to avoid crashing the entire mapping
+            LocalDateTime.of(1970, 1, 1, 0, 0, 0)
+        }
     }
 }

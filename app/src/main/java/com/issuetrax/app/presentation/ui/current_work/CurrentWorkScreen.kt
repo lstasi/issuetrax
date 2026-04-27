@@ -160,7 +160,9 @@ fun CurrentWorkScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        ErrorText(text = uiState.error!!)
+                        uiState.error?.let { error ->
+                            ErrorText(text = error)
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { viewModel.refreshPullRequests() }) {
                             Text(stringResource(R.string.retry))

@@ -7,7 +7,9 @@ import com.issuetrax.app.domain.entity.CheckRunConclusion
 import com.issuetrax.app.domain.entity.CheckRunStatus
 import com.issuetrax.app.domain.entity.CheckRunSummary
 import com.issuetrax.app.domain.entity.PullRequest
+import com.issuetrax.app.domain.entity.Release
 import com.issuetrax.app.domain.entity.Repository
+import com.issuetrax.app.domain.entity.WorkflowRun
 import com.issuetrax.app.domain.repository.GitHubRepository
 import com.issuetrax.app.domain.usecase.GetPullRequestsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -187,7 +189,7 @@ class CurrentWorkViewModel @Inject constructor(
         return when (_uiState.value.sortBy) {
             PRSortOrder.CREATED -> pullRequests.sortedByDescending { it.createdAt }
             PRSortOrder.UPDATED -> pullRequests.sortedByDescending { it.updatedAt }
-            PRSortOrder.COMMENTS -> pullRequests.sortedByDescending { it.commits ?: 0 } // Using commits as proxy since we don't have comments count
+            PRSortOrder.COMMENTS -> pullRequests.sortedByDescending { it.commits ?: 0 }
         }
     }
     
@@ -269,9 +271,9 @@ data class CurrentWorkUiState(
     val filter: PRFilter = PRFilter.OPEN,
     val sortBy: PRSortOrder = PRSortOrder.UPDATED,
     val error: String? = null,
-    val latestRelease: com.issuetrax.app.domain.entity.Release? = null,
+    val latestRelease: Release? = null,
     val showBuildActionsSheet: Boolean = false,
     val selectedPrForBuildActions: PullRequest? = null,
-    val workflowRuns: List<com.issuetrax.app.domain.entity.WorkflowRun> = emptyList(),
+    val workflowRuns: List<WorkflowRun> = emptyList(),
     val isLoadingWorkflowRuns: Boolean = false
 )

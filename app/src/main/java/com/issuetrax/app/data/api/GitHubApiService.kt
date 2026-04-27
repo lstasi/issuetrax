@@ -171,11 +171,10 @@ interface GitHubApiService {
     ): Response<Unit>
     
     /**
-     * Mark a draft pull request as ready for review using GitHub GraphQL API.
-     * This is required because GitHub REST API doesn't support this operation directly.
+     * Executes a GraphQL query or mutation against the GitHub GraphQL API.
      */
     @POST("graphql")
-    suspend fun markPrReadyForReview(
+    suspend fun executeGraphQL(
         @Header("Authorization") authorization: String,
         @Body request: GraphQLRequest
     ): Response<GraphQLResponse>
