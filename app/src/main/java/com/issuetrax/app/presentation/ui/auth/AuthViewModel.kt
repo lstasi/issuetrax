@@ -34,7 +34,16 @@ class AuthViewModel @Inject constructor(
     fun authenticate(authCode: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
+            // Validate GitHub token format
+            if (!isValidGitHubToken(authCode)) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "Invalid GitHub token format. Token should start with ghp_, gho_, ghu_, ghs_, or ghr_"
+                )
+                return@launch
+            }
+
             val result = authenticateUseCase(authCode)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(
@@ -48,6 +57,17 @@ class AuthViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun isValidGitHubToken(token: String): Boolean {
+        // GitHub Personal Access Tokens have specific prefixes:
+        // ghp_ - Personal Access Token
+        // gho_ - OAuth Access Token
+        // ghu_ - User-to-server token
+        // ghs_ - Server-to-server token
+        // ghr_ - Refresh token
+        val validPrefixes = listOf("ghp_", "gho_", "ghu_", "ghs_", "ghr_")
+        return validPrefixes.any { token.startsWith(it) } && token.length >= 40
     }
     
     fun clearError() {

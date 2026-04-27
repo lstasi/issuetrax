@@ -102,9 +102,9 @@ fun AuthScreen(
                 isError = uiState.error != null
             )
             
-            if (uiState.error != null) {
+            uiState.error?.let { error ->
                 ErrorText(
-                    text = uiState.error!!,
+                    text = error,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
