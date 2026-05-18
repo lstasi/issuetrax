@@ -181,7 +181,7 @@ dependencies {
     implementation("androidx.browser:browser:1.6.0")
 
     // Material Components (needed for Theme.MaterialComponents parent and material attributes)
-    implementation("com.google.android.material:material:1.13.0")
+    implementation("com.google.android.material:material:1.14.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
